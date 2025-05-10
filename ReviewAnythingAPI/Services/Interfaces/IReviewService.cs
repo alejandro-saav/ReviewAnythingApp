@@ -9,5 +9,7 @@ public interface IReviewService
     
     Task<IEnumerable<ReviewResponseDto>> GetAllReviewsByItemIdAsync(int itemId);
 
-    Task<ReviewResponseDto> CreateReviewAsync(ReviewCreateRequestDto review, int userId);
+    Task<ReviewResponseDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId);
+    
+    Task<ReviewResponseDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto);
 }

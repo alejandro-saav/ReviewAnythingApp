@@ -19,4 +19,9 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
     {
         return await _context.Reviews.Where(r => r.ItemId == itemId).ToListAsync();
     }
+
+    public async Task<Review> GetReviewByUserIdAndItemIdAsync(int userId, int itemId)
+    {
+        return await _context.Reviews.FirstOrDefaultAsync(r => r.UserId == userId && r.ItemId == itemId);
+    }
 }

@@ -25,4 +25,10 @@ public class ReviewTagRepository : Repository<ReviewTag>, IReviewTagRepository
         await _context.SaveChangesAsync();
         return reviewTags;
     }
+
+    public async Task<bool> DeleteAllTagsByReviewIdAsync(int reviewId)
+    {
+        var rowsAffected = await _context.ReviewTags.Where(rt => rt.ReviewId == reviewId).ExecuteDeleteAsync();
+        return rowsAffected > 0;
+    }
 }
