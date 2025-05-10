@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewAnythingAPI", "ReviewAnythingAPI\ReviewAnythingAPI.csproj", "{19EA785E-F242-4910-B051-B226F52B457B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{19EA785E-F242-4910-B051-B226F52B457B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19EA785E-F242-4910-B051-B226F52B457B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19EA785E-F242-4910-B051-B226F52B457B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19EA785E-F242-4910-B051-B226F52B457B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
