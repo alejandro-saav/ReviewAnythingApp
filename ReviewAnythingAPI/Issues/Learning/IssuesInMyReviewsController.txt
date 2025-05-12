@@ -1,0 +1,17 @@
+1. Inconsistency in route parameters vs body parameters:
+    In my CreateReviewAsync and UpdateReviewAsync methods, I have userId in the route but don't use it, instead  extracting it from the JWT token. The route parameter creates confusion.
+2. Missing validation in GetUserReviewsByUserId and GetItemReviewByItemId:
+    These methods don't have any error handling or validation.
+3. Incorrect HTTP verb for update: I'm using HttpPost for updating a review, but this should be a HttpPut.
+4. Inconsistent async handling: My get methods are marked async but don't use await and don't return Task<IActionResult>.
+5. Missing route parameter usage in update method:
+    The {reviewId} in my update route isn't captured or used in the method.
+6. Inconsistent error handling strategies:
+    Some methods return BadRequest(ex.Message) for all exceptions while others have more specialized handling.
+7. Direct exposure of exception messages:
+    Returning exception messages directly to the client can expose internal details and potentially security information.
+8. Return type for list methods:
+    My GetAllReviewsByUserIdAsync methods don't appear to be returning Tasks based on how im using them.
+9. Ambiguous route naming: 
+    The difference between routes like "users/{userId}/reviews" and "users/{userId}/reviews/{reviewId}" isnt immediately clear for their purpose.
+10. Missing versioning: No API versioning strategy is present.

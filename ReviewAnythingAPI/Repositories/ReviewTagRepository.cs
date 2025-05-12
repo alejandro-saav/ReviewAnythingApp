@@ -22,7 +22,7 @@ public class ReviewTagRepository : Repository<ReviewTag>, IReviewTagRepository
     public async Task<IEnumerable<ReviewTag>> AddRangeAsync(IEnumerable<ReviewTag> reviewTags)
     {
         await _context.ReviewTags.AddRangeAsync(reviewTags);
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
         return reviewTags;
     }
 

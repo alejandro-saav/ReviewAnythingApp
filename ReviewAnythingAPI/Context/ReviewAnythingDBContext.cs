@@ -56,7 +56,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
   // ReviewTags Constraints
   modelBuilder.Entity<ReviewTag>().HasKey(rt => new { rt.ReviewId, rt.TagId });
   
-  modelBuilder.Entity<ReviewTag>().HasOne(rt => rt.TagReview).WithMany(r => r.ReviewTags).HasForeignKey(rt => rt.ReviewId).OnDelete(DeleteBehavior.Restrict);
+  modelBuilder.Entity<ReviewTag>().HasOne(rt => rt.TagReview).WithMany(r => r.ReviewTags).HasForeignKey(rt => rt.ReviewId).OnDelete(DeleteBehavior.Cascade);
   
   modelBuilder.Entity<ReviewTag>().HasOne(rt => rt.Tag).WithMany(t => t.ReviewTags).HasForeignKey(rt => rt.TagId).OnDelete(DeleteBehavior.Restrict);
   

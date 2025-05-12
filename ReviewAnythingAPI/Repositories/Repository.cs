@@ -28,14 +28,14 @@ public class Repository<T> : IRepository<T> where T : class
     public async Task<T> AddAsync(T entity)
     {
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
         return entity;
     }
 
     public async Task<T> UpdateAsync(T entity)
     {
         _context.Entry(entity).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
         return entity;
     }
 
@@ -44,7 +44,7 @@ public class Repository<T> : IRepository<T> where T : class
         var entity = await _dbSet.FindAsync(id);
         if (entity == null) return false;
         _dbSet.Remove(entity);
-        await _context.SaveChangesAsync();
+        //await _context.SaveChangesAsync();
         return true;
     }
 }

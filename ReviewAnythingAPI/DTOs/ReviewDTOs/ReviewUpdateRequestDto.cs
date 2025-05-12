@@ -4,8 +4,8 @@ namespace ReviewAnythingAPI.DTOs.ReviewDTOs;
 
 public class ReviewUpdateRequestDto
 {
-    [Required]
-    public int ReviewId { get; set; }
+    //[Required]
+    //public int ReviewId { get; set; }
     
     [Required]
     [MaxLength(100)]
@@ -22,6 +22,7 @@ public class ReviewUpdateRequestDto
     [Required]
     public int ItemId { get; set; }
     
+    [MaxLength(200)]
     public string Tags { get; set; }
     
     [Required]

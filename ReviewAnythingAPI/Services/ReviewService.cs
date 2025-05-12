@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
@@ -113,6 +114,9 @@ public class ReviewService : IReviewService
                 {
                     await _reviewTagRepository.AddRangeAsync(reviewTagsToAdd);
                 }
+                
+                // Save Changes
+                await _dbContext.SaveChangesAsync();
 
                 // Commit transaction
                 await transaction.CommitAsync();
@@ -126,6 +130,8 @@ public class ReviewService : IReviewService
                     LastEditedDate = createdReview.LastEditDate,
                     Rating = createdReview.Rating,
                     ItemId = createdReview.ItemId,
+                    Tags = reviewCreateRequestDto.Tags,
+                    ReviewVotes = 0
                 };
             }
             catch (Exception ex)
@@ -135,10 +141,10 @@ public class ReviewService : IReviewService
                 throw;
             }
         }
-        catch (ArgumentException ex)
+        catch (UnauthorizedAccessException ex)
         {
             // Log the validation error
-            _logger.LogError(ex, "Validation error in CreateReviewAsync: {Message}", ex.Message);
+            _logger.LogError(ex, "Userid does not match with review userid: {Message}", ex.Message);
             throw;
         }
         catch (InvalidOperationException ex)
@@ -154,32 +160,29 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<ReviewUpdateRequestDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto,
-        int userId)
+    public async Task<ReviewResponseDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto,
+        int userId, int reviewId)
     {
         try
         {
             // using transaction to ensure data consistency
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
                 // review exists
-                var reviewExists = await _reviewRepository.GetByIdAsync(reviewUpdateRequestDto.ReviewId);
+                var reviewExists = await _reviewRepository.GetByIdAsync(reviewId);
                 if (reviewExists == null)
                 {
-                    throw new ArgumentException($"Review with ID {reviewUpdateRequestDto.ReviewId} not found");
+                    throw new ArgumentException($"Review with ID {reviewId} not found");
                 }
 
                 // Does review match the userId
                 if (userId != reviewExists.UserId)
                 {
                     throw new ArgumentException(
-                        $"Review with ID {reviewUpdateRequestDto.ReviewId} does not belong to user");
+                        $"Review with ID {reviewId} does not belong to user");
                 }
-
-                // GetTags review
-                var tagsFromPreviousReview =
-                    await _reviewTagRepository.GetTagsByReviewIdAsync(reviewUpdateRequestDto.ReviewId);
+                
 
                 var newTags = string.IsNullOrWhiteSpace(reviewUpdateRequestDto.Tags)
                     ? new List<string>()
@@ -187,26 +190,12 @@ public class ReviewService : IReviewService
                         .Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(
                             StringComparer.OrdinalIgnoreCase).ToList();
 
-                var existingTagNames = new HashSet<string>(tagsFromPreviousReview.Select(t => t.TagName),
-                    StringComparer.OrdinalIgnoreCase);
-
-                newTags.RemoveAll(t => existingTagNames.Contains(t));
-
                 // Update review
-                var review = new Review
-                {
-                    ReviewId = reviewUpdateRequestDto.ReviewId,
-                    Title = reviewUpdateRequestDto.Title,
-                    Content = reviewUpdateRequestDto.Content,
-                    CreationDate = reviewExists.CreationDate,
-                    LastEditDate = DateTime.UtcNow,
-                    Rating = reviewUpdateRequestDto.Rating,
-                    UserId = userId,
-                    ItemId = reviewUpdateRequestDto.ItemId,
-                };
-
-                var updatedReview = await _reviewRepository.UpdateAsync(review);
-
+                reviewExists.Title = reviewUpdateRequestDto.Title;
+                reviewExists.Content = reviewUpdateRequestDto.Content;
+                reviewExists.LastEditDate = DateTime.UtcNow;
+                reviewExists.Rating = reviewUpdateRequestDto.Rating;
+                
                 // Process tags and create review-tag associations in batch
                 var reviewTagsToAdd = new List<ReviewTag>();
                 foreach (var tag in newTags)
@@ -227,23 +216,44 @@ public class ReviewService : IReviewService
                     reviewTagsToAdd.Add(new ReviewTag
                     {
                         TagId = tagId,
-                        ReviewId = updatedReview.ReviewId,
+                        ReviewId = reviewExists.ReviewId,
                     });
                 }
             
                 // Remove all tags
-                await _reviewTagRepository.DeleteAllTagsByReviewIdAsync(review.ReviewId);
+                await _reviewTagRepository.DeleteAllTagsByReviewIdAsync(reviewExists.ReviewId);
+                // Insert all tags in ReviewTags
+                await _reviewTagRepository.AddRangeAsync(reviewTagsToAdd);
 
-        // Add all review-Tags associations in a single batch operations
+                // Save changes
+                await _dbContext.SaveChangesAsync();
+                
+                // Commit transaction
+                await transaction.CommitAsync();
+                
+                return new ReviewResponseDto
+                {
+                    ReviewId = reviewExists.ReviewId,
+                    Title = reviewExists.Title,
+                    Content = reviewExists.Content,
+                    CreationDate = reviewExists.CreationDate,
+                    LastEditedDate = reviewExists.LastEditDate,
+                    Rating = reviewExists.Rating,
+                    ItemId = reviewExists.ItemId,
+                    Tags = reviewUpdateRequestDto.Tags,
+                };
             }
-            catch
+            catch (Exception ex)
             {
-
+                await transaction.RollbackAsync();
+                throw;
             }
         }
-        catch
+        catch (ArgumentException ex)
         {
-            
+            // Log the validation error
+            _logger.LogError(ex, "Validation error in UpdateReviewAsync: {Message}", ex.Message);
+            throw;
         }
     }
     
@@ -289,5 +299,36 @@ public class ReviewService : IReviewService
         }
 
         return reviewDtos;
+    }
+
+    public async Task<bool> DeleteReviewAsync(int reviewId, int userId)
+    {
+        var review = await _reviewRepository.GetByIdAsync(reviewId);
+        if (review == null) return false;
+        var isUserOwner = userId == review.UserId;
+        if (!isUserOwner) return false;
+        await _reviewRepository.DeleteAsync(reviewId);
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<ReviewResponseDto> GetReviewByIdAsync(int reviewId)
+    {
+        var review = await _reviewRepository.GetByIdAsync(reviewId);
+        if (review == null)
+        {
+            throw new ArgumentException($"Review with ID {reviewId} not found");
+        }
+
+        return new ReviewResponseDto
+        {
+            ReviewId = review.ReviewId,
+            Title = review.Title,
+            Content = review.Content,
+            CreationDate = review.CreationDate,
+            LastEditedDate = review.LastEditDate,
+            Rating = review.Rating,
+            ItemId = review.ItemId
+        };
     }
 }
