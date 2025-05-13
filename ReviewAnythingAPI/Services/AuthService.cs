@@ -25,7 +25,7 @@ public class AuthService : IAuthService
     public async Task<AuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto)
     {
         // Check if user already exists
-        var existingUserByUsername = await _userManager.FindByNameAsync(userRegistrationDto.Username);
+        var existingUserByUsername = await _userManager.FindByNameAsync(userRegistrationDto.UserName);
         if (existingUserByUsername != null)
         {
             return new AuthResponseDto
@@ -47,7 +47,7 @@ public class AuthService : IAuthService
         
         var user = new ApplicationUser
         {
-            UserName = userRegistrationDto.Username,
+            UserName = userRegistrationDto.UserName,
             Email = userRegistrationDto.Email,
             FirstName = userRegistrationDto.FirstName,
             LastName = userRegistrationDto.LastName,
@@ -79,7 +79,7 @@ public class AuthService : IAuthService
             Token = token,
             UserResponse = new UserResponseDto {
                 UserId = user.Id,
-                Username = user.UserName,
+                UserName = user.UserName,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -136,7 +136,7 @@ public class AuthService : IAuthService
             UserResponse = new UserResponseDto
             {
                 UserId = user.Id,
-                Username = user.UserName,
+                UserName = user.UserName,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,

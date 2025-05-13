@@ -5,15 +5,15 @@ namespace ReviewAnythingAPI.Services.Interfaces;
 
 public interface IReviewService
 {
-    Task<IEnumerable<ReviewResponseDto>> GetAllReviewsByUserIdAsync(int userId);
+    Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByUserIdAsync(int userId);
 
-    Task<IEnumerable<ReviewResponseDto>> GetAllReviewsByItemIdAsync(int itemId);
+    Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByItemIdAsync(int itemId);
 
-    Task<ReviewResponseDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId);
+    Task<ReviewSummaryDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId);
 
-    Task<ReviewResponseDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto, int userId, int reviewId);
+    Task<ReviewSummaryDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto, int userId, int reviewId);
     
-    Task<ReviewResponseDto> GetReviewByIdAsync(int reviewId);
+    Task<ReviewDetailDto> GetReviewByIdAsync(int reviewId);
     
     Task<bool> DeleteReviewAsync(int reviewId, int userId);
 }

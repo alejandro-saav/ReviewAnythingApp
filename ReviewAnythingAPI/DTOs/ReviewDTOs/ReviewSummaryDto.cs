@@ -1,6 +1,8 @@
+using ReviewAnythingAPI.HelperClasses.ValidationClasses;
+
 namespace ReviewAnythingAPI.DTOs.ReviewDTOs;
 
-public class ReviewResponseDto
+public class ReviewSummaryDto
 {
     public int ReviewId { get; set; }
     public string Title { get; set; }
@@ -11,8 +13,5 @@ public class ReviewResponseDto
     
     public int? UserId {get; set;}
     public int ItemId { get; set; }
-    public string Tags { get; set; }
-    public int UpVoteCount { get; set; }
-    public int DownVoteCount { get; set; }
-    public int TotalVotes { get; set; }
+    public List<string> Tags { get; set; } = new List<string>();
 }

@@ -15,3 +15,8 @@
 9. Ambiguous route naming: 
     The difference between routes like "users/{userId}/reviews" and "users/{userId}/reviews/{reviewId}" isnt immediately clear for their purpose.
 10. Missing versioning: No API versioning strategy is present.
+
+// Review Votes approach
+    - Yes im returning the votes in the reviewDto
+    - I dont need to initialize any votes on reviewCreation
+    - Should I use the updateReview for the votes count?

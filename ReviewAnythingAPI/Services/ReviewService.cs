@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
@@ -18,13 +19,20 @@ public class ReviewService : IReviewService
     private readonly IReviewTagRepository _reviewTagRepository;
     private readonly ReviewAnythingDbContext _dbContext;
     private readonly ILogger<ReviewService> _logger;
+    private readonly IReviewVoteRepository _reviewVoteRepository;
 
-    public ReviewService(IReviewRepository reviewRepository)
+    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, ILogger<ReviewService> logger, IReviewVoteRepository reviewVoteRepository)
     {
         _reviewRepository = reviewRepository;
+        _itemRepository = itemRepository;
+        _tagRepository = tagRepository;
+        _reviewTagRepository = reviewTagRepository;
+        _dbContext = dbContext;
+        _logger = logger;
+        _reviewVoteRepository = reviewVoteRepository;
     }
 
-    public async Task<ReviewResponseDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId)
+    public async Task<ReviewSummaryDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId)
     {
         try
         {
@@ -44,6 +52,7 @@ public class ReviewService : IReviewService
                         CreatedByUserId = userId,
                     };
                     var item = await _itemRepository.AddAsync(itemToInsert);
+                    await _dbContext.SaveChangesAsync();
                     itemId = item.ItemId;
                 }
                 else
@@ -65,11 +74,10 @@ public class ReviewService : IReviewService
                 }
 
                 // Process tags
-                var tagsList = string.IsNullOrWhiteSpace(reviewCreateRequestDto.Tags)
-                    ? new List<string>()
-                    : reviewCreateRequestDto.Tags.Split(",", StringSplitOptions.RemoveEmptyEntries)
-                        .Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t))
-                        .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                if (reviewCreateRequestDto.Tags.Count > 0)
+                {
+                    reviewCreateRequestDto.Tags = reviewCreateRequestDto.Tags.Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                }
 
                 // Create the review
                 var review = new Review
@@ -83,10 +91,11 @@ public class ReviewService : IReviewService
                     ItemId = itemId,
                 };
                 var createdReview = await _reviewRepository.AddAsync(review);
+                await _dbContext.SaveChangesAsync();
 
                 // Process tags and create review-tag associations in batch
                 var reviewTagsToAdd = new List<ReviewTag>();
-                foreach (var tag in tagsList)
+                foreach (var tag in reviewCreateRequestDto.Tags)
                 {
                     var existingTag = await _tagRepository.GetTagByNameAsync(tag);
                     int tagId;
@@ -94,6 +103,7 @@ public class ReviewService : IReviewService
                     {
                         // Create new tag
                         var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
+                        await _dbContext.SaveChangesAsync();
                         tagId = newTag.TagId;
                     }
                     else
@@ -121,17 +131,16 @@ public class ReviewService : IReviewService
                 // Commit transaction
                 await transaction.CommitAsync();
 
-                return new ReviewResponseDto
+                return new ReviewSummaryDto()
                 {
                     ReviewId = createdReview.ReviewId,
                     Title = createdReview.Title,
                     Content = createdReview.Content,
                     CreationDate = createdReview.CreationDate,
-                    LastEditedDate = createdReview.LastEditDate,
+                    LastEditDate = createdReview.LastEditDate,
                     Rating = createdReview.Rating,
                     ItemId = createdReview.ItemId,
-                    Tags = reviewCreateRequestDto.Tags,
-                    ReviewVotes = 0
+                    Tags = reviewCreateRequestDto.Tags
                 };
             }
             catch (Exception ex)
@@ -160,7 +169,7 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<ReviewResponseDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto,
+    public async Task<ReviewSummaryDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto,
         int userId, int reviewId)
     {
         try
@@ -184,11 +193,11 @@ public class ReviewService : IReviewService
                 }
                 
 
-                var newTags = string.IsNullOrWhiteSpace(reviewUpdateRequestDto.Tags)
-                    ? new List<string>()
-                    : reviewUpdateRequestDto.Tags.Split(",", StringSplitOptions.RemoveEmptyEntries)
-                        .Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(
-                            StringComparer.OrdinalIgnoreCase).ToList();
+                // Process tags
+                if (reviewUpdateRequestDto.Tags.Count > 0)
+                {
+                    reviewUpdateRequestDto.Tags = reviewUpdateRequestDto.Tags.Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                }
 
                 // Update review
                 reviewExists.Title = reviewUpdateRequestDto.Title;
@@ -198,7 +207,7 @@ public class ReviewService : IReviewService
                 
                 // Process tags and create review-tag associations in batch
                 var reviewTagsToAdd = new List<ReviewTag>();
-                foreach (var tag in newTags)
+                foreach (var tag in reviewUpdateRequestDto.Tags)
                 {
                     var existingTag = await _tagRepository.GetTagByNameAsync(tag);
                     int tagId;
@@ -231,13 +240,13 @@ public class ReviewService : IReviewService
                 // Commit transaction
                 await transaction.CommitAsync();
                 
-                return new ReviewResponseDto
+                return new ReviewSummaryDto
                 {
                     ReviewId = reviewExists.ReviewId,
                     Title = reviewExists.Title,
                     Content = reviewExists.Content,
                     CreationDate = reviewExists.CreationDate,
-                    LastEditedDate = reviewExists.LastEditDate,
+                    LastEditDate = reviewExists.LastEditDate,
                     Rating = reviewExists.Rating,
                     ItemId = reviewExists.ItemId,
                     Tags = reviewUpdateRequestDto.Tags,
@@ -257,48 +266,62 @@ public class ReviewService : IReviewService
         }
     }
     
-    public async Task<IEnumerable<ReviewResponseDto>> GetAllReviewsByUserIdAsync(int userId)
+    public async Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByUserIdAsync(int userId)
     {
-        var reviews = await _reviewRepository.GetAllReviewsByUserIdAsync(userId);
-        var reviewDtos = new List<ReviewResponseDto>();
-
-        foreach (var review in reviews)
+        try
         {
-            reviewDtos.Add(new ReviewResponseDto
-            {
-                ReviewId = review.ReviewId,
-                Title = review.Title,
-                Content = review.Content,
-                CreationDate = review.CreationDate,
-                LastEditedDate = review.LastEditDate,
-                Rating = review.Rating,
-                ItemId = review.ItemId
-            });
-        };
-        return reviewDtos;
+               var reviewDtos = await _dbContext.Reviews.Where(r => r.UserId == userId)
+                   .Select(r => new ReviewDetailDto
+                {
+                    ReviewId = r.ReviewId,
+                    Title = r.Title,
+                    Content = r.Content,
+                    CreationDate = r.CreationDate,
+                    LastEditDate = r.LastEditDate,
+                    Rating = r.Rating,
+                    ItemId = r.ItemId,
+                    UserId = userId,
+                    Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+                    DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
+                    UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
+                    TotalVotes = r.ReviewVotes.Count(),
+                }).ToListAsync();
+            return reviewDtos;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching reviews for user {UserId}", userId);
+            throw;
+        }
     }
 
-    public async Task<IEnumerable<ReviewResponseDto>> GetAllReviewsByItemIdAsync(int itemId)
+    public async Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByItemIdAsync(int itemId)
     {
-        var reviews = await _reviewRepository.GetAllReviewsByItemIdAsync(itemId);
-        
-        var reviewDtos = new List<ReviewResponseDto>();
-
-        foreach (var review in reviews)
+        try
         {
-            reviewDtos.Add(new ReviewResponseDto
-            {
-                ReviewId = review.ReviewId,
-                Title = review.Title,
-                Content = review.Content,
-                CreationDate = review.CreationDate,
-                LastEditedDate = review.LastEditDate,
-                Rating = review.Rating,
-                ItemId = review.ItemId
-            });
+            var reviewDtos = await _dbContext.Reviews.Where(r => r.ItemId == itemId)
+                .Select(r => new ReviewDetailDto
+                {
+                    ReviewId = r.ReviewId,
+                    Title = r.Title,
+                    Content = r.Content,
+                    CreationDate = r.CreationDate,
+                    LastEditDate = r.LastEditDate,
+                    Rating = r.Rating,
+                    ItemId = r.ItemId,
+                    UserId = r.UserId,
+                    Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+                    DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
+                    UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
+                    TotalVotes = r.ReviewVotes.Count(),
+                }).ToListAsync();
+            return reviewDtos;
         }
-
-        return reviewDtos;
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error fetching reviews for item {ItemId}", itemId);
+            throw;
+        }
     }
 
     public async Task<bool> DeleteReviewAsync(int reviewId, int userId)
@@ -312,23 +335,23 @@ public class ReviewService : IReviewService
         return true;
     }
 
-    public async Task<ReviewResponseDto> GetReviewByIdAsync(int reviewId)
+    public async Task<ReviewDetailDto> GetReviewByIdAsync(int reviewId)
     {
-        var review = await _reviewRepository.GetByIdAsync(reviewId);
-        if (review == null)
+        var review =  await _dbContext.Reviews.Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
         {
-            throw new ArgumentException($"Review with ID {reviewId} not found");
-        }
-
-        return new ReviewResponseDto
-        {
-            ReviewId = review.ReviewId,
-            Title = review.Title,
-            Content = review.Content,
-            CreationDate = review.CreationDate,
-            LastEditedDate = review.LastEditDate,
-            Rating = review.Rating,
-            ItemId = review.ItemId
-        };
+            ReviewId = r.ReviewId,
+            Title = r.Title,
+            Content = r.Content,
+            CreationDate = r.CreationDate,
+            LastEditDate = r.LastEditDate,
+            Rating = r.Rating,
+            ItemId = r.ItemId,
+            UserId = r.UserId,
+            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
+            DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
+            TotalVotes = r.ReviewVotes.Count()
+        }).FirstOrDefaultAsync();
+        return review != null ? review : null;
     }
 }

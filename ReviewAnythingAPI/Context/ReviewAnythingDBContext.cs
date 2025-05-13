@@ -80,7 +80,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
   
   modelBuilder.Entity<ReviewVote>().HasOne(rv => rv.User).WithMany().HasForeignKey(rv => rv.UserId).OnDelete(DeleteBehavior.Cascade);
   
-  modelBuilder.Entity<ReviewVote>().HasOne(rv => rv.Review).WithMany().HasForeignKey(rv => rv.ReviewId).OnDelete(DeleteBehavior.Cascade);
+  modelBuilder.Entity<ReviewVote>().HasOne(rv => rv.Review).WithMany(r => r.ReviewVotes).HasForeignKey(rv => rv.ReviewId).OnDelete(DeleteBehavior.Cascade);
 
   modelBuilder.Entity<ReviewVote>().ToTable(t => t.HasCheckConstraint("CHK_VoteType", "[VoteType] IN (-1, 1)"));
   

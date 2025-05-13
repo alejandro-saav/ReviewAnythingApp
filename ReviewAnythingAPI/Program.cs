@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.Models;
+using ReviewAnythingAPI.Repositories;
+using ReviewAnythingAPI.Repositories.Interfaces;
 using ReviewAnythingAPI.Services;
 using ReviewAnythingAPI.Services.Interfaces;
 
@@ -12,6 +14,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+// Add repositories to the container
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentVoteRepository, CommentVoteRepository>();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReviewVoteRepository, ReviewVoteRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
+builder.Services.AddScoped<IReviewTagRepository, ReviewTagRepository>();
+// For the generic repository
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // DbContext
 builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

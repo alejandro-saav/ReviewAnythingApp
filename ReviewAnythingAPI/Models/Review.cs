@@ -16,4 +16,5 @@ public class Review
     public Item ReviewItem { get; set; }
     public ICollection<Comment> ReviewComments { get; set; }
     public ICollection<ReviewTag> ReviewTags { get; set; }
+    public ICollection<ReviewVote> ReviewVotes { get; set; }
 }
