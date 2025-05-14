@@ -13,7 +13,7 @@ public interface IReviewService
 
     Task<ReviewSummaryDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto, int userId, int reviewId);
     
-    Task<ReviewDetailDto> GetReviewByIdAsync(int reviewId);
+    Task<ReviewDetailDto?> GetReviewByIdAsync(int reviewId);
     
     Task<bool> DeleteReviewAsync(int reviewId, int userId);
 }

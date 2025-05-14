@@ -11,4 +11,5 @@ public class Item
     // Navigation Properties
     public ApplicationUser? Creator { get; set; }
     public Category ItemCategory { get; set; }
+    public ICollection<Review> ItemReviews { get; set; } = new List<Review>();
 }

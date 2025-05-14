@@ -335,7 +335,7 @@ public class ReviewService : IReviewService
         return true;
     }
 
-    public async Task<ReviewDetailDto> GetReviewByIdAsync(int reviewId)
+    public async Task<ReviewDetailDto?> GetReviewByIdAsync(int reviewId)
     {
         var review =  await _dbContext.Reviews.Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
         {

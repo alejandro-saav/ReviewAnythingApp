@@ -17,6 +17,7 @@ public class ApplicationUser : IdentityUser<int>
     public ICollection<Review> UserReviews { get; set; }
     public ICollection<Comment> UserComments { get; set; }
     public ICollection<Follow> UserFollows { get; set; }
+    public ICollection<Follow> UserFollowings { get; set; }
     public ICollection<ReviewVote> UserReviewVotes { get; set; }
     public ICollection<CommentVote> UserCommentVotes { get; set; }
     public ICollection<Report> UserReports { get; set; }
