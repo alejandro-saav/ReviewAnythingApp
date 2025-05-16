@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReviewAnythingAPI.DTOs.CommentDTOs;
 using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Controllers;
@@ -9,46 +10,68 @@ namespace ReviewAnythingAPI.Controllers;
 public class CommentController : ControllerBase
 {
     private readonly ICommentService _commentService;
-    private readonly ILogger<CommentController> _logger;
 
-    public CommentController(ICommentService commentService, ILogger<CommentController> logger)
+    public CommentController(ICommentService commentService)
     {
         _commentService = commentService;
-        _logger = logger;
+    }
+    
+    [HttpGet("{commentId}")]
+    public async Task<IActionResult> GetCommentByIdAsync([FromRoute] int commentId)
+    {
+        var comment = await _commentService.GetCommentByIdAsync(commentId);
+        return Ok(comment);
     }
 
-    [Authorize]
-    [HttpGet("user")]
-    public async Task<IActionResult> GetAllCommentsByUser()
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetAllCommentsByUser([FromRoute] int userId)
     {
-        try
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
             var comments = await _commentService.GetAllCommentsByUserAsync(userId);
-            if (!comments.Any()) return NotFound();
             return Ok(comments);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unhandled exception");
-            return StatusCode(500, "Internal server error");
-        }
     }
 
     [HttpGet("reviews/{reviewId}")]
     public async Task<IActionResult> GetAllCommentsByReview([FromRoute] int reviewId)
     {
-        try
-        {
             var comments = await _commentService.GetAllCommentsByReviewAsync(reviewId);
-            if (!comments.Any()) return NotFound();
             return Ok(comments);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unhandled exception");
-            return StatusCode(500, "Internal server error");
-        }
+    }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> CreateCommentAsync([FromBody] CommentCreateRequestDto comment)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        if (userName == null) return Unauthorized();
+        
+        var createdComment = await _commentService.CreateCommentAsync(comment, userId, userName);
+        return CreatedAtAction(nameof(GetCommentByIdAsync), new { commentId = createdComment.CommentId }, createdComment);
+    }
+
+    [Authorize]
+    [HttpPut("{commentId}")]
+    public async Task<IActionResult> UpdateCommentAsync([FromBody] CommentCreateRequestDto comment,
+        [FromRoute] int commentId)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userName = User.FindFirst(ClaimTypes.Name)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        if (userName == null) return Unauthorized();
+
+        var updatedComment = await _commentService.UpdateCommentAsync(comment, commentId, userId, userName);
+        return Ok(updatedComment);
+    }
+    
+
+    [Authorize]
+    [HttpDelete("{commentId}")]
+    public async Task<IActionResult> DeleteCommentByIdAsync([FromRoute] int commentId)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        await _commentService.DeleteCommentByIdAsync(commentId, userId);
+        return NoContent();
     }
 }

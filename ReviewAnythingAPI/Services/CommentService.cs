@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
+using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
+using ReviewAnythingAPI.HelperClasses.CustomExceptions;
+using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories.Interfaces;
 using ReviewAnythingAPI.Services.Interfaces;
 
@@ -8,42 +12,134 @@ public class CommentService : ICommentService
 {
     private readonly ICommentRepository _commentRepository;
     private readonly ILogger<CommentService> _logger;
+    private readonly IRepository<Review> _reviewRepository;
+    private readonly ReviewAnythingDbContext _dbContext;
+
+    public CommentService(ICommentRepository commentRepository, ILogger<CommentService> logger,
+        IRepository<Review> reviewRepository, ReviewAnythingDbContext dbContext)
+    {
+        _commentRepository = commentRepository;
+        _logger = logger;
+        _reviewRepository = reviewRepository;
+        _dbContext = dbContext;
+    }
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByUserAsync(int userId)
     {
-        try
-        {
             if (userId < 0)
             {
-                _logger.LogError("User id cannot be negative");
-                return Enumerable.Empty<CommentResponseDto>();
+                throw new ArgumentException("User id cannot be negative");
             }
             var comments = await _commentRepository.GetAllCommentsByUserIdAsync(userId);
             return comments;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error while retrieving comments for userId {userId}", userId);
-            throw;
-        }
     }
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByReviewAsync(int reviewId)
     {
-        try
-        {
             if (reviewId < 0)
             {
-                _logger.LogError("Review id cannot be negative");
-                return Enumerable.Empty<CommentResponseDto>();
+                throw new ArgumentException($"ReviewId cannot be negative");
             }
             var comments = await _commentRepository.GetAllCommentsByReviewIdAsync(reviewId);
             return comments;
-        }
-        catch (Exception ex)
+    }
+
+    public async Task<CommentResponseDto> CreateCommentAsync(CommentCreateRequestDto commentCreateRequestDto, int userId, string userName)
+    {
+            var reviewExists = await _reviewRepository.GetByIdAsync(commentCreateRequestDto.ReviewId);
+            if (reviewExists == null)
+            {
+                throw new EntityNotFoundException($"review not found for the given reviewId {commentCreateRequestDto.ReviewId}");
+            }
+
+            Comment comment = new Comment
+            {
+                Content = commentCreateRequestDto.Content,
+                ReviewId = commentCreateRequestDto.ReviewId,
+                UserId = userId,
+                CreationDate = DateTime.UtcNow,
+                LastEditDate = DateTime.UtcNow
+            };
+            var commentInserted = await _commentRepository.AddAsync(comment);
+            await _dbContext.SaveChangesAsync();
+            return new CommentResponseDto
+            {
+                CommentId = commentInserted.CommentId,
+                Content = commentInserted.Content,
+                ReviewId = commentInserted.ReviewId,
+                LastEditDate = commentInserted.LastEditDate,
+                CreatorUserName = userName
+            };
+    }
+
+    public async Task<CommentResponseDto> UpdateCommentAsync(CommentCreateRequestDto commentCreateRequestDto, int commentId, int userId, string userName)
+    {
+            Comment comment = await _commentRepository.GetByIdAsync(commentId);
+            if (comment == null)
+            {
+                throw new EntityNotFoundException($"comment not found for the given commentId {commentId}");
+            }
+
+            if (comment.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"userId: {userId} does not own the given commentId {commentId}");
+            }
+            comment.Content = commentCreateRequestDto.Content;
+            comment.LastEditDate = DateTime.UtcNow;
+            await _dbContext.SaveChangesAsync();
+            return new CommentResponseDto
+            {
+                CommentId = comment.CommentId,
+                Content = comment.Content,
+                ReviewId = comment.ReviewId,
+                LastEditDate = comment.LastEditDate,
+                CreatorUserName = userName
+            };
+    }
+
+    public async Task<CommentResponseDto> GetCommentByIdAsync(int commentId)
+    {
+            Comment comment = await _commentRepository.GetByIdAsync(commentId);
+            if (comment == null)
+            {
+                throw new EntityNotFoundException($"comment not found for commentId {commentId}");
+            };
+
+            var userName = "";
+            if (comment.UserId != null)
+            {
+                userName = await _dbContext.Users.Where(user => user.Id == comment.UserId).Select(u => u.UserName).FirstOrDefaultAsync();    
+            }
+            
+            return new CommentResponseDto
+            {
+                CommentId = comment.CommentId,
+                Content = comment.Content,
+                LastEditDate = comment.LastEditDate,
+                ReviewId = comment.ReviewId,
+                CreatorUserName = userName
+            };
+        
+    }
+
+    public async Task DeleteCommentByIdAsync(int commentId, int userId)
+    {
+        if (commentId <= 0)
         {
-            _logger.LogError(ex, "Error while retrieving comments for reviewId {reviewId}", reviewId);
-            throw;
+            throw new ArgumentException("commentId must be greater than 0", nameof(commentId));
         }
+        var comment = await _commentRepository.GetByIdAsync(commentId);
+            if (comment == null)
+            {
+                throw new KeyNotFoundException($"comment not found for the given commentId {commentId}");
+            };
+
+            if (comment.UserId != userId)
+            {
+                throw new UnauthorizedAccessException($"userId: {userId} is not authorized to delete comment commentId {commentId}");
+            }
+            await _commentRepository.DeleteAsync(commentId);
+            await _dbContext.SaveChangesAsync();
+        
     }
 }

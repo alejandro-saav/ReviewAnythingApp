@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ReviewAnythingAPI.Context;
+using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories;
 using ReviewAnythingAPI.Repositories.Interfaces;
@@ -92,6 +93,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

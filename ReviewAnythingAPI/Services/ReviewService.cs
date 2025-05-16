@@ -354,4 +354,9 @@ public class ReviewService : IReviewService
         }).FirstOrDefaultAsync();
         return review != null ? review : null;
     }
+
+    public async Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId)
+    {
+        var review 
+    }
 }
