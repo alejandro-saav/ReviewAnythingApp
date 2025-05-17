@@ -1,4 +1,5 @@
 using ReviewAnythingAPI.DTOs.CommentDTOs;
+using ReviewAnythingAPI.DTOs.ReviewDTOs;
 using ReviewAnythingAPI.Models;
 
 namespace ReviewAnythingAPI.Services.Interfaces;
@@ -12,4 +13,6 @@ public interface ICommentService
     public Task<CommentResponseDto> UpdateCommentAsync(CommentCreateRequestDto commentCreateRequestDto, int commentId, int userId, string userName);
     public Task<CommentResponseDto> GetCommentByIdAsync(int commentId);
     public Task DeleteCommentByIdAsync(int commentId, int userId);
+    
+    public Task<CommentVoteResponseDto> CommentVoteAsync(CommentVoteRequestDto commentVoteRequestDto, int userId);
 }

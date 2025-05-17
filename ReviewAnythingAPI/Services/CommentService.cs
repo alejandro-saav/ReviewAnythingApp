@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
+using ReviewAnythingAPI.DTOs.ReviewDTOs;
+using ReviewAnythingAPI.Enums;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories.Interfaces;
@@ -14,14 +16,16 @@ public class CommentService : ICommentService
     private readonly ILogger<CommentService> _logger;
     private readonly IRepository<Review> _reviewRepository;
     private readonly ReviewAnythingDbContext _dbContext;
+    private readonly ICommentVoteRepository _commentVoteRepository;
 
     public CommentService(ICommentRepository commentRepository, ILogger<CommentService> logger,
-        IRepository<Review> reviewRepository, ReviewAnythingDbContext dbContext)
+        IRepository<Review> reviewRepository, ReviewAnythingDbContext dbContext, ICommentVoteRepository commentVoteRepository)
     {
         _commentRepository = commentRepository;
         _logger = logger;
         _reviewRepository = reviewRepository;
         _dbContext = dbContext;
+        _commentVoteRepository = commentVoteRepository;
     }
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByUserAsync(int userId)
@@ -138,8 +142,42 @@ public class CommentService : ICommentService
             {
                 throw new UnauthorizedAccessException($"userId: {userId} is not authorized to delete comment commentId {commentId}");
             }
-            await _commentRepository.DeleteAsync(commentId);
+            await _commentRepository.DeleteAsyncById(commentId);
             await _dbContext.SaveChangesAsync();
         
+    }
+
+    public async Task<CommentVoteResponseDto> CommentVoteAsync(CommentVoteRequestDto commentVoteRequestDto, int userId)
+    {
+        var existingCommentVote = await _commentVoteRepository.GetByUserAndCommentIdAsync(userId, commentVoteRequestDto.CommentId);
+        var response = new CommentVoteResponseDto
+        {
+            CommentId = commentVoteRequestDto.CommentId,
+            UserVote = commentVoteRequestDto.VoteType,
+        };
+        if (existingCommentVote == null)
+        {
+            CommentVote newCommentVote = new CommentVote
+            {
+                UserId = userId,
+                CommentId = commentVoteRequestDto.CommentId,
+                VoteType = commentVoteRequestDto.VoteType,
+                VoteDate = DateTime.UtcNow
+            };
+            await _commentVoteRepository.AddAsync(newCommentVote);
+            response.ActionType = ActionType.Created;
+        } else if (existingCommentVote.VoteType == commentVoteRequestDto.VoteType)
+        {
+            await _commentVoteRepository.DeleteAsyncByEntity(existingCommentVote);
+            response.ActionType = ActionType.Deleted;
+        }
+        else
+        {
+            existingCommentVote.VoteType = commentVoteRequestDto.VoteType;
+            existingCommentVote.VoteDate = DateTime.UtcNow;
+            response.ActionType = ActionType.Updated;
+        }
+        await _dbContext.SaveChangesAsync();
+        return response;
     }
 }

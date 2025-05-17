@@ -2,6 +2,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
+using ReviewAnythingAPI.DTOs.ReviewDTOs;
+using ReviewAnythingAPI.Enums;
 using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Controllers;
@@ -73,5 +75,21 @@ public class CommentController : ControllerBase
         if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
         await _commentService.DeleteCommentByIdAsync(commentId, userId);
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("comment-votes")]
+    public async Task<IActionResult> PostCommentVotes([FromBody] CommentVoteRequestDto vote)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
+        var response = await _commentService.CommentVoteAsync(vote, userId);
+        return response.ActionType switch
+        {
+            ActionType.Created => CreatedAtAction(nameof(PostCommentVotes), new { vote.CommentId }, vote),
+            ActionType.Updated => Ok(vote),
+            ActionType.Deleted => NoContent(),
+            _ => StatusCode(500, "Internal server error")
+        };
     }
 }

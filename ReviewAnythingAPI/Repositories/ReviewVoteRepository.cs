@@ -9,8 +9,13 @@ public class ReviewVoteRepository : Repository<ReviewVote>, IReviewVoteRepositor
 {
     public ReviewVoteRepository(ReviewAnythingDbContext context) : base(context) {}
     
-    public async Task<IEnumerable<int>> GetVotesByReviewIdAsync(int reviewId)
+    public async Task<int> GetVotesByReviewIdAsync(int reviewId)
     {
-        return await _context.ReviewVotes.Where(rv => rv.ReviewId == reviewId).Select(rv => rv.VoteType).ToListAsync();
+        return await _context.ReviewVotes.Where(rv => rv.ReviewId == reviewId).SumAsync(rv => rv.VoteType);
+    }
+
+    public async Task<ReviewVote?> GetByUserAndReviewIdAsync(int userId, int reviewId)
+    {
+        return await _context.ReviewVotes.FirstOrDefaultAsync(rv => rv.UserId == userId && rv.ReviewId == reviewId);
     }
 }

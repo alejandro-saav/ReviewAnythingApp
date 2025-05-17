@@ -1,9 +1,12 @@
 using System.Security.Claims;
+using System.Transactions;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
+using ReviewAnythingAPI.Enums;
+using ReviewAnythingAPI.HelperClasses.CustomExceptions;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories;
 using ReviewAnythingAPI.Repositories.Interfaces;
@@ -34,161 +37,140 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewSummaryDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId)
     {
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
             // using transaction to ensure data consistency
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
-
-            try
+            int itemId;
+            if (reviewCreateRequestDto.ItemId == null)
             {
-                int itemId;
-                if (reviewCreateRequestDto.ItemId == null)
+                var itemToInsert = new Item
                 {
-                    var itemToInsert = new Item
-                    {
-                        ItemName = reviewCreateRequestDto.Title,
-                        CategoryId = reviewCreateRequestDto.CategoryId,
-                        CreationDate = DateTime.UtcNow,
-                        CreatedByUserId = userId,
-                    };
-                    var item = await _itemRepository.AddAsync(itemToInsert);
+                    ItemName = reviewCreateRequestDto.Title,
+                    CategoryId = reviewCreateRequestDto.CategoryId,
+                    CreationDate = DateTime.UtcNow,
+                    CreatedByUserId = userId,
+                };
+                var item = await _itemRepository.AddAsync(itemToInsert);
+                await _dbContext.SaveChangesAsync();
+                itemId = item.ItemId;
+            }
+            else
+            {
+                var itemExists = await _itemRepository.GetByIdAsync(reviewCreateRequestDto.ItemId.Value);
+                if (itemExists == null)
+                {
+                    throw new EntityNotFoundException($"Item with ID {reviewCreateRequestDto.ItemId.Value} not found");
+                }
+
+                itemId = reviewCreateRequestDto.ItemId.Value;
+            }
+
+            // Check if the user already reviewed this item to prevent duplicates
+            var existingReview = await _reviewRepository.GetReviewByUserIdAndItemIdAsync(userId, itemId);
+            if (existingReview != null)
+            {
+                throw new InvalidOperationException("You have already reviewed this item");
+            }
+
+            // Process tags
+            if (reviewCreateRequestDto.Tags.Count > 0)
+            {
+                reviewCreateRequestDto.Tags = reviewCreateRequestDto.Tags.Select(t => t.Trim())
+                    .Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            }
+
+            // Create the review
+            var review = new Review
+            {
+                Title = reviewCreateRequestDto.Title,
+                Content = reviewCreateRequestDto.Content,
+                CreationDate = DateTime.UtcNow,
+                LastEditDate = DateTime.UtcNow,
+                Rating = reviewCreateRequestDto.Rating,
+                UserId = userId,
+                ItemId = itemId,
+            };
+            var createdReview = await _reviewRepository.AddAsync(review);
+            await _dbContext.SaveChangesAsync();
+
+            // Process tags and create review-tag associations in batch
+            var reviewTagsToAdd = new List<ReviewTag>();
+            foreach (var tag in reviewCreateRequestDto.Tags)
+            {
+                var existingTag = await _tagRepository.GetTagByNameAsync(tag);
+                int tagId;
+                if (existingTag == null)
+                {
+                    // Create new tag
+                    var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
                     await _dbContext.SaveChangesAsync();
-                    itemId = item.ItemId;
+                    tagId = newTag.TagId;
                 }
                 else
                 {
-                    var itemExists = await _itemRepository.GetByIdAsync(reviewCreateRequestDto.ItemId.Value);
-                    if (itemExists == null)
-                    {
-                        throw new ArgumentException($"Item with ID {reviewCreateRequestDto.ItemId.Value} not found");
-                    }
-
-                    itemId = reviewCreateRequestDto.ItemId.Value;
+                    tagId = existingTag.TagId;
                 }
 
-                // Check if the user already reviewed this item to prevent duplicates
-                var existingReview = await _reviewRepository.GetReviewByUserIdAndItemIdAsync(userId, itemId);
-                if (existingReview != null)
+                // Add to batch collection
+                reviewTagsToAdd.Add(new ReviewTag
                 {
-                    throw new InvalidOperationException("You have already reviewed this item");
-                }
-
-                // Process tags
-                if (reviewCreateRequestDto.Tags.Count > 0)
-                {
-                    reviewCreateRequestDto.Tags = reviewCreateRequestDto.Tags.Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-                }
-
-                // Create the review
-                var review = new Review
-                {
-                    Title = reviewCreateRequestDto.Title,
-                    Content = reviewCreateRequestDto.Content,
-                    CreationDate = DateTime.UtcNow,
-                    LastEditDate = DateTime.UtcNow,
-                    Rating = reviewCreateRequestDto.Rating,
-                    UserId = userId,
-                    ItemId = itemId,
-                };
-                var createdReview = await _reviewRepository.AddAsync(review);
-                await _dbContext.SaveChangesAsync();
-
-                // Process tags and create review-tag associations in batch
-                var reviewTagsToAdd = new List<ReviewTag>();
-                foreach (var tag in reviewCreateRequestDto.Tags)
-                {
-                    var existingTag = await _tagRepository.GetTagByNameAsync(tag);
-                    int tagId;
-                    if (existingTag == null)
-                    {
-                        // Create new tag
-                        var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
-                        await _dbContext.SaveChangesAsync();
-                        tagId = newTag.TagId;
-                    }
-                    else
-                    {
-                        tagId = existingTag.TagId;
-                    }
-
-                    // Add to batch collection
-                    reviewTagsToAdd.Add(new ReviewTag
-                    {
-                        TagId = tagId,
-                        ReviewId = createdReview.ReviewId,
-                    });
-                }
-
-                // Add all review-tags associations in a single batch operation
-                if (reviewTagsToAdd.Count > 0)
-                {
-                    await _reviewTagRepository.AddRangeAsync(reviewTagsToAdd);
-                }
-                
-                // Save Changes
-                await _dbContext.SaveChangesAsync();
-
-                // Commit transaction
-                await transaction.CommitAsync();
-
-                return new ReviewSummaryDto()
-                {
+                    TagId = tagId,
                     ReviewId = createdReview.ReviewId,
-                    Title = createdReview.Title,
-                    Content = createdReview.Content,
-                    CreationDate = createdReview.CreationDate,
-                    LastEditDate = createdReview.LastEditDate,
-                    Rating = createdReview.Rating,
-                    ItemId = createdReview.ItemId,
-                    Tags = reviewCreateRequestDto.Tags
-                };
+                });
             }
-            catch (Exception ex)
+
+            // Add all review-tags associations in a single batch operation
+            if (reviewTagsToAdd.Count > 0)
             {
-                // Roll back the transaction if any operation fails
-                await transaction.RollbackAsync();
-                throw;
+                await _reviewTagRepository.AddRangeAsync(reviewTagsToAdd);
             }
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            // Log the validation error
-            _logger.LogError(ex, "Userid does not match with review userid: {Message}", ex.Message);
-            throw;
-        }
-        catch (InvalidOperationException ex)
-        {
-            // Log business rule violations
-            _logger.LogError(ex, "Business rule violation in CreateReviewAsync: {Message}", ex.Message);
-            throw;
+
+            // Save Changes
+            await _dbContext.SaveChangesAsync();
+
+            // Commit transaction
+            await transaction.CommitAsync();
+
+            return new ReviewSummaryDto()
+            {
+                ReviewId = createdReview.ReviewId,
+                Title = createdReview.Title,
+                Content = createdReview.Content,
+                CreationDate = createdReview.CreationDate,
+                LastEditDate = createdReview.LastEditDate,
+                Rating = createdReview.Rating,
+                ItemId = createdReview.ItemId,
+                Tags = reviewCreateRequestDto.Tags
+            };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error in CreateReviewAsync: {Message}", ex.Message);
-            throw new ApplicationException("An error occurred while creating the review", ex);
+            // Roll back the transaction if any operation fails
+            await transaction.RollbackAsync();
+            throw new TransactionFailedException("Review create transaction failed", ex);
         }
     }
+
 
     public async Task<ReviewSummaryDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto,
         int userId, int reviewId)
     {
-        try
-        {
-            // using transaction to ensure data consistency
             await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            // using transaction to ensure data consistency
             try
             {
                 // review exists
                 var reviewExists = await _reviewRepository.GetByIdAsync(reviewId);
                 if (reviewExists == null)
                 {
-                    throw new ArgumentException($"Review with ID {reviewId} not found");
+                    throw new EntityNotFoundException($"Review with ID {reviewId} not found");
                 }
 
                 // Does review match the userId
                 if (userId != reviewExists.UserId)
                 {
-                    throw new ArgumentException(
+                    throw new UnauthorizedAccessException(
                         $"Review with ID {reviewId} does not belong to user");
                 }
                 
@@ -255,21 +237,12 @@ public class ReviewService : IReviewService
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw;
+                throw new TransactionFailedException("Review update transaction failed", ex);
             }
-        }
-        catch (ArgumentException ex)
-        {
-            // Log the validation error
-            _logger.LogError(ex, "Validation error in UpdateReviewAsync: {Message}", ex.Message);
-            throw;
-        }
     }
     
     public async Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByUserIdAsync(int userId)
     {
-        try
-        {
                var reviewDtos = await _dbContext.Reviews.Where(r => r.UserId == userId)
                    .Select(r => new ReviewDetailDto
                 {
@@ -287,18 +260,10 @@ public class ReviewService : IReviewService
                     TotalVotes = r.ReviewVotes.Count(),
                 }).ToListAsync();
             return reviewDtos;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching reviews for user {UserId}", userId);
-            throw;
-        }
     }
 
     public async Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByItemIdAsync(int itemId)
     {
-        try
-        {
             var reviewDtos = await _dbContext.Reviews.Where(r => r.ItemId == itemId)
                 .Select(r => new ReviewDetailDto
                 {
@@ -316,12 +281,6 @@ public class ReviewService : IReviewService
                     TotalVotes = r.ReviewVotes.Count(),
                 }).ToListAsync();
             return reviewDtos;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching reviews for item {ItemId}", itemId);
-            throw;
-        }
     }
 
     public async Task<bool> DeleteReviewAsync(int reviewId, int userId)
@@ -330,7 +289,7 @@ public class ReviewService : IReviewService
         if (review == null) return false;
         var isUserOwner = userId == review.UserId;
         if (!isUserOwner) return false;
-        await _reviewRepository.DeleteAsync(reviewId);
+        await _reviewRepository.DeleteAsyncById(reviewId);
         await _dbContext.SaveChangesAsync();
         return true;
     }
@@ -357,6 +316,36 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId)
     {
-        var review 
+        var existingVote = await _reviewVoteRepository.GetByUserAndReviewIdAsync(userId, reviewVoteRequestDto.ReviewId);
+        var response = new ReviewVoteResponseDto
+        {
+            ReviewId = reviewVoteRequestDto.ReviewId,
+            UserVote = reviewVoteRequestDto.VoteType
+        };
+        if (existingVote == null)
+        {
+            ReviewVote newReviewVote = new ReviewVote
+            {
+                ReviewId = reviewVoteRequestDto.ReviewId,
+                UserId = userId,
+                VoteType = reviewVoteRequestDto.VoteType,
+                VoteDate = DateTime.UtcNow,
+            };
+            await _reviewVoteRepository.AddAsync(newReviewVote);
+            response.ActionType = ActionType.Created;
+        } else if (existingVote.VoteType == reviewVoteRequestDto.VoteType)
+        {
+            await _reviewVoteRepository.DeleteAsyncByEntity(existingVote);
+            response.ActionType = ActionType.Deleted;
+        }
+        else
+        {
+            existingVote.VoteType = reviewVoteRequestDto.VoteType;
+            existingVote.VoteDate = DateTime.UtcNow;
+            response.ActionType = ActionType.Updated;
+        }
+
+        await _dbContext.SaveChangesAsync();
+        return response;
     }
 }

@@ -48,6 +48,14 @@ public class GlobalExceptionHandlerMiddleware
                 statusCode = HttpStatusCode.NotFound;
                 message = exception.Message;
                 break;
+            case InvalidOperationException:
+                statusCode = HttpStatusCode.Conflict;
+                message = exception.Message;
+                break;
+            case TransactionFailedException:
+                statusCode = HttpStatusCode.InternalServerError;
+                message = exception.Message;
+                break;
         }
         logger.LogError(exception, "Exception caught in global handler");
 

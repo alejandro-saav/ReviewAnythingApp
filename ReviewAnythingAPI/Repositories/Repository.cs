@@ -39,12 +39,17 @@ public class Repository<T> : IRepository<T> where T : class
         return entity;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsyncById(int id)
     {
         var entity = await _dbSet.FindAsync(id);
         if (entity == null) return false;
         _dbSet.Remove(entity);
         //await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task DeleteAsyncByEntity(T entity)
+    {
+        _dbSet.Remove(entity);
     }
 }
