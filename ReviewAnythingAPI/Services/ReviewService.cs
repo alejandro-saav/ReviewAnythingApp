@@ -21,17 +21,15 @@ public class ReviewService : IReviewService
     private readonly ITagRepository _tagRepository;
     private readonly IReviewTagRepository _reviewTagRepository;
     private readonly ReviewAnythingDbContext _dbContext;
-    private readonly ILogger<ReviewService> _logger;
     private readonly IReviewVoteRepository _reviewVoteRepository;
 
-    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, ILogger<ReviewService> logger, IReviewVoteRepository reviewVoteRepository)
+    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, IReviewVoteRepository reviewVoteRepository)
     {
         _reviewRepository = reviewRepository;
         _itemRepository = itemRepository;
         _tagRepository = tagRepository;
         _reviewTagRepository = reviewTagRepository;
         _dbContext = dbContext;
-        _logger = logger;
         _reviewVoteRepository = reviewVoteRepository;
     }
 

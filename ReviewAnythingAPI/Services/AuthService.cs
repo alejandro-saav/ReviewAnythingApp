@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using ReviewAnythingAPI.DTOs.AuthDTOs;
@@ -181,5 +182,92 @@ public class AuthService : IAuthService
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+
+    public async Task<AuthResponseDto> GoogleSignInAsync(string idTokenString)
+    {
+        var googleClientId = _configuration["Google:ClientId"];
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(idTokenString, new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = new[] { googleClientId},
+            });
+        }
+        catch (InvalidJwtException)
+        {
+            return new AuthResponseDto { Success = false, ErrorMessage = "Invalid Google Token" };
+        }
+        
+        // Token is valid, extract user information
+        var userEmail = payload.Email;
+        var googleUserId = payload.Subject;
+        var firstName = payload.GivenName;
+        var lastName = payload.FamilyName;
+        var profilePicture = payload.Picture;
+        var emailVerified = payload.EmailVerified;
+        if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(googleUserId))
+        {
+            return new AuthResponseDto { Success = false, ErrorMessage = "Required information not provided by Google." };
+        }
+        
+        // Use ASP.NET Core Identity's external login mechanism
+        var loginInfo = new UserLoginInfo("Google", googleUserId, "Google");
+
+        var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+
+        if (user == null)
+        {
+            user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = GenerateRandomUsername(),
+                    Email = userEmail,
+                    FirstName = firstName,
+                    LastName = lastName,
+                    ProfileImage = profilePicture,
+                    EmailConfirmed = emailVerified,
+                    CreationDate = DateTime.UtcNow,
+                    IsActive = true
+                };
+                var createUserResult = await _userManager.CreateAsync(user);
+                if (!createUserResult.Succeeded)
+                {
+                    return new AuthResponseDto { Success = false, ErrorMessage = "Could not create local user account.", Errors = createUserResult.Errors.Select(e => e.Description).ToList() };
+                }
+            }
+
+            var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+            if (!addLoginResult.Succeeded)
+            {
+                return new AuthResponseDto { Success = false, ErrorMessage = "Could not link google account to local user.", Errors = addLoginResult.Errors.Select(e => e.Description).ToList() };
+            }
+        }
+        var localToken = await GenerateJwtToken(user);
+        return new AuthResponseDto
+        {
+            Success = true,
+            Token = localToken,
+            UserResponse = new UserResponseDto
+            {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Bio = user.Bio,
+                ProfileImage = user.ProfileImage,
+                CreationDate = user.CreationDate,
+                Phone = user.PhoneNumber
+            }
+        };
+    }
+
+    public string GenerateRandomUsername()
+    {
+        return "user_" + Guid.NewGuid().ToString("N").Substring(0,8);
     }
 }
