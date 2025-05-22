@@ -20,3 +20,12 @@
     - Yes im returning the votes in the reviewDto
     - I dont need to initialize any votes on reviewCreation
     - Should I use the updateReview for the votes count?
+    
+// Email Verification Flow
+    1. User fill the registration form
+    2. API generates an email confirmation token
+    3. API constructs a confirmation link (URL pointing to your frontend, which then calls an api endpoint)
+    4. API sends this link to the users email
+    5. Users click the link
+    6. Frondend calls your API's confirm-email endpoint with the userId and token.
+    7. API validates the token and marks the email as confirmed.

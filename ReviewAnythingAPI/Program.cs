@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Resend;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.Models;
@@ -12,6 +13,15 @@ using ReviewAnythingAPI.Services;
 using ReviewAnythingAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Resend config
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(options =>
+{
+    options.ApiToken = builder.Configuration["Resend:ApiKey"];
+});
+builder.Services.AddTransient<IResend, ResendClient>();
 
 // Add services to the container.
 builder.Services.AddScoped<IAuthService, AuthService>();

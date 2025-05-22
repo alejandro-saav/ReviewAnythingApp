@@ -4,6 +4,7 @@ using System.Text;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Resend;
 using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.Models;
@@ -16,11 +17,13 @@ public class AuthService : IAuthService
 {
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IResend _resend;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IResend resend)
     {
         _userManager = userManager;
         _configuration = configuration;
+        _resend = resend;
     }
 
     public async Task<AuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto)
@@ -73,12 +76,85 @@ public class AuthService : IAuthService
         }
 
         // Generate Token
-        var token = await GenerateJwtToken(user);
+        //var token = await GenerateJwtToken(user);
+        // Email verification
+        var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var verificationEmail = $"{_configuration["FrontendUrls:ConfirmEmailUrl"]}?userId={user.Id}&token={verificationToken}";
+        var message = new EmailMessage();
+        message.From = "onboarding@resend.dev";
+        message.To.Add(user.Email);
+        message.Subject = "ReviewAnything Verification Email";
+        message.HtmlBody = $@"
+    <div style=""font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#333;background:#f9f9f9;padding:20px;border-radius:8px;"">
+        <h2 style=""color:#222;"">Welcome to <span style=""color:#007bff;"">ReviewAnything</span>!</h2>
+        
+        <p>Hi {user.FirstName},</p>
+        
+        <p>Thanks for signing up. To get started, please confirm your email address by clicking the button below:</p>
+
+        <p style=""text-align:center;"">
+            <a href=""{verificationEmail}"" 
+               style=""background-color:#007bff;color:#fff;padding:12px 20px;text-decoration:none;
+                      border-radius:5px;display:inline-block;font-weight:bold;"">
+                Confirm Email
+            </a>
+        </p>
+
+        <p>If the button above doesn't work, copy and paste this link into your browser:</p>
+        <p><a href=""{verificationEmail}"" style=""color:#007bff;"">{verificationEmail}</a></p>
+
+        <p>If you didn’t create this account, you can safely ignore this email.</p>
+
+        <p style=""margin-top:30px;"">— The ReviewAnything Team</p>
+    </div>";
+
+        await _resend.EmailSendAsync(message);
         return new AuthResponseDto
         {
             Success = true,
-            Token = token,
             UserResponse = new UserResponseDto {
+                UserId = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Bio = user.Bio,
+                ProfileImage = user.ProfileImage,
+                CreationDate = user.CreationDate,
+                Phone = user.PhoneNumber
+            },
+        };
+    }
+
+    public async Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return new AuthResponseDto
+            {
+                Success = false,
+                ErrorMessage = "User not found!"
+            };
+        }
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        if (!result.Succeeded)
+        {
+            return new AuthResponseDto
+            {
+                Success = false,
+                ErrorMessage = "Email confirmation failed!"
+            };
+        }
+
+        var newJwtToken = await GenerateJwtToken(user);
+
+        return new AuthResponseDto
+        {
+            Success = true,
+            Token = newJwtToken,
+            UserResponse = new UserResponseDto
+            {
                 UserId = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,

@@ -11,4 +11,5 @@ public interface IAuthService
 
     Task<string> GenerateJwtToken(ApplicationUser user);
     Task<AuthResponseDto> GoogleSignInAsync(string idToken);
+    Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token);
 }

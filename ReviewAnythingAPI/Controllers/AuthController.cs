@@ -36,5 +36,17 @@ public class AuthController : ControllerBase
         
         if (!result.Success) return BadRequest(result.ErrorMessage);
         return Ok(result);
-    }   
+    }
+
+    [HttpPost("google-signin")]
+    public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInRequestDto googleSignInDto)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+        var authResponse = await _authService.GoogleSignInAsync(googleSignInDto.IdToken);
+        if (authResponse.Success)
+        {
+            return Ok(authResponse);
+        }
+        return BadRequest(new { authResponse.ErrorMessage, authResponse.Errors });
+    }
 }
