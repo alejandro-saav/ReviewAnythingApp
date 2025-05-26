@@ -1,0 +1,288 @@
+/* ========================================= */
+/* 1. CSS Reset & Base Styles              */
+/* ========================================= */
+
+/* Box sizing for all elements */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Remove default margin from common elements */
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+    margin: 0;
+}
+
+/* Set root font size for rem units */
+html {
+    font-size: 16px; /* Defines what 1rem equals */
+    scroll-behavior: smooth; /* Smooth scrolling for anchor links */
+}
+
+/* Body defaults */
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Common system fonts */
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    -webkit-font-smoothing: antialiased; /* Improves font rendering on macOS/iOS */
+    -moz-osx-font-smoothing: grayscale; /* Improves font rendering on macOS/iOS */
+    min-height: 100vh; /* Ensure body takes full viewport height */
+    display: flex; /* For overall app layout if using flexbox for main layout */
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+/* Remove list styles on ul, ol elements with a class attribute */
+ul[class],
+ol[class] {
+    list-style: none;
+}
+
+/* A elements that don't have a class get a default style */
+a:not([class]) {
+    text-decoration-skip-ink: auto;
+}
+
+/* Make images easier to work with */
+img {
+    max-width: 100%;
+    display: block;
+}
+
+/* Inherit fonts for form controls */
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+/* ========================================= */
+/* 2. Color Variables (Custom Properties)  */
+/* ========================================= */
+
+:root {
+    /* Your Custom Palette Colors */
+    --palette-pink: #ff99c8;
+    --palette-yellow: #fcf6bd;
+    --palette-green: #d0f4de;
+    --palette-blue: #a9def9;
+    --palette-purple: #e4c1f9;
+
+    /* Assigning roles to your palette colors */
+    --primary-color: var(--palette-blue); /* Let's use your light blue as a primary button/link color */
+    --primary-dark: #81b7e6; /* A slightly darker shade of --palette-blue */
+    --primary-light: #c2e6fc; /* A slightly lighter shade of --palette-blue */
+
+    --secondary-color: var(--palette-green); /* Using your green for secondary actions or elements */
+    --secondary-dark: #aee7c5; /* A darker shade of --palette-green */
+    --secondary-light: #e1f9ee; /* A lighter shade of --palette-green */
+
+    /* Text Colors - adjusting to ensure good contrast with your palette */
+    --text-color: #333; /* Dark for good readability on light backgrounds */
+    --text-light: #555;
+    --text-lighter: #777;
+    --text-inverted: #fff; /* White for use on dark backgrounds (like buttons) */
+
+    /* Background Colors - considering your light palette */
+    --background-color: #fcfcfc; /* A very light, almost white background */
+    --background-card: #fff;
+    --background-dark: #444; /* A darker background for contrast if needed */
+
+    /* Border Colors */
+    --border-color: #eee;
+    --border-dark: #ccc;
+
+    /* Specific palette colors for direct use */
+    --color-pink: var(--palette-pink);
+    --color-yellow: var(--palette-yellow);
+    --color-green: var(--palette-green);
+    --color-blue: var(--palette-blue);
+    --color-purple: var(--palette-purple);
+
+
+    /* Success, Warning, Error Colors (Can be derived from your palette or kept standard) */
+    --success-color: #4CAF50; /* A standard green for success */
+    --warning-color: #FFC107; /* A standard yellow for warning */
+    --error-color: #F44336; /* A standard red for error */
+
+    /* Spacing units (e.g., for padding, margin) */
+    --space-xs: 0.25rem; /* 4px */
+    --space-sm: 0.5rem;  /* 8px */
+    --space-md: 1rem;    /* 16px */
+    --space-lg: 1.5rem;  /* 24px */
+    --space-xl: 2rem;    /* 32px */
+}
+
+/* Utility to generate darker/lighter shades if needed programmatically, or just define them */
+/* Example: using an online tool like ColorBrewer or paletton.com to find shades */
+
+/* ========================================= */
+/* 3. Global Typography                    */
+/* ========================================= */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-color);
+    margin-bottom: var(--space-md); /* Add some space below headings */
+}
+
+h1 { font-size: 2.5rem; } /* ~40px */
+h2 { font-size: 2rem; }   /* ~32px */
+h3 { font-size: 1.75rem; }/* ~28px */
+h4 { font-size: 1.5rem; } /* ~24px */
+h5 { font-size: 1.25rem; }/* ~20px */
+h6 { font-size: 1rem; }   /* ~16px */
+
+p {
+    margin-bottom: var(--space-md);
+}
+
+a {
+    color: var(--primary-color); /* Links use primary color */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* ========================================= */
+/* 4. Accessibility & Focus States         */
+/* ========================================= */
+
+/* Better focus states for keyboard navigation */
+/*:focus-visible {*/
+/*    outline: 2px solid var(--primary-color);*/
+/*    outline-offset: 2px;*/
+/*}*/
+
+/* Hide content visually but keep it accessible for screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ========================================= */
+/* 5. Basic Layout Helpers (Optional but useful) */
+/* ========================================= */
+
+.container {
+    max-width: 1200px; /* Max width for your main content */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-md);
+    padding-right: var(--space-md);
+}
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+/* Basic spacing classes */
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+
+/* ========================================= */
+/* 6. Form Element Styling (Basic)         */
+/* ========================================= */
+
+label {
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-weight: 600;
+}
+
+/*input[type="text"],*/
+/*input[type="email"],*/
+/*input[type="password"],*/
+/*input[type="number"],*/
+/*textarea,*/
+/*select {*/
+/*    width: 100%;*/
+/*    padding: var(--space-sm) var(--space-md);*/
+/*    margin-bottom: var(--space-md);*/
+/*    border: 1px solid var(--border-color);*/
+/*    border-radius: 4px;*/
+/*    background-color: var(--background-card);*/
+/*    color: var(--text-color);*/
+/*    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;*/
+/*}*/
+
+/*input[type="text"]:focus,*/
+/*input[type="email"]:focus,*/
+/*input[type="password"]:focus,*/
+/*input[type="number"]:focus,*/
+/*textarea:focus,*/
+/*select:focus {*/
+/*    border-color: var(--primary-color);*/
+/*    outline: none;*/
+/*    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 25%, transparent); !* Use a transparent primary color for the shadow *!*/
+/*}*/
+
+button {
+    display: inline-block;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--primary-color); /* Uses your chosen primary color */
+    color: var(--text-inverted);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color); /* Uses your chosen secondary color */
+    color: var(--text-inverted);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-dark);
+}
+
+/* ========================================= */
+/* 7. Error/Validation Messages            */
+/* ========================================= */
+
+.validation-message {
+    color: var(--error-color);
+    font-size: 0.875rem; /* Smaller text for errors */
+    margin-top: var(--space-sm); /* Pull it closer to the field */
+    margin-bottom: var(--space-md);
+}
+
+.validation-summary-errors ul {
+    list-style: none;
+    padding: 0;
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+    background-color: color-mix(in srgb, var(--error-color) 10%, transparent); /* A lighter tint of the error color */
+    padding: var(--space-sm);
+    border-radius: 4px;
+    margin-bottom: var(--space-md);
+}
