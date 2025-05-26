@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using Google.Apis.Auth;
@@ -7,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Resend;
 using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.DTOs.UserDTOs;
+using ReviewAnythingAPI.HelperClasses.CustomExceptions;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories.Interfaces;
 using ReviewAnythingAPI.Services.Interfaces;
@@ -79,7 +81,8 @@ public class AuthService : IAuthService
         //var token = await GenerateJwtToken(user);
         // Email verification
         var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var verificationEmail = $"{_configuration["FrontendUrls:ConfirmEmailUrl"]}?userId={user.Id}&token={verificationToken}";
+        var encodedToken = WebUtility.UrlEncode(verificationToken);
+        var verificationEmail = $"{_configuration["FrontendUrls:ConfirmEmailUrl"]}?userId={user.Id}&token={encodedToken}";
         var message = new EmailMessage();
         message.From = "onboarding@resend.dev";
         message.To.Add(user.Email);
@@ -112,6 +115,7 @@ public class AuthService : IAuthService
         return new AuthResponseDto
         {
             Success = true,
+            Message = "Registration Successful! Please confirm your email by clicking on the link sent to your email address.",
             UserResponse = new UserResponseDto {
                 UserId = user.Id,
                 UserName = user.UserName,
@@ -131,20 +135,12 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "User not found!"
-            };
+            throw new EntityNotFoundException("User not found!");
         }
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "Email confirmation failed!"
-            };
+            throw new InvalidOperationException($"Unable to confirm your email: {user.Email}");
         }
 
         var newJwtToken = await GenerateJwtToken(user);

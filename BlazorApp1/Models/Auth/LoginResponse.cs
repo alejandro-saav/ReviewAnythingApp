@@ -1,13 +1,11 @@
-using ReviewAnythingAPI.DTOs.UserDTOs;
+namespace BlazorApp1.Models.Auth;
 
-namespace ReviewAnythingAPI.DTOs.AuthDTOs;
-
-public class AuthResponseDto
+public class LoginResponse
 {
     public bool Success { get; set; }
     public string? Message { get; set; }
     public string? ErrorMessage { get; set; }
     public string? Token { get; set; }
-    public UserResponseDto? UserResponse { get; set; }
+    public User? UserResponse { get; set; }
     public List<string>? Errors { get; set; }
 }

@@ -1,0 +1,54 @@
+.auth-layout {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg. var(--palette-green), var(--palette-yellow));
+    padding: var(--space-md);
+}
+
+.auth-card-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+#blazor-error-ui {
+    background: var(--error-color);
+    color: var(--text-inverted);
+    padding: var(--space-sm) var(--space-md);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.9rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+#blazor-error-ui .reload {
+    color: var(--text-inverted);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#blazor-error-ui .dismiss {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: var(--text-inverted);
+    cursor: pointer;
+    font-weight: bold;
+    height: 24px;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#blazor-error-ui .dismiss:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}

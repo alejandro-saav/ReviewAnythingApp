@@ -49,4 +49,12 @@ public class AuthController : ControllerBase
         }
         return BadRequest(new { authResponse.ErrorMessage, authResponse.Errors });
     }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return BadRequest("userId or token is empty");
+        var result = await _authService.ConfirmEmailAsync(userId, token);
+        return Ok(result);
+    }
 }

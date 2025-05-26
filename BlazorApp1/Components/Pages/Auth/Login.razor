@@ -1,0 +1,59 @@
+@page "/login"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="login-container">
+    <div class="login-wrapper">
+        <!-- Login Panel -->
+        <div class="login-panel">
+            <h2 class="panel-title">Login</h2>
+            
+            <EditForm Model="@LoginModel" OnValidSubmit="HandleLogin" FormName="loginForm">
+                <DataAnnotationsValidator />
+                
+                <div class="form-group">
+                    <input type="email" @bind="LoginModel.Email" @bind:event="oninput"
+                           placeholder="Email Address" class="form-input" />
+                    <ValidationMessage For="@(() => LoginModel.Email)" class="validation-error" />
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" @bind="LoginModel.Password" @bind:event="oninput"
+                           placeholder="Password" class="form-input" />
+                    <ValidationMessage For="@(() => LoginModel.Password)" class="validation-error" />
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <InputCheckbox @bind-Value="LoginModel.RememberMe"/>
+                        <span class="checkmark"></span>
+                        Remember me
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="btn-primary" disabled="@IsLoading">
+                    @if (IsLoading) 
+                    { 
+                        <span class="spinner"></span>
+                        <span>Loading...</span>
+                    }
+                    else
+                    {
+                        <span>Login</span>
+                    }
+                </button>
+                
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="error-message">@ErrorMessage</div>
+                }
+            </EditForm>
+            
+            <div class="divider">or</div>
+            <button type="button" class="btn-google" @onclick="LoginWithGoogle">
+                Log in with Google
+            </button>
+        </div>
+    </div>
+</div>
