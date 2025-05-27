@@ -10,64 +10,80 @@
         <div class="signup-panel">
             <h2 class="panel-title">Sign up</h2>
             
-            <EditForm Model="@SignUpModel" OnValidSubmit="HandleLogin" FormName="signupForm">
+            <EditForm Model="@SignUpModel" OnValidSubmit="HandleSignUp" FormName="signupForm">
                 <DataAnnotationsValidator />
                 <div class="form-group">
+                    <label for="username">Username:<span class="asterisk"> *</span></label>
                     <input type="text" @bind="SignUpModel.UserName" @bind:event="oninput"
-                           placeholder="Username" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.UserName)" class="validation-error" />
+                           placeholder="Username" class="form-input" id="username"/>
+                    <ValidationMessage For="@(() => SignUpModel.UserName)" class="validation-error"/>
                 </div>
                 
                 <div class="form-group">
+                    <label for="firstname">Firstname:<span class="asterisk"> *</span></label>
                     <input type="text" @bind="SignUpModel.FirstName" @bind:event="oninput"
-                           placeholder="Firstname" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.FirstName)" class="validation-error" />
+                           placeholder="Firstname" class="form-input" id="firstname"/>
+                    <ValidationMessage For="@(() => SignUpModel.FirstName)" class="validation-error"/>
                 </div>
 
                 <div class="form-group">
+                    <label for="lastname">Lastname:</label>
                     <input type="text" @bind="SignUpModel.LastName" @bind:event="oninput"
-                           placeholder="LastName" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.LastName)" class="validation-error" />
+                           placeholder="LastName" class="form-input" id="lastname"/>
+                    <ValidationMessage For="@(() => SignUpModel.LastName)" class="validation-error"/>
                 </div>
                 
                 <div class="form-group">
+                    <label for="email">Email:<span class="asterisk"> *</span></label>
                     <input type="email" @bind="SignUpModel.Email" @bind:event="oninput"
-                           placeholder="Email Address" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.Email)" class="validation-error" />
+                           placeholder="Email Address" class="form-input" id="email"/>
+                    <ValidationMessage For="@(() => SignUpModel.Email)" class="validation-error"/>
                 </div>
                 
                 <div class="form-group">
+                    <label for="password">Password:<span class="asterisk"> *</span></label>
                     <input type="password" @bind="SignUpModel.Password" @bind:event="oninput"
-                           placeholder="Password" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.Password)" class="validation-error" />
+                           placeholder="Password" class="form-input" id="password"/>
+                    <ValidationMessage For="@(() => SignUpModel.Password)" class="validation-error"/>
                 </div>
 
                 <div class="form-group">
+                    <label for="phone">Phone Number:</label>
                     <input type="text" @bind="SignUpModel.Phone" @bind:event="oninput"
-                           placeholder="Phone number" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.Phone)" class="validation-error" />
+                           placeholder="Phone number" class="form-input" id="phone"/>
+                    <ValidationMessage For="@(() => SignUpModel.Phone)" class="validation-error"/>
                 </div>
 
                 <div class="upload-container">
                     <label for="profile-upload" class="profile-upload">
-                        <div class="profile-icon">👤</div>
-                        <span>Profile Picture:</span>
+                        @if (string.IsNullOrEmpty(ImagePreviewUrl)) {
+                            <div class="profile-icon">👤</div>
+                        }
+                        else
+                        {
+                            <div class="image-preview" id="imagePreview">
+                                <img id="previewImg" src="@ImagePreviewUrl" alt="Profile Preview">
+                                <button type="button" class="remove-btn"  @onclick="HandleRemovePhoto">×</button>
+                            </div>
+                         
+                        }
+                        <span>Profile Picture: @ImageNameSelected</span>
                         @* <input type="file" id="profile-upload" accept="image/*" hidden> *@
                         <InputFile id="profile-upload" accept="image/*"
                                    OnChange="HandleImageSelected" style="display: none;" />
                     </label>
 
-                    <!-- Preview area (hidden initially) -->
-                    <div class="image-preview" id="imagePreview" style="display: none;">
-                        <img id="previewImg" src="" alt="Profile Preview">
-                        <button type="button" class="remove-btn" id="removeBtn">×</button>
-                    </div>
-                </div>
-
+                    @* <!-- Preview area (hidden initially) --> *@
+                </div >
+                @if (!string.IsNullOrEmpty(ImageErrorMessage))
+                {
+                    <div class="error-message" style="margin-bottom: 10px">@ImageErrorMessage</div>
+                }
                 <div class="form-group">
-                    <input type="text" @bind="SignUpModel.Bio" @bind:event="oninput"
-                           placeholder="Bio" class="form-input" />
-                    <ValidationMessage For="@(() => SignUpModel.Bio)" class="validation-error" />
+                    <label for="bio">Biography:</label>
+                    <textarea type="text" @bind="SignUpModel.Bio" @bind:event="oninput"
+                           placeholder="Bio max length(500)" class="form-input" id="bio" maxlength="500" style="resize: none"></textarea>
+                    <ValidationMessage For="@(() => SignUpModel.Bio)" class="validation-error"/>
                 </div>
                 
                 <button type="submit" class="btn-primary" disabled="@IsLoading">
@@ -90,76 +106,77 @@
         </div>
     </div>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const profileUpload = document.getElementById('profile-upload');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
-        const removeBtn = document.getElementById('removeBtn');
-        const uploadLabel = document.querySelector('.profile-upload');
-        console.log("FOCUS MEN FOCUS MEN FOCUS MEN FOCUS MEN FOCUS MEN");
-        /*
-
-        profileUpload.onchange = function () {
-            console.log("does this work?");
-        }
-*/
-        profileUpload.addEventListener('change', function(e) {
-            e.target.preventDefault();
-            console.log("Input Fire");
-            const file = e.target.files[0];
-            
-            if (file) {
-                // Validate file type
-                if (!file.type.startsWith('image/')) {
-                    alert('Please select a valid image file');
-                    return;
-                }
-                
-                // Validate file size (5MB limit)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File size must be less than 5MB');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                    uploadLabel.style.display = 'none';
-                };
-                
-                reader.readAsDataURL(file);
-            }
-        });
-        removeBtn.addEventListener('click', function () {
-            profileUpload.value = '';
-            imagePreview.style.display = 'none';
-            uploadLabel.style.display = 'flex';
-            previewImg.src = '';
-        });
-
-        // Drag and drop functionality
-        uploadLabel.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            this.style.background = 'rgba(142, 36, 170, 0.3)';
-        });
-
-        uploadLabel.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-            this.style.background = 'rgba(142, 36, 170, 0.1)';
-        });
-
-        uploadLabel.addEventListener('drop', function (e) {
-            e.preventDefault();
-            this.style.background = 'rgba(142, 36, 170, 0.1)';
-
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                profileUpload.files = files;
-                profileUpload.dispatchEvent(new Event('change'));
-            }
-        });
-    });
-</script>
+@* <script> *@
+@*     document.addEventListener('DOMContentLoaded', function () { *@
+@*         const profileUpload = document.getElementById('profile-upload'); *@
+@*         const imagePreview = document.getElementById('imagePreview'); *@
+@*         const previewImg = document.getElementById('previewImg'); *@
+@*         const removeBtn = document.getElementById('removeBtn'); *@
+@*         const uploadLabel = document.querySelector('.profile-upload'); *@
+@*         console.log("FOCUS MEN FOCUS MEN FOCUS MEN FOCUS MEN FOCUS MEN"); *@
+@*         /* *@
+@* *@
+@*         profileUpload.onchange = function () { *@
+@*             console.log("does this work?"); *@
+@*         } *@
+@* */ *@
+@*         profileUpload.addEventListener('change', function(e) { *@
+@*             e.target.preventDefault(); *@
+@*             console.log("Input Fire"); *@
+@*             const file = e.target.files[0]; *@
+@* *@
+@*             if (file) { *@
+@*                 // Validate file type *@
+@*                 if (!file.type.startsWith('image/')) { *@
+@*                     alert('Please select a valid image file'); *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 // Validate file size (5MB limit) *@
+@*                 if (file.size > 5 * 1024 * 1024) { *@
+@*                     alert('File size must be less than 5MB'); *@
+@*                     return; *@
+@*                 } *@
+@* *@
+@*                 const reader = new FileReader(); *@
+@* *@
+@*                 reader.onload = function(e) { *@
+@*                     previewImg.src = e.target.result; *@
+@*                     imagePreview.style.display = 'block'; *@
+@*                     uploadLabel.style.display = 'none'; *@
+@*                 }; *@
+@* *@
+@*                 reader.readAsDataURL(file); *@
+@*             } *@
+@*         }); *@
+@*         removeBtn.addEventListener('click', function () { *@
+@*             console.log("YO"); *@
+@*             profileUpload.value = ''; *@
+@*             imagePreview.style.display = 'none'; *@
+@*             uploadLabel.style.display = 'flex'; *@
+@*             previewImg.src = ''; *@
+@*         }); *@
+@* *@
+@*         // Drag and drop functionality *@
+@*         uploadLabel.addEventListener('dragover', function (e) { *@
+@*             e.preventDefault(); *@
+@*             this.style.background = 'rgba(142, 36, 170, 0.3)'; *@
+@*         }); *@
+@* *@
+@*         uploadLabel.addEventListener('dragleave', function (e) { *@
+@*             e.preventDefault(); *@
+@*             this.style.background = 'rgba(142, 36, 170, 0.1)'; *@
+@*         }); *@
+@* *@
+@*         uploadLabel.addEventListener('drop', function (e) { *@
+@*             e.preventDefault(); *@
+@*             this.style.background = 'rgba(142, 36, 170, 0.1)'; *@
+@* *@
+@*             const files = e.dataTransfer.files; *@
+@*             if (files.length > 0) { *@
+@*                 profileUpload.files = files; *@
+@*                 profileUpload.dispatchEvent(new Event('change')); *@
+@*             } *@
+@*         }); *@
+@*     }); *@
+@* </script> *@
