@@ -29,3 +29,7 @@
     5. Users click the link
     6. Frondend calls your API's confirm-email endpoint with the userId and token.
     7. API validates the token and marks the email as confirmed.
+    
+Verification TOken: CfDJ8Px4jGDDeMZJnwGICBjCuf3c1Rp05cFRArd0EJmPC5/k3wyiaLZ0hgUU3dvcjsebfP9eUCdsii00Ohb40RdJFrtEsqUlnRZAdwDKujhjiwCdhd4jfdwk8RjRFtjkSAlGKcq2ob6RjOUtgoxGjLp3Q0MDBhmiuTymLi834uu/T9ByVus63suHsC7QMOBRS8PBpQ==
+
+EncodedToken: CfDJ8Px4jGDDeMZJnwGICBjCuf3c1Rp05cFRArd0EJmPC5/k3wyiaLZ0hgUU3dvcjsebfP9eUCdsii00Ohb40RdJFrtEsqUlnRZAdwDKujhjiwCdhd4jfdwk8RjRFtjkSAlGKcq2ob6RjOUtgoxGjLp3Q0MDBhmiuTymLi834uu/T9ByVus63suHsC7QMOBRS8PBpQ==

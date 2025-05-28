@@ -11,7 +11,7 @@ public class RegisterRequestDto
     [StringLength(30)]
     public string FirstName { get; set; }
     [StringLength(30)]
-    public string LastName { get; set; }
+    public string? LastName { get; set; }
     [Required] 
     [EmailAddress] 
     public string Email { get; set; }
@@ -19,14 +19,10 @@ public class RegisterRequestDto
     [StringLength(50, MinimumLength = 8)]
     [DataType(DataType.Password)]
     public string Password { get; set; }
-    [Required]
-    [Compare("Password")]
-    [DataType(DataType.Password)]
-    public string ConfirmPassword { get; set; }
     [Phone]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
     public string? ProfileImage { get; set; }
     [StringLength(500)]
     [DataType(DataType.MultilineText)]
-    public string Bio { get; set; }
+    public string? Bio { get; set; }
 }

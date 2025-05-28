@@ -35,8 +35,10 @@
                 <button type="submit" class="btn-primary" disabled="@IsLoading">
                     @if (IsLoading) 
                     { 
+                        <div class="spinner-container">
                         <span class="spinner"></span>
                         <span>Loading...</span>
+                        </div>
                     }
                     else
                     {

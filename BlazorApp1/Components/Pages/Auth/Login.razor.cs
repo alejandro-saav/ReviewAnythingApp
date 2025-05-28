@@ -83,7 +83,7 @@ public partial class Login : ComponentBase
         IsLoading = true;
         
         // Force UI update to show loading state
-        await InvokeAsync(StateHasChanged);
+        // await InvokeAsync(StateHasChanged);
 
         try
         {
@@ -107,7 +107,7 @@ public partial class Login : ComponentBase
         {
             IsLoading = false;
             // Force UI update
-            await InvokeAsync(StateHasChanged);
+            // await InvokeAsync(StateHasChanged);
         }
     }
 

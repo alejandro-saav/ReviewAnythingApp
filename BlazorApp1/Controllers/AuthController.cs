@@ -59,18 +59,57 @@ public class AuthController : ControllerBase
             }
         }
         
-    [HttpPost("signup")]
-    public async Task<IActionResult> SignUp([FromBody] RegisterRequestDto request)
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
     {
-        var apiResponse = await _apiHttpClient.PostAsJsonAsync("auth/register", request); // Assuming your API has /auth/register
-        if (apiResponse.IsSuccessStatusCode)
+            var apiResponse = await _apiHttpClient.PostAsJsonAsync("api/auth/Register", request);
+            if (apiResponse.IsSuccessStatusCode)
+            {
+                return Ok(new { Message = "Registration successful. We have sent a confirmation email to the register address." });
+            }
+            else
+            {
+                var errorContent = await apiResponse.Content.ReadAsStringAsync();
+                return StatusCode((int)apiResponse.StatusCode, errorContent);
+            }
+    }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return BadRequest("userId or token is empty");
+        try
         {
-            return Ok(new { Message = "Registration successful. Please check your email." });
+            var decodedToken = Uri.UnescapeDataString(token);
+            var apiResponse = await _apiHttpClient.GetAsync($"api/auth/confirm-email?userId={userId}&token={decodedToken}");
+
+            if (apiResponse.IsSuccessStatusCode)
+            {
+                var loginApiResponse = await apiResponse.Content.ReadFromJsonAsync<LoginResponse>();
+
+                if (loginApiResponse == null || string.IsNullOrEmpty(loginApiResponse.Token))
+                {
+                    return BadRequest("Authentication failed: No token received.");
+                }
+
+                Response.Cookies.Append("AuthToken", loginApiResponse.Token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(30)
+                });
+                return Ok(new { Message = "Login successful" });
+            }
+            else
+            {
+                var errorContent = await apiResponse.Content.ReadAsStringAsync();
+                return StatusCode((int)apiResponse.StatusCode, errorContent);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            var errorContent = await apiResponse.Content.ReadAsStringAsync();
-            return StatusCode((int)apiResponse.StatusCode, errorContent);
+            return StatusCode(500, $"An unexpected error occurred during email confirmation: {ex.Message}");
         }
     }
     [HttpGet("data")] // This would be called by your Blazor client to get protected data
