@@ -81,7 +81,7 @@ public class AuthService : IAuthService
         //var token = await GenerateJwtToken(user);
         // Email verification
         var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var encodedToken = WebUtility.UrlEncode(verificationToken);
+        var encodedToken = Uri.EscapeDataString(verificationToken);
         var verificationEmail = $"{_configuration["FrontendUrls:ConfirmEmailUrl"]}?userId={user.Id}&token={encodedToken}";
         var message = new EmailMessage();
         message.From = "onboarding@resend.dev";
@@ -137,7 +137,8 @@ public class AuthService : IAuthService
         {
             throw new EntityNotFoundException("User not found!");
         }
-        var result = await _userManager.ConfirmEmailAsync(user, token);
+        var decodedToken = Uri.UnescapeDataString(token);
+        var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
         if (!result.Succeeded)
         {
             throw new InvalidOperationException($"Unable to confirm your email: {user.Email}");

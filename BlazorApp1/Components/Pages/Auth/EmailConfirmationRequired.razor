@@ -1,0 +1,39 @@
+@page "/email-confirmation-required"
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Email Confirmation Required</PageTitle>
+
+<div class="confirmation-container">
+    <div class="confirmation-card">
+        <div class="icon-container">
+            <div class="email-icon">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="title">Check Your Email</h1>
+
+        <p class="message">
+            Please go to the email address you registered with and confirm your email to complete the process.
+        </p>
+
+        <div class="info-box">
+            <p class="info-text">
+                <strong>Didn't receive the email?</strong><br>
+                Check your spam folder or contact support if you need assistance.
+            </p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary" @onclick="ResendEmailVerification">
+                Resend Email
+            </button>
+            <a href="/Login" class="btn btn-secondary">
+                Login
+            </a>
+        </div>
+    </div>
+</div>

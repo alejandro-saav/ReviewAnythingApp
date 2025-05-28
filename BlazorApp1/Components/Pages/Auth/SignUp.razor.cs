@@ -91,7 +91,7 @@ public partial class SignUp : ComponentBase
 
             if (success)
             {
-                Navigation.NavigateTo("/", forceLoad: true);
+                Navigation.NavigateTo("/email-confirmation-required", forceLoad: true);
             }
             else
             {

@@ -52,6 +52,50 @@ public class AuthService : IAuthService
 
     public async Task<bool> RegisterAsync(RegisterRequestDto request)
     {
-        return true;
+        LastErrorMessage = null;
+        try
+        {
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, "api/auth/Register");
+            var response = await _httpClient.PostAsJsonAsync(requestUri, request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                LastErrorMessage = $"Signup failed: {response.StatusCode}. {errorContent}";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Network error during signup: {ex.Message}";
+            return false;
+        }
+    }
+
+    public async Task<bool> ConfirmEmailAsync(string userId, string token)
+    {
+        try
+        {
+            // var encodedToken = Uri.EscapeDataString(token);
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/confirm-email?userId={userId}&token={token}");
+            var response = await _httpClient.GetAsync(requestUri);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                LastErrorMessage = $"Confirm email failed: {response.StatusCode}.";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Network error during signup: {ex.Message}";
+            return false;
+        }
     }
 }
