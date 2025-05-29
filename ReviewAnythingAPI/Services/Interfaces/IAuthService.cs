@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.Data;
 using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.Models;
 
@@ -12,4 +13,6 @@ public interface IAuthService
     Task<string> GenerateJwtToken(ApplicationUser user);
     Task<AuthResponseDto> GoogleSignInAsync(string idToken);
     Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token);
+    Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto forgotPasswordRequestDto);
+    Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto resetPasswordRequestDto);
 }

@@ -112,6 +112,22 @@ public class AuthController : ControllerBase
             return StatusCode(500, $"An unexpected error occurred during email confirmation: {ex.Message}");
         }
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var apiResponse = await _apiHttpClient.PostAsJsonAsync("api/auth/forgot-password", request);
+        if (apiResponse.IsSuccessStatusCode)
+        {
+            return Ok(new { Message = "We have sent a link to your email address to reset your password." });
+        }
+        else
+        {
+            var errorContent = await apiResponse.Content.ReadAsStringAsync();
+            return StatusCode((int)apiResponse.StatusCode, errorContent);
+        }
+    }
+    
     [HttpGet("data")] // This would be called by your Blazor client to get protected data
     // You'd need to add authorization here if you want to restrict access to the proxy endpoint
     // [Authorize]
