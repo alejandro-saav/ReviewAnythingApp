@@ -178,6 +178,16 @@ public class AuthService : IAuthService
             };
         }
         
+        if (!user.EmailConfirmed)
+        {
+            return new AuthResponseDto
+            {
+                Success = false,
+                ErrorMessage = "Email not confirmed. Please check your inbox."
+                // You could add a flag here like RequiresEmailConfirmation = true
+            };
+        }
+        
         // Check if account is locked out
         if (await _userManager.IsLockedOutAsync(user))
         {
@@ -342,5 +352,87 @@ public class AuthService : IAuthService
     public string GenerateRandomUsername()
     {
         return "user_" + Guid.NewGuid().ToString("N").Substring(0,8);
+    }
+
+    public async Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+        {
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "If your email address is registered and confirmed, you will receive a password reset link.",
+            };
+        }
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = Uri.EscapeDataString(token);
+        string callBackUrl = $"{_configuration["FrontEndUrls:ResetPassword"]}?userId={user.Id}&token={encodedToken}";
+        
+        // Send Email
+        var message = new EmailMessage();
+        message.From = "onboarding@resend.dev";
+        message.To.Add(user.Email);
+        message.Subject = "ReviewAnything Password Reset";
+        message.HtmlBody = $@"
+    <div style=""font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#333;background:#f9f9f9;padding:20px;border-radius:8px;"">
+        <h2 style=""color:#222;"">Hello from <span style=""color:#007bff;"">ReviewAnything</span>!</h2>
+        
+        <p>Hi {user.FirstName},</p>
+        
+        <p>We received a request to reset your password for your ReviewAnything account. If you made this request, you can reset your password by clicking the link below:</p>
+
+        <p style=""text-align:center;"">
+            <a href=""{callBackUrl}"" 
+               style=""background-color:#007bff;color:#fff;padding:12px 20px;text-decoration:none;
+                      border-radius:5px;display:inline-block;font-weight:bold;"">
+                Reset Password
+            </a>
+        </p>
+
+        <p>If the button above doesn't work, copy and paste this link into your browser:</p>
+        <p><a href=""{callBackUrl}"" style=""color:#007bff;"">{callBackUrl}</a></p>
+
+        <p>This link will expire in 60 minutes. If you didn’t request a password reset, you can safely ignore this email — your password will remain unchanged. If you have any issues, feel free to contact our support team.</p>
+
+        <p style=""margin-top:30px;"">— The ReviewAnything Team</p>
+    </div>";
+        await _resend.EmailSendAsync(message);
+        return new AuthResponseDto
+        {
+            Success = true,
+            Message =
+                "Reset password success you will receive a password reset link to the email address registered to your account.",
+        };
+    }
+
+    public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId);
+        if (user == null)
+        {
+            return new AuthResponseDto
+            {
+                Success = false,
+                Message = "Password reset failed, invalid request."
+            };
+        }
+
+        string decodedToken = Uri.UnescapeDataString(request.Token);
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.Password);
+        if (result.Succeeded)
+        {
+            return new AuthResponseDto
+            {
+                Success = true,
+                Message = "Password has been reset successfully."
+            };
+        }
+
+        return new AuthResponseDto
+        {
+            Success = false,
+            Message = "Password reset failed, invalid request."
+        };
     }
 }
