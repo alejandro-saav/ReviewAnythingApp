@@ -203,6 +203,21 @@
     font-weight: 500;
 }
 
+.need-account {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.need-account a {
+    color: darkblue;
+    transition: color ease-in-out 0.3s;
+}
+
+.need-account a:hover {
+    color: var(--primary-color);
+}
+
 .spinner-container {
     display: flex;
     justify-content: center;
@@ -238,7 +253,7 @@
     padding-left: 20px;
 } 
     
-    .error-message {
+.error-message {
         background: rgba(244, 67, 54, 0.1);
         border: 1px solid #f44336;
         border-radius: 15px;
@@ -247,7 +262,7 @@
         color: #d32f2f;
         font-size: 14px;
         text-align: center;
-    }
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
