@@ -1,8 +1,5 @@
 using BlazorApp1.Models.Auth;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity.Data;
-using ForgotPasswordRequest = Microsoft.AspNetCore.Identity.Data.ForgotPasswordRequest;
-using LoginRequest = BlazorApp1.Models.Auth.LoginRequest;
 
 namespace BlazorApp1.Services;
 
@@ -107,6 +104,31 @@ public class AuthService : IAuthService
         {
             Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/forgot-password");
             var response = await _httpClient.PostAsJsonAsync(requestUri, request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                LastErrorMessage = $"Error: {response.StatusCode}. {errorContent}";
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Network error during forgot-password: {ex.Message}";
+            return false;
+        }
+    }
+
+    public async Task<bool> ResetPasswordAsync(string userId, string token, string newPassword)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/reset-password?userId={userId}&token={token}");
+            var response = await _httpClient.PostAsJsonAsync(requestUri, newPassword);
             if (response.IsSuccessStatusCode)
             {
                 return true;

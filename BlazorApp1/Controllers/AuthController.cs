@@ -127,7 +127,23 @@ public class AuthController : ControllerBase
             return StatusCode((int)apiResponse.StatusCode, errorContent);
         }
     }
-    
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromQuery] string userId, [FromQuery] string token,
+        [FromBody] string newPassword)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword)) return BadRequest("Some parameters are null or empty");
+        var apiResponse = await _apiHttpClient.PostAsJsonAsync("api/auth/reset-password", newPassword);
+        if (apiResponse.IsSuccessStatusCode)
+        {
+            return Ok(new { message = "Success."});
+        }
+        else
+        {
+            var errorContent = await apiResponse.Content.ReadAsStringAsync();
+            return StatusCode((int)apiResponse.StatusCode, errorContent);
+        }
+    }
     [HttpGet("data")] // This would be called by your Blazor client to get protected data
     // You'd need to add authorization here if you want to restrict access to the proxy endpoint
     // [Authorize]

@@ -14,5 +14,5 @@ public interface IAuthService
     Task<AuthResponseDto> GoogleSignInAsync(string idToken);
     Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token);
     Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto forgotPasswordRequestDto);
-    Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto resetPasswordRequestDto);
+    Task<AuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto resetPasswordRequestDto);
 }

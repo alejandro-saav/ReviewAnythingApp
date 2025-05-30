@@ -406,9 +406,9 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto request)
+    public async Task<AuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto request)
     {
-        var user = await _userManager.FindByIdAsync(request.UserId);
+        var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
             return new AuthResponseDto
@@ -418,7 +418,7 @@ public class AuthService : IAuthService
             };
         }
 
-        string decodedToken = Uri.UnescapeDataString(request.Token);
+        string decodedToken = Uri.UnescapeDataString(token);
         var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.Password);
         if (result.Succeeded)
         {

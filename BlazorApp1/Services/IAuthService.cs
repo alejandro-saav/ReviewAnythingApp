@@ -8,6 +8,7 @@ public interface IAuthService
     Task<bool> RegisterAsync(RegisterRequestDto request);
     Task<bool> ConfirmEmailAsync(string userId, string token);
     Task<bool> ForgotPasswordAsync(ForgotPasswordRequest request);
+    Task<bool> ResetPasswordAsync(string userId, string token, string newPassword);
     
     string? LastErrorMessage { get; }
 }
