@@ -286,3 +286,17 @@ button {
     border-radius: 4px;
     margin-bottom: var(--space-md);
 }
+
+/* ========================================= */
+/* 1. MY VARIABLES             */
+/* ========================================= */
+:root{
+    --background-container: #F2C078;
+    --background-wrapper: #FE5D26;
+    
+    --title-color: #FE5D26;
+    --input-border: 2px solid #FE5D26;
+    --wrapper-border: 5px solid #FE5D26;
+    --input-background-color: #FAEDCA;
+    --light-shadow: 0 0 10px #FE5D26;
+}

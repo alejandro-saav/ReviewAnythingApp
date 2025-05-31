@@ -127,7 +127,8 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/reset-password?userId={userId}&token={token}");
+            var encodedToken = Uri.EscapeDataString(token);
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/reset-password?userId={userId}&token={encodedToken}");
             var response = await _httpClient.PostAsJsonAsync(requestUri, newPassword);
             if (response.IsSuccessStatusCode)
             {

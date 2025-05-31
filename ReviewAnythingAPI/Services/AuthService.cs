@@ -418,8 +418,8 @@ public class AuthService : IAuthService
             };
         }
 
-        string decodedToken = Uri.UnescapeDataString(token);
-        var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.Password);
+        // string decodedToken = Uri.UnescapeDataString(token);
+        var result = await _userManager.ResetPasswordAsync(user, token, request.Password);
         if (result.Succeeded)
         {
             return new AuthResponseDto

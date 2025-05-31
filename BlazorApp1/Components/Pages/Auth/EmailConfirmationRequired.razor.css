@@ -3,20 +3,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #fcf6bd 0%, #d0f4de 50%, #a9def9 100%);
+    /*background: linear-gradient(135deg, #fcf6bd 0%, #d0f4de 50%, #a9def9 100%);*/
+    background: var(--background-container);
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .confirmation-card {
-    background: white;
+    /*background: white;*/
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
     border-radius: 20px;
-    padding: 40px;
+    padding: 20px 40px;
     text-align: center; 
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    /*box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);*/
     max-width: 500px;
     width: 100%;
-    border: 3px solid #e4c1f9;
+    border: var(--wrapper-border);
 }
 
 .icon-container {
@@ -26,37 +29,40 @@
 .email-icon {
     display: inline-flex;
     padding: 20px;
-    background: linear-gradient(135deg, #ff99c8, #e4c1f9);
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background: var(--background-wrapper);
     border-radius: 50%;
     color: white;
     margin: 0 auto;
 }
 
 .title {
-    font-size: 2.5rem;
+    font-size: 1.7rem;
     font-weight: 700;
     color: #333;
     margin-bottom: 20px;
-    background: linear-gradient(135deg, #ff99c8, #e4c1f9);
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background: var(--background-container);
 }
 
 .message {
-    font-size: 1.2rem;
-    color: #666;
+    font-size: 1rem;
+    color: #000;
     line-height: 1.6;
     margin-bottom: 30px;
 }
 
 .info-box {
-    background: #fcf6bd;
-    border: 2px solid #d0f4de;
+    background: var(--background-container);
+    border: 2px solid var(--title-color);
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 30px;
 }
 
 .info-text {
-    color: #555;
+    color: #333;
+    font-weight: 600;
     margin: 0;
     font-size: 0.95rem;
     line-height: 1.5;
@@ -82,25 +88,28 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #ff99c8, #e4c1f9);
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background: var(--background-wrapper);
     color: white;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 153, 200, 0.4);
+    transform: translateY(-1px);
+    box-shadow: var(--light-shadow);
+    /*box-shadow: 0 8px 20px rgba(255, 153, 200, 0.4);*/
 }
 
 .btn-secondary {
-    background: #d0f4de;
+    background: var(--background-container);
     color: #333;
-    border: 2px solid #a9def9;
+    border: 2px solid var(--title-color);
 }
 
 .btn-secondary:hover {
-    background: #a9def9;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(169, 222, 249, 0.4);
+    /*background: #a9def9;*/
+    transform: translateY(-1px);
+    box-shadow: var(--light-shadow);
+    /*box-shadow: 0 8px 20px rgba(169, 222, 249, 0.4);*/
 }
 
 @media (max-width: 600px) {
