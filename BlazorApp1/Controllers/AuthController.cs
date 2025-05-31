@@ -133,7 +133,9 @@ public class AuthController : ControllerBase
         [FromBody] string newPassword)
     {
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword)) return BadRequest("Some parameters are null or empty");
-        var apiResponse = await _apiHttpClient.PostAsJsonAsync("api/auth/reset-password", newPassword);
+        ResetPasswordRequestDto password = new ResetPasswordRequestDto { Password = newPassword };
+        var encodedToken = Uri.EscapeDataString(token);
+        var apiResponse = await _apiHttpClient.PostAsJsonAsync($"api/auth/reset-password?userId={userId}&token={encodedToken}", password);
         if (apiResponse.IsSuccessStatusCode)
         {
             return Ok(new { message = "Success."});
