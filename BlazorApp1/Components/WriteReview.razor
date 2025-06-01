@@ -1,0 +1,63 @@
+@page "/"
+@rendermode InteractiveServer
+
+<nav class="bottom-navbar">
+    <a class="explore-text" href="#">Explore Reviews</a>
+    <div class="profile-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <!-- Circle background -->
+            <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
+            <!-- User icon -->
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#FE5D26"/>
+        </svg>
+
+    </div>
+</nav>
+<div class="write-review-container">
+    
+<div class="write-review-wrapper">
+    <h1 class="page-title">Write a Review</h1>
+
+    <div class="categories">
+        @foreach (string category in Categories) {
+            <button 
+                class="category-btn @(SelectedCategory == category ? "active" : "")"
+                @onclick="() => SelectCategory(category)">
+                @category
+            </button>
+        }
+    </div>
+
+    <form onsubmit="submitReview(event)">
+        <div class="form-group">
+                <label class="form-label" for="reviewTitle">Review Title</label>
+            <input type="text" id="reviewTitle" class="form-input review-title-input" placeholder="Enter your review title..." required>
+        </div>
+
+        <div class="form-group">
+            <div class="rating-container">
+                <label class="form-label" for="reviewContent">Review Content</label>
+                <div>
+                    <span>rating:</span>
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        int starValue = i;
+                        <span
+                            class="star @(starValue <= (HoverRating > 0 ? HoverRating : Rating) ? "selected" : "")"
+                            @onclick="@(() => SetRating(starValue))"
+                            @onmouseover="@(() => SetHoverRating(starValue))"
+                            @onmouseout="@(() => ClearHover())">
+            ★
+        </span>
+                    }
+                </div>
+            </div>
+            <textarea id="reviewContent" class="form-input form-textarea" placeholder="Share your thoughts and experience..." required></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Create Review</button>
+    </form>
+</div>
+
+
+</div>

@@ -27,7 +27,7 @@ body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Common system fonts */
     line-height: 1.6;
     color: var(--text-color);
-    background-color: var(--background-color);
+    background-color: var(--secondary);
     -webkit-font-smoothing: antialiased; /* Improves font rendering on macOS/iOS */
     -moz-osx-font-smoothing: grayscale; /* Improves font rendering on macOS/iOS */
     min-height: 100vh; /* Ensure body takes full viewport height */
@@ -291,6 +291,12 @@ button {
 /* 1. MY VARIABLES             */
 /* ========================================= */
 :root{
+    --primary: #FE5D26;
+    --secondary: #F2C078;
+    --light: #FAEDCA;
+    --accent: #C1DBB3;
+    --dark: #222;
+    
     --background-container: #F2C078;
     --background-wrapper: #FE5D26;
     
@@ -299,4 +305,5 @@ button {
     --wrapper-border: 5px solid #FE5D26;
     --input-background-color: #FAEDCA;
     --light-shadow: 0 0 10px #FE5D26;
+    --lighter-shadow: 0 0 5px #FE5D26;
 }

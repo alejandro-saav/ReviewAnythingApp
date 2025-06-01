@@ -1,0 +1,206 @@
+.write-review-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--secondary);
+    color: var(--dark);
+    /*padding-bottom: 80px;*/
+    /*min-height: 100vh;*/
+}
+.write-review-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--title-color);
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.category-btn {
+    padding: 5px 20px;
+    border: 2px solid var(--primary);
+    background-color: var(--light);
+    color: var(--dark);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+    min-width: 100px;
+    text-align: center;
+}
+
+.category-btn:hover {
+    /*background-color: var(--primary);*/
+    transform: translateY(-1px);
+    /*border-color: var(--light);*/
+    /*color: white;*/
+    box-shadow: var(--light-shadow);
+    
+}
+
+.category-btn.active {
+    background-color: var(--primary);
+    border-color: var(--light);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: var(--lighter-shadow);
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.rating-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-label {
+    display: block;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.star {
+    font-size: 20px;
+    cursor: pointer;
+    color: lightgray;
+}
+
+.star.selected {
+    color: #ffff00;
+}
+
+.form-input {
+    width: 100%;
+    padding: 5px 10px;
+    /*border: 2px solid var(--accent);*/
+    border: var(--input-border);
+    border-radius: 12px;
+    font-size: 16px;
+    background-color: var(--input-background-color);
+    color: var(--dark);
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    box-shadow: var(--lighter-shadow);
+}
+.review-title-input {
+    padding: 5px 10px;
+}
+
+.form-textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--lighter-shadow);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.bottom-navbar {
+    /*position: fixed;*/
+    /*bottom: 0;*/
+    left: 0;
+    right: 0;
+    top: 0;
+    /*background: linear-gradient(135deg, var(--dark), #333);*/
+    /*border-bottom: var(--input-border);*/
+    box-shadow: var(--light-shadow);
+    background-color: var(--secondary);
+    padding: 5px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /*box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);*/
+    backdrop-filter: blur(10px);
+}
+
+.explore-text {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 24px;
+    /*font-weight: 600;*/
+    letter-spacing: 0.5px;
+}
+
+.profile-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    /*background: linear-gradient(135deg, var(--primary), var(--secondary));*/
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /*border: 3px solid white;*/
+}
+
+.profile-circle:hover {
+    transform: scale(1.05);
+    box-shadow: var(--lighter-shadow);
+}
+
+.profile-icon {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .categories {
+        gap: 8px;
+    }
+
+    .category-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+        min-width: 80px;
+    }
+}
