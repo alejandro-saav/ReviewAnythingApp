@@ -19,11 +19,11 @@
     <h1 class="page-title">Write a Review</h1>
 
     <div class="categories">
-        @foreach (string category in Categories) {
+        @foreach (var category in Categories) {
             <button 
-                class="category-btn @(SelectedCategory == category ? "active" : "")"
-                @onclick="() => SelectCategory(category)">
-                @category
+                class="category-btn @(SelectedCategory == category.CategoryName ? "active" : "")"
+                @onclick="() => SelectCategory(category.CategoryName)">
+                @category.CategoryName
             </button>
         }
     </div>
@@ -52,7 +52,26 @@
                     }
                 </div>
             </div>
-            <textarea id="reviewContent" class="form-input form-textarea" placeholder="Share your thoughts and experience..." required></textarea>
+            <textarea id="reviewContent" class="form-input form-textarea" 
+                placeholder="Share your thoughts and experience..." required>
+            </textarea>
+            <form class="tags-container" @onsubmit:preventDefault>
+                <div class="hellno">
+                <label for="tag-input">Tags:</label>
+                <ul>
+                    @foreach (var tag in Tags)
+                    {
+                        <li class="tag">
+                            @tag
+                            <button class="remove-tag-btn" type="button" @onclick="() => RemoveTag(tag)">x</button>
+                        </li>
+                    }
+                </ul>
+                </div>
+                <input id="tag-input" class="form-input" 
+placeholder="Add 5 tags max. (no special characters allow, just letters and numbers)" @onkeydown="HandleKeyDown" @bind="NewTag" 
+@bind:event="oninput" />
+            </form>
         </div>
 
         <button type="submit" class="submit-btn">Create Review</button>

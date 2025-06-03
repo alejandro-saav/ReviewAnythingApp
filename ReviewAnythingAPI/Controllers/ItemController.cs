@@ -40,4 +40,11 @@ public class ItemController : ControllerBase
             if (result == null) return NotFound($"Item with name '{itemName}' not found");
             return Ok(result);
     }
+
+    [HttpGet("/api/categories")]
+    public async Task<IActionResult> GetAllCategoriesAsync()
+    {
+        var result = await _itemService.GetAllCategoriesAsync();
+        return Ok(result);
+    }
 }

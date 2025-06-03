@@ -22,12 +22,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Console.WriteLine($"AuthService HttpClient BaseAddress: {_httpClient.BaseAddress}");
-
-            // --- CHANGE IS HERE ---
-            // Create a full absolute URI using the BaseAddress
             Uri requestUri = new Uri(_httpClient.BaseAddress!, "api/auth/Login");
-            //var response = await _httpClient.PostAsJsonAsync("api/auth/Login", request);
             var response = await _httpClient.PostAsJsonAsync(requestUri, request);
             if (response.IsSuccessStatusCode)
             {
@@ -35,7 +30,6 @@ public class AuthService : IAuthService
             }
             else
             {
-
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Login failed: {response.StatusCode}. {errorContent}";
                 return false;

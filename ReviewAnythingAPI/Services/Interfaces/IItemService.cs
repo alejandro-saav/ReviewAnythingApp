@@ -10,4 +10,5 @@ public interface IItemService
     Task<IEnumerable<ItemSummaryDto>> GetItemsByUserIdAsync(int userId);
 
     Task<ItemSummaryDto?> GetItemByNameAsync(string itemName);
+    Task<IEnumerable<Category>> GetAllCategoriesAsync();
 }
