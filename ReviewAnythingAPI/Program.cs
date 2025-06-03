@@ -26,6 +26,7 @@ builder.Services.AddTransient<IResend, ResendClient>();
 // Add services to the container.
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IItemService, ItemService>();
 // Add repositories to the container
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();

@@ -17,6 +17,7 @@ builder.Services.AddControllers();
 
 // Custom services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 // httpClient
 string? blazorAppBaseUrl = builder.Configuration["BlazorAppBaseUrl"];
 builder.Services.AddHttpClient("BlazorAppApi",client =>

@@ -8,10 +8,12 @@ namespace ReviewAnythingAPI.Services;
 public class ItemService : IItemService
 {
     private readonly IItemRepository _itemRepository;
+    private readonly IRepository<Category> _categoryRepository;
 
-    public ItemService(IItemRepository itemRepository)
+    public ItemService(IItemRepository itemRepository, IRepository<Category> categoryRepository)
     {
         _itemRepository = itemRepository;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<IEnumerable<ItemSummaryDto>> GetItemsByCategoryIdAsync(int categoryId)
@@ -31,5 +33,11 @@ public class ItemService : IItemService
     {
             var item = await _itemRepository.GetItemByItemNameAsync(itemName);
             return item;
+    }
+
+    public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+    {
+        var categories = await _categoryRepository.GetAllAsync();
+        return categories;
     }
 }
