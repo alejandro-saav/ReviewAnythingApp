@@ -1,5 +1,7 @@
 @page "/"
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
+@attribute [Authorize]
 
 <nav class="bottom-navbar">
     <a class="explore-text" href="#">Explore Reviews</a>
@@ -28,16 +30,18 @@
         }
     </div>
 
-    <form onsubmit="submitReview(event)">
+    <EditForm Model="@ReviewModel" OnValidSubmit="CreateNewReview" FormName="CreateReview">
+        <DataAnnotationsValidator />
         <div class="form-group">
-                <label class="form-label" for="reviewTitle">Review Title</label>
-            <input type="text" id="reviewTitle" class="form-input review-title-input" placeholder="Enter your review title..." required>
+            <label class="form-label" for="reviewTitle">Review Title</label>
+            <input type="text" id="reviewTitle" @bind="ReviewModel.Title" class="form-input review-title-input" placeholder="Enter your review title..." required>
+            <ValidationMessage For="@(() => ReviewModel.Title)"/>
         </div>
 
         <div class="form-group">
             <div class="rating-container">
                 <label class="form-label" for="reviewContent">Review Content</label>
-                <div>
+                <div class="@(AnimateRatingError ? "animate-error" : "")">
                     <span>rating:</span>
                     @for (int i = 1; i <= 5; i++)
                     {
@@ -47,16 +51,16 @@
                             @onclick="@(() => SetRating(starValue))"
                             @onmouseover="@(() => SetHoverRating(starValue))"
                             @onmouseout="@(() => ClearHover())">
-            ★
-        </span>
+                            ★
+                        </span>
                     }
                 </div>
             </div>
             <textarea id="reviewContent" class="form-input form-textarea" 
-                placeholder="Share your thoughts and experience..." required>
+                placeholder="Share your thoughts and experience..." required @bind="ReviewModel.Content">
             </textarea>
-            <form class="tags-container" @onsubmit:preventDefault>
-                <div class="hellno">
+            <ValidationMessage For="@(() => ReviewModel.Content)"/>
+            <div class="hellno">
                 <label for="tag-input">Tags:</label>
                 <ul>
                     @foreach (var tag in Tags)
@@ -66,16 +70,19 @@
                             <button class="remove-tag-btn" type="button" @onclick="() => RemoveTag(tag)">x</button>
                         </li>
                     }
+                    @if (!string.IsNullOrEmpty(ErrorTagMessage))
+                    {
+                        <span class="error-message">@ErrorTagMessage</span>
+                    }
                 </ul>
-                </div>
-                <input id="tag-input" class="form-input" 
-placeholder="Add 5 tags max. (no special characters allow, just letters and numbers)" @onkeydown="HandleKeyDown" @bind="NewTag" 
-@bind:event="oninput" />
-            </form>
+            </div>
+            <input id="tag-input" class="form-input"
+                   placeholder="Add 5 tags max. (no special characters allow, just letters and numbers)" @onkeydown="HandleKeyDown" @bind="NewTag"
+                   @bind:event="oninput" type="text" autocomplete="off"/>
         </div>
 
         <button type="submit" class="submit-btn">Create Review</button>
-    </form>
+    </EditForm>
 </div>
 
 

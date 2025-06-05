@@ -91,7 +91,7 @@ public partial class Login : ComponentBase
 
             if (success)
             {
-                Navigation.NavigateTo("/", forceLoad: true);
+                Navigation.NavigateTo("/test", forceLoad: true);
             }
             else
             {

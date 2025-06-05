@@ -35,4 +35,28 @@ public class ReviewService : IReviewService
             return [];
         }
     }
+
+    public async Task<object> CreateReviewAsync(ReviewViewModel review)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/review", review);
+            if (response.IsSuccessStatusCode)
+            {
+                return response.Content.ReadFromJsonAsync<object>();
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                LastErrorMessage = $"Error creating review, status code: {response.StatusCode} - error message:{errorContent}";
+                return new { };
+            }
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = "Something went wrong";
+            return new {};
+        }
+    }
 }

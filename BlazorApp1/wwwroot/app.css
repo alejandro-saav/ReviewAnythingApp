@@ -272,8 +272,9 @@ button {
 .validation-message {
     color: var(--error-color);
     font-size: 0.875rem; /* Smaller text for errors */
-    margin-top: var(--space-sm); /* Pull it closer to the field */
+    /*margin-top: var(--space-sm); !* Pull it closer to the field *!*/
     margin-bottom: var(--space-md);
+    font-weight: bolder;
 }
 
 .validation-summary-errors ul {
