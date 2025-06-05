@@ -1,4 +1,8 @@
+using System.Security.Claims;
 using BlazorApp1.Models.Auth;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorApp1.Controllers;
@@ -16,7 +20,7 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
     
-    [HttpPost("Login")] // Maps to /api/auth/login
+    [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             // 1. Call your actual .NET 9 API to authenticate the user
@@ -37,13 +41,31 @@ public class AuthController : ControllerBase
                 //    For simplicity here, we'll demonstrate using a cookie.
                 //    In a real app, consider using a library like OpenIddict or IdentityServer
                 //    with a proper client (e.g., Duende.BFF) for robust token management.
-                Response.Cookies.Append("AuthToken", loginApiResponse.Token, new CookieOptions
+                
+                // Response.Cookies.Append("AuthToken", loginApiResponse.Token, new CookieOptions
+                // {
+                //     HttpOnly = true,    // Essential for security: JavaScript cannot access this cookie
+                //     Secure = true,      // Essential for production: only send over HTTPS
+                //     SameSite = SameSiteMode.Strict, // Protects against CSRF
+                //     Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set expiry based on JWT
+                // });
+                var claims = new List<Claim>
                 {
-                    HttpOnly = true,    // Essential for security: JavaScript cannot access this cookie
-                    Secure = true,      // Essential for production: only send over HTTPS
-                    SameSite = SameSiteMode.Strict, // Protects against CSRF
-                    Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set expiry based on JWT
-                });
+                    new Claim(ClaimTypes.Name, loginApiResponse.UserResponse.FirstName),
+                    new Claim("AccessToken", loginApiResponse.Token)
+                };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+                try
+                {
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
 
                 // You might also append a refresh token similarly if your API supports it.
 

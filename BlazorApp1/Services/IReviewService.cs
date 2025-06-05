@@ -5,6 +5,7 @@ namespace BlazorApp1.Services;
 public interface IReviewService
 {
     Task<IEnumerable<Category>> GetAllReviewCategoriesAsync();
+    Task<object> CreateReviewAsync(ReviewViewModel review);
     
     string? LastErrorMessage { get; }
 }
