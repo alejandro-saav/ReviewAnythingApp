@@ -10,4 +10,9 @@
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Remove="Components\Pages\Auth\Login.razor" />
+      <None Include="Components\Pages\Auth\LoginBlazor.razor" />
+    </ItemGroup>
+
 </Project>

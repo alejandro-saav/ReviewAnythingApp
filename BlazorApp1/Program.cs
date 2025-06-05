@@ -3,8 +3,10 @@ using BlazorApp1.Controllers;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.SetMinimumLevel(LogLevel.Debug);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -45,12 +47,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.Name = "auth_token";
         options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
         options.LoginPath = "/login"; // Redirect here when not authenticated
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.None;
     });
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
+// for razor pages
+builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages");;
+
 
 var app = builder.Build();
 
@@ -61,6 +63,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+// for razor pages
+app.MapRazorPages();
+
 
 app.UseHttpsRedirection();
 
