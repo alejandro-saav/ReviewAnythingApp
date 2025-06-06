@@ -17,7 +17,7 @@ public class AuthService : IAuthService
         _navigationManager = navigationManager;
     }
 
-    public async Task<bool> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request)
     {
         LastErrorMessage = null;
         try
@@ -26,19 +26,20 @@ public class AuthService : IAuthService
             var response = await _httpClient.PostAsJsonAsync(requestUri, request);
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                LoginResponse loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                return loginResponse;
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Login failed: {response.StatusCode}. {errorContent}";
-                return false;
+                return new LoginResponse { ErrorMessage = errorContent, Success = false };
             }
         }
         catch (Exception ex)
         {
             LastErrorMessage = $"Network error during login: {ex.Message}";
-            return false;
+            return new LoginResponse { ErrorMessage = ex.Message, Success = false };
         }
     }
 

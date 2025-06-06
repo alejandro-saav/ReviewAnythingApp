@@ -89,7 +89,7 @@ public partial class LoginBlazor : ComponentBase
         {
             var success = await AuthService.LoginAsync(LoginModel);
 
-            if (success)
+            if (success.Success)
             {
                 Navigation.NavigateTo("/test", forceLoad: true);
             }

@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using BlazorApp1.Models;
 
 namespace BlazorApp1.Services;
@@ -36,11 +37,12 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<object> CreateReviewAsync(ReviewViewModel review)
+    public async Task<object> CreateReviewAsync(ReviewViewModel review, string jwt)
     {
         LastErrorMessage = null;
         try
         {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",jwt);
             var response = await _httpClient.PostAsJsonAsync("api/review", review);
             if (response.IsSuccessStatusCode)
             {

@@ -7,392 +7,32 @@
 
 <head>
     <title>Login</title>
+    <link rel="stylesheet" href="app.css"/>
+    <link rel="stylesheet" href="Login.css">
 </head>
-
-<style>
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-    :root{
-        --primary: #FE5D26;
-        --secondary: #F2C078;
-        --light: #FAEDCA;
-        --accent: #C1DBB3;
-        --dark: #222;
-
-        --background-container: #F2C078;
-        --background-wrapper: #FE5D26;
-
-        --title-color: #FE5D26;
-        --input-border: 2px solid #FE5D26;
-        --wrapper-border: 5px solid #FE5D26;
-        --input-background-color: #FAEDCA;
-        --light-shadow: 0 0 10px #FE5D26;
-        --lighter-shadow: 0 0 5px #FE5D26;
-    }
-    .login-container {
-        min-height: 100vh;
-        /*background: linear-gradient(135deg, #f8d7da 0%, #f5c2c7 50%, #f1aeb5 100%);*/
-        background-color: var(--background-container);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        width: 100vw;
-    }
-
-    .login-wrapper {
-        display: flex;
-        gap: 40px;
-        max-width: 350px;
-        width: 100%;
-    }
-
-    .login-panel {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        /*border: 5px solid var(--palette-pink);*/
-        border: var(--input-border);
-        /*border-radius: 25px;*/
-        border-radius: 10px;
-        padding: 25px 25px;
-        flex: 1;
-        min-width: 300px;
-    }
-
-    .panel-title {
-        font-size: 2.5em;
-        font-weight: 700;
-        /*color: #6a1b9a;*/
-        color: var(--title-color);
-        text-align: center;
-        margin-bottom: 30px;
-        margin-top: 0;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 6px 10px;
-        /*border: 3px solid var(--primary-dark);*/
-        /*border: 3px solid #FE5D26;*/
-        border: none;
-        border-bottom: var(--input-border);
-        /*border-radius: 12px;*/
-        border-radius: 5px;
-        /*background: var(--primary-light);*/
-        background: var(--input-background-color);
-        font-size: 16px;
-        color: #000;
-        box-sizing: border-box;
-        transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-        outline: none;
-        /*border-color: #00759c;*/
-        transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-        box-shadow: var(--light-shadow);
-    }
-
-    .form-options {
-        display: flex;
-        justify-content: space-between;
-        /*align-items: center;*/
-        margin-bottom: 25px;
-        font-size: 14px;
-    }
-
-    .checkbox-container {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        color: #333;
-        gap: 5px;
-    }
-
-    .checkbox-container input[type="checkbox"] {
-        margin-right: 8px;
-        width: 18px;
-        height: 18px;
-        accent-color: #4caf50;
-    }
-
-    .forgot-link {
-        /*color: #6a1b9a;*/
-        color: blue;
-        text-decoration: none;
-    }
-
-    .forgot-link:hover {
-        text-decoration: underline;
-    }
-
-    .btn-primary {
-        width: 100%;
-        padding: 10px;
-        /*background: linear-gradient(45deg, #26c6da, #00acc1);*/
-        background-color: var(--background-wrapper);
-        border: none;
-        /*border-radius: 25px;*/
-        border-radius: 5px;
-        color: white;
-        font-size: 18px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-bottom: 20px;
-        transition: all 0.2s ease-in-out;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-1px);
-        /*box-shadow: 0 5px 15px rgba(38, 198, 218, 0.4);*/
-        box-shadow: var(--light-shadow);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: var(--light-shadow);
-        /*box-shadow: 0 5px 15px rgba(38, 198, 218, 0.4);*/
-    }
-
-    .btn-primary:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-
-    .divider {
-        text-align: center;
-        margin: 10px 0;
-        color: #333333;
-        font-weight: 500;
-        position: relative;
-    }
-
-    .divider::before, .divider::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        width: 45%;
-        height: 1px;
-        background: #333333;
-    }
-
-    .divider::before {
-        left: 0;
-    }
-
-    .divider::after {
-        right: 0;
-    }
-
-    .profile-upload span {
-        color: #6a1b9a;
-        font-weight: 500;
-    }
-
-    .need-account {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #000;
-    }
-
-    .need-account a {
-        color: blue;
-        transition: color ease-in-out 0.3s;
-    }
-
-    .need-account a:hover {
-        /*color: var(--primary-color);*/
-        /*color: darkblue;*/
-    }
-
-    .spinner-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .spinner {
-        width: 20px;
-        height: 20px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spin 1s ease-in-out infinite;
-        display: block;
-    }
-
-
-    /* Hide validation messages when valid */
-    .valid .validation-error {
-        display: none;
-    }
-
-    .validation-error {
-        color: #f44336;
-        font-size: 14px;
-        margin-top: 5px;
-        display: block;
-        padding-left: 20px;
-    }
-
-    .error-message {
-        background: rgba(244, 67, 54, 0.1);
-        border: 1px solid #f44336;
-        border-radius: 15px;
-        padding: 10px 15px;
-        margin-top: 15px;
-        color: #d32f2f;
-        font-size: 14px;
-        text-align: center;
-    }
-
-    @@keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-    
-
-    /* Google button styles */
-    .gsi-material-button {
-        -moz-user-select: none;
-        -webkit-user-select: none;
-        -ms-user-select: none;
-        -webkit-appearance: none;
-        background-color: WHITE;
-        background-image: none;
-        border: 1px solid #747775;
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        color: #1f1f1f;
-        cursor: pointer;
-        font-family: 'Roboto', arial, sans-serif;
-        font-size: 14px;
-        height: 40px;
-        letter-spacing: 0.25px;
-        outline: none;
-        overflow: hidden;
-        padding: 0 12px;
-        position: relative;
-        text-align: center;
-        -webkit-transition: background-color .218s, border-color .218s, box-shadow .218s;
-        transition: background-color .218s, border-color .218s, box-shadow .218s;
-        vertical-align: middle;
-        white-space: nowrap;
-        width: 100%;
-        max-width: 400px;
-        min-width: min-content;
-    }
-
-    .gsi-material-button .gsi-material-button-icon {
-        height: 20px;
-        margin-right: 12px;
-        min-width: 20px;
-        width: 20px;
-    }
-
-    .gsi-material-button .gsi-material-button-content-wrapper {
-        -webkit-align-items: center;
-        align-items: center;
-        display: flex;
-        -webkit-flex-direction: row;
-        flex-direction: row;
-        -webkit-flex-wrap: nowrap;
-        flex-wrap: nowrap;
-        height: 100%;
-        justify-content: space-between;
-        position: relative;
-        width: 100%;
-    }
-
-    .gsi-material-button .gsi-material-button-contents {
-        -webkit-flex-grow: 1;
-        flex-grow: 1;
-        font-family: 'Roboto', arial, sans-serif;
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        vertical-align: top;
-    }
-
-    .gsi-material-button .gsi-material-button-state {
-        -webkit-transition: opacity .218s;
-        transition: opacity .218s;
-        bottom: 0;
-        left: 0;
-        opacity: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-
-    .gsi-material-button:disabled {
-        cursor: default;
-        background-color: #ffffff61;
-        border-color: #1f1f1f1f;
-    }
-
-    .gsi-material-button:disabled .gsi-material-button-contents {
-        opacity: 38%;
-    }
-
-    .gsi-material-button:disabled .gsi-material-button-icon {
-        opacity: 38%;
-    }
-
-    .gsi-material-button:not(:disabled):active .gsi-material-button-state,
-    .gsi-material-button:not(:disabled):focus .gsi-material-button-state {
-        background-color: #303030;
-        opacity: 12%;
-    }
-
-    .gsi-material-button:not(:disabled):hover {
-        -webkit-box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
-        box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
-    }
-
-    .gsi-material-button:not(:disabled):hover .gsi-material-button-state {
-        background-color: #303030;
-        opacity: 8%;
-    }
-
-
-</style>
 
 <div class="login-container">
     <div class="login-wrapper">
         <div class="login-panel">
             <h2 class="panel-title">Login</h2>
-
             <form method="post" id="loginForm">
                 @Html.AntiForgeryToken()
+
                 <div class="form-group">
-                    <label asp-for="LoginModel.Email"></label>
-                    <input asp-for="LoginModel.Email" class="form-input" name="LoginModel.Email"/>
-                    <span asp-validation-for="LoginModel.Email" class="validation-error"></span>
+                    <label for="Email">Email</label>
+                    <input type="text" id="Email" name="Email" value="@Model.LoginModel.Email" class="form-input" placeholder="Email Address"/>
+                    @Html.ValidationMessage("Email", null, new { @class = "validation-error" })
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="LoginModel.Password"></label>
-                    <input asp-for="LoginModel.Password" class="form-input" type="password" name="LoginModel.Password"/>
-                    <span asp-validation-for="LoginModel.Password" class="validation-error"></span>
+                    <label for="Password">Password</label>
+                    <input type="password" id="Password" name="Password" value="@Model.LoginModel.Password" class="form-input" placeholder="Password"/>
+                    @Html.ValidationMessage("Password", null, new { @class = "validation-error" })
                 </div>
 
                 <div class="form-options">
                     <label class="checkbox-container">
-                        <input asp-for="RememberMe" type="checkbox"/>
+                        <input type="checkbox" id="RememberMe" name="RememberMe" @(Model.LoginModel.RememberMe ? "checked" : "") />
                         <span class="checkmark"></span>
                         Remember me
                     </label>
@@ -400,11 +40,11 @@
                 </div>
 
                 <button type="submit" class="btn-primary" id="submitLoginBtn">
-                        <div class="spinner-container" id="loadingSpinner" style="display: none;">
-                            <span class="spinner"></span>
-                            <span>Loading...</span>
-                        </div>
-                        <span id="loginBtnText">Login</span>
+                    <div class="spinner-container" id="loadingSpinner" style="display: none;">
+                        <span class="spinner"></span>
+                        <span>Loading...</span>
+                    </div>
+                    <span id="loginBtnText">Login</span>
                 </button>
 
                 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
@@ -422,6 +62,13 @@
                 <div class="gsi-material-button-content-wrapper">
                     <div class="gsi-material-button-icon">
                         <!-- SVG icon here -->
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                            <path fill="none" d="M0 0h48v48H0z"></path>
+                        </svg>
                     </div>
                     <span class="gsi-material-button-contents">Sign in with Google</span>
                 </div>
@@ -429,6 +76,7 @@
         </div>
     </div>
 </div>
+
 
 
 <script>
