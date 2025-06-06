@@ -22,60 +22,27 @@ public class AuthController : ControllerBase
     
     [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            // 1. Call your actual .NET 9 API to authenticate the user
+        { 
             var apiResponse = await _apiHttpClient.PostAsJsonAsync("api/auth/Login", request);
 
             if (apiResponse.IsSuccessStatusCode)
             {
-                // 2. Read the JWT from your .NET 9 API's response
-                var loginApiResponse = await apiResponse.Content.ReadFromJsonAsync<LoginResponse>(); // You'll need to define LoginApiResponse below
+                var loginApiResponse = await apiResponse.Content.ReadFromJsonAsync<LoginResponse>(); 
 
                 if (loginApiResponse == null || string.IsNullOrEmpty(loginApiResponse.Token))
                 {
                     return BadRequest("Authentication failed: No token received.");
                 }
-
-                // 3. SECURELY Store the JWT on the Blazor Web App server
-                //    This could be in a session, a HttpOnly cookie, or a distributed cache.
-                //    For simplicity here, we'll demonstrate using a cookie.
-                //    In a real app, consider using a library like OpenIddict or IdentityServer
-                //    with a proper client (e.g., Duende.BFF) for robust token management.
-                
-                // Response.Cookies.Append("AuthToken", loginApiResponse.Token, new CookieOptions
+                // var claims = new List<Claim>
                 // {
-                //     HttpOnly = true,    // Essential for security: JavaScript cannot access this cookie
-                //     Secure = true,      // Essential for production: only send over HTTPS
-                //     SameSite = SameSiteMode.Strict, // Protects against CSRF
-                //     Expires = DateTimeOffset.UtcNow.AddMinutes(30) // Set expiry based on JWT
-                // });
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, loginApiResponse.UserResponse.FirstName),
-                    new Claim("AccessToken", loginApiResponse.Token)
-                };
-
-                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var authProperties = new AuthenticationProperties
-                {
-                    IsPersistent = true,
-                };
-                var principal = new ClaimsPrincipal(identity);
-                try
-                {
-                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
-                // You might also append a refresh token similarly if your API supports it.
-
-                // 4. Return success to the Blazor client (it doesn't need the JWT)
-                //    The client only needs to know that it's now authenticated via the cookie.
-                return Ok(new { Message = "Login successful" });
+                //     new Claim(ClaimTypes.Name, loginApiResponse.UserResponse.FirstName),
+                //     new Claim("AccessToken", loginApiResponse.Token)
+                // };
+                //
+                // var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                // var principal = new ClaimsPrincipal(identity);
+                // await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                return Ok(loginApiResponse);
             }
             else
             {

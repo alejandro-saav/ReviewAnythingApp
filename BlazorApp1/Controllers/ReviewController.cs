@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using BlazorApp1.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorApp1.Controllers;
@@ -33,11 +34,13 @@ public class ReviewController : ControllerBase
             return StatusCode((int)response.StatusCode, errorContent);
         }
     }
-
+    
     [HttpPost]
     public async Task<IActionResult> CreateReview([FromBody] ReviewViewModel review)
     {
-        var token = _httpContextAccessor.HttpContext.Request.Cookies["AuthToken"];
+        // var token = _httpContextAccessor.HttpContext.Request.Cookies["jwt"];
+        // _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
         if (response.IsSuccessStatusCode)

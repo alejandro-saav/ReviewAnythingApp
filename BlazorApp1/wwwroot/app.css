@@ -247,24 +247,6 @@ button {
     /*transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;*/
 }
 
-.btn-primary {
-    background-color: var(--primary-color); /* Uses your chosen primary color */
-    color: var(--text-inverted);
-}
-
-.btn-primary:hover {
-    background-color: var(--primary-dark);
-}
-
-.btn-secondary {
-    background-color: var(--secondary-color); /* Uses your chosen secondary color */
-    color: var(--text-inverted);
-}
-
-.btn-secondary:hover {
-    background-color: var(--secondary-dark);
-}
-
 /* ========================================= */
 /* 7. Error/Validation Messages            */
 /* ========================================= */

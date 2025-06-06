@@ -24,6 +24,7 @@ public partial class WriteReview : ComponentBase
     [Inject] private IJSRuntime JSRuntime { get; set; }
 
     [Inject] private IReviewService ReviewService { get; set; }
+    [Inject] IHttpContextAccessor HttpContextAccessor  { get; set; }
 
     private IEnumerable<Category> Categories { get; set; } = [];
 
@@ -66,7 +67,8 @@ public partial class WriteReview : ComponentBase
         }
 
         try {
-            var createdReview = await ReviewService.CreateReviewAsync(ReviewModel);
+            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
+            var createdReview = await ReviewService.CreateReviewAsync(ReviewModel, jwt);
             Console.WriteLine("SUCCESS");
         }
         catch (Exception ex)
