@@ -28,15 +28,11 @@ builder.Services.AddHttpClient("BlazorAppApi",client =>
     client.BaseAddress = new Uri(blazorAppBaseUrl);
 
 });
-// builder.Services.AddHttpClient<AuthService>(client =>
-// {
-//     client.BaseAddress = new Uri(builder.Configuration["BlazorAppBaseUrl"] ?? "http://localhost:5032/");
-// });
-builder.Services.AddHttpClient("ReviewAnythingAPI",client =>
-{
-    // This base address MUST point to your separate .NET 9 API's URL
-    client.BaseAddress = new Uri(builder.Configuration["YourApi:BaseUrl"] ?? "https://localhost:5026/"); // Set a fallback URL
-});
+    builder.Services.AddHttpClient("ReviewAnythingAPI",client =>
+    {
+        // This base address MUST point to your separate .NET 9 API's URL
+        client.BaseAddress = new Uri(builder.Configuration["YourApi:BaseUrl"] ?? "https://localhost:5026/"); // Set a fallback URL
+    });
 // HttpContextAccessor for accessing the auth token
 builder.Services.AddHttpContextAccessor();
 

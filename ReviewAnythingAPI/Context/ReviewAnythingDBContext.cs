@@ -42,7 +42,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
   // Reviews Constraints
   modelBuilder.Entity<Review>().HasOne(review => review.Creator).WithMany(creator => creator.UserReviews).HasForeignKey(review => review.UserId).OnDelete(DeleteBehavior.SetNull);
   
-  modelBuilder.Entity<Review>().HasOne(review => review.ReviewItem).WithMany().HasForeignKey(review => review.ItemId).OnDelete(DeleteBehavior.Restrict);
+  modelBuilder.Entity<Review>().HasOne(review => review.ReviewItem).WithMany(i => i.ItemReviews).HasForeignKey(review => review.ItemId).OnDelete(DeleteBehavior.Restrict);
 
   modelBuilder.Entity<Review>().ToTable(t => t.HasCheckConstraint("CHK_Rating", "[Rating] BETWEEN 1 AND 5"));
   
@@ -71,9 +71,9 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
   // Follows Constraints
   modelBuilder.Entity<Follow>().HasKey(f => new { f.FollowerUserId, f.FollowingUserId });
   
-  modelBuilder.Entity<Follow>().HasOne(f => f.Follower).WithMany().HasForeignKey(f => f.FollowerUserId).OnDelete(DeleteBehavior.Cascade);
+  modelBuilder.Entity<Follow>().HasOne(f => f.Follower).WithMany(u => u.UserFollows).HasForeignKey(f => f.FollowerUserId).OnDelete(DeleteBehavior.Cascade);
   
-  modelBuilder.Entity<Follow>().HasOne(f => f.Following).WithMany().HasForeignKey(f => f.FollowingUserId).OnDelete(DeleteBehavior.Restrict);
+  modelBuilder.Entity<Follow>().HasOne(f => f.Following).WithMany(u => u.UserFollowings).HasForeignKey(f => f.FollowingUserId).OnDelete(DeleteBehavior.Restrict);
   
   // ReviewVotes Constraints
   modelBuilder.Entity<ReviewVote>().HasKey(rv => new { rv.UserId, rv.ReviewId });

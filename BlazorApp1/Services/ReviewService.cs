@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using BlazorApp1.Models;
+using Category = BlazorApp1.Models.Category;
 
 namespace BlazorApp1.Services;
 
@@ -7,6 +8,7 @@ public class ReviewService : IReviewService
 {
     private readonly HttpClient _httpClient;
     public string? LastErrorMessage { get; private set; }
+    public ReviewModel? CreatedReview { get; set; }
 
     public ReviewService(IHttpClientFactory httpClientFactory)
     {
@@ -37,28 +39,54 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<object> CreateReviewAsync(ReviewViewModel review, string jwt)
+    public async Task<ReviewModel> CreateReviewAsync(ReviewViewModel review)
     {
         LastErrorMessage = null;
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",jwt);
             var response = await _httpClient.PostAsJsonAsync("api/review", review);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<object>();
+                var newReview = response.Content.ReadFromJsonAsync<ReviewModel>().Result;
+                CreatedReview = newReview;
+                return newReview;
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Error creating review, status code: {response.StatusCode} - error message:{errorContent}";
-                return new { };
+                return new ReviewModel();
             }
         }
         catch (Exception ex)
         {
             LastErrorMessage = "Something went wrong";
-            return new {};
+            return new ReviewModel();
+        }
+    }
+
+    public async Task<ReviewModel> GetReviewByIdAsync(int reviewId)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.GetAsync("api/review");
+            if (response.IsSuccessStatusCode)
+            {
+                var review = await response.Content.ReadFromJsonAsync<ReviewModel>();
+                return review;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                LastErrorMessage = $"Error while fetching the review, status code: {response.StatusCode} - error message:{errorContent}";
+                return new ReviewModel();
+            }
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = "Something went wrong";
+            return new ReviewModel();
         }
     }
 }
