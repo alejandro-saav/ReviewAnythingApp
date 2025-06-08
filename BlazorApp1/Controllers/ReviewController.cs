@@ -39,9 +39,8 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> CreateReview([FromBody] ReviewViewModel review)
     {
         // var token = _httpContextAccessor.HttpContext.Request.Cookies["jwt"];
-        // _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        // var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", review.jwtToken);
         var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
         if (response.IsSuccessStatusCode)
         {
@@ -52,5 +51,11 @@ public class ReviewController : ControllerBase
             var errorContent = await response.Content.ReadAsStringAsync();
             return StatusCode((int)response.StatusCode, errorContent);
         }
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetReviewById([FromQuery] int id)
+    {
+        var response = await _httpClient.GetAsync($"api/reviews/{id}");
     }
 }

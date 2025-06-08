@@ -15,4 +15,8 @@
       <None Include="Components\Pages\Auth\LoginBlazor.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ReviewAnythingAPI\ReviewAnythingAPI.csproj" />
+    </ItemGroup>
+
 </Project>

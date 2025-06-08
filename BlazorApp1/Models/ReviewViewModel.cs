@@ -19,5 +19,7 @@ public class ReviewViewModel
     
     public List<string> Tags { get; set; } = new List<string>();
     
-    public int CategoryId { get; set; }
+    [Required(ErrorMessage = "Please select a category")]
+    public int? CategoryId { get; set; }
+    public string jwtToken { get; set; } = string.Empty;
 }

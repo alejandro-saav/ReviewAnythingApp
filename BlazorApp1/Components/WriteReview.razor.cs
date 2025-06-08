@@ -4,6 +4,7 @@ using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Category = BlazorApp1.Models.Category;
 
 namespace BlazorApp1.Components;
 
@@ -16,8 +17,8 @@ public partial class WriteReview : ComponentBase
     private int HoverRating;
     private string NewTag = "";
 
-    private int Rating;
-    private readonly List<string> Tags = [];
+    // private int Rating;
+    // private readonly List<string> Tags = [];
     private string SelectedCategory { get; set; }
     private ReviewViewModel ReviewModel { get; } = new();
 
@@ -30,7 +31,7 @@ public partial class WriteReview : ComponentBase
 
     private void SetRating(int rating)
     {
-        Rating = rating;
+        ReviewModel.Rating = rating;
     }
 
     private void SetHoverRating(int hoverRating)
@@ -58,7 +59,7 @@ public partial class WriteReview : ComponentBase
 
     private async Task CreateNewReview()
     {
-        if (Rating < 1 || Rating > 5)
+        if (ReviewModel.Rating < 1 || ReviewModel.Rating > 5)
         {
             AnimateRatingError = true;
             await Task.Delay(2000);
@@ -68,7 +69,8 @@ public partial class WriteReview : ComponentBase
 
         try {
             var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
-            var createdReview = await ReviewService.CreateReviewAsync(ReviewModel, jwt);
+            ReviewModel.jwtToken = jwt;
+            var createdReview = await ReviewService.CreateReviewAsync(ReviewModel);
             Console.WriteLine("SUCCESS");
         }
         catch (Exception ex)
@@ -78,9 +80,10 @@ public partial class WriteReview : ComponentBase
         }
     }
 
-    private void SelectCategory(string category)
+    private void SelectCategory(Category category)
     {
-        SelectedCategory = category;
+        SelectedCategory = category.CategoryName;
+        ReviewModel.CategoryId = category.CategoryId;
     }
 
     private void HandleKeyDown(KeyboardEventArgs e)
@@ -94,13 +97,29 @@ public partial class WriteReview : ComponentBase
                 return;
             }
 
-            if (!Tags.Contains(NewTag) && Tags.Count < 5) Tags.Add(NewTag.Trim().ToLower());
+            if (!ReviewModel.Tags.Contains(NewTag) && ReviewModel.Tags.Count < 5) ReviewModel.Tags.Add(NewTag.Trim().ToLower());
             NewTag = "";
         }
     }
 
     private void RemoveTag(string tag)
     {
-        Tags.Remove(tag);
+        ReviewModel.Tags.Remove(tag);
     }
 }
+
+// {
+// "reviewId": 8,
+// "title": "WHAT",
+// "content": "WAIT WHAT",
+// "creationDate": "2025-06-08T16:51:13.8079718Z",
+// "lastEditDate": "2025-06-08T16:51:13.8080361Z",
+// "rating": 1,
+// "userId": null,
+// "itemId": 12,
+// "tags": [
+// "funny",
+// "letsgo",
+// "xd"
+//     ]
+// }

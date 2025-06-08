@@ -135,6 +135,7 @@ public class ReviewService : IReviewService
                 ReviewId = createdReview.ReviewId,
                 Title = createdReview.Title,
                 Content = createdReview.Content,
+                UserId = userId,
                 CreationDate = createdReview.CreationDate,
                 LastEditDate = createdReview.LastEditDate,
                 Rating = createdReview.Rating,

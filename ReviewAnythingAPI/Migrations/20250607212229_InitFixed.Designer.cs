@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReviewAnythingAPI.Context;
 
@@ -11,9 +12,11 @@ using ReviewAnythingAPI.Context;
 namespace ReviewAnythingAPI.Migrations
 {
     [DbContext(typeof(ReviewAnythingDbContext))]
-    partial class ReviewAnythingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250607212229_InitFixed")]
+    partial class InitFixed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -336,10 +339,20 @@ namespace ReviewAnythingAPI.Migrations
                     b.Property<int>("FollowingUserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ApplicationUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ApplicationUserId1")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("FollowDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("FollowerUserId", "FollowingUserId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ApplicationUserId1");
 
                     b.HasIndex("FollowingUserId");
 
@@ -472,6 +485,9 @@ namespace ReviewAnythingAPI.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ItemId1")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("LastEditDate")
                         .HasColumnType("datetime2");
 
@@ -488,6 +504,8 @@ namespace ReviewAnythingAPI.Migrations
                     b.HasKey("ReviewId");
 
                     b.HasIndex("ItemId");
+
+                    b.HasIndex("ItemId1");
 
                     b.HasIndex("Rating");
 
@@ -678,14 +696,22 @@ namespace ReviewAnythingAPI.Migrations
 
             modelBuilder.Entity("ReviewAnythingAPI.Models.Follow", b =>
                 {
-                    b.HasOne("ReviewAnythingAPI.Models.ApplicationUser", "Follower")
+                    b.HasOne("ReviewAnythingAPI.Models.ApplicationUser", null)
+                        .WithMany("UserFollowings")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.HasOne("ReviewAnythingAPI.Models.ApplicationUser", null)
                         .WithMany("UserFollows")
+                        .HasForeignKey("ApplicationUserId1");
+
+                    b.HasOne("ReviewAnythingAPI.Models.ApplicationUser", "Follower")
+                        .WithMany()
                         .HasForeignKey("FollowerUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ReviewAnythingAPI.Models.ApplicationUser", "Following")
-                        .WithMany("UserFollowings")
+                        .WithMany()
                         .HasForeignKey("FollowingUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -753,10 +779,14 @@ namespace ReviewAnythingAPI.Migrations
             modelBuilder.Entity("ReviewAnythingAPI.Models.Review", b =>
                 {
                     b.HasOne("ReviewAnythingAPI.Models.Item", "ReviewItem")
-                        .WithMany("ItemReviews")
+                        .WithMany()
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("ReviewAnythingAPI.Models.Item", null)
+                        .WithMany("ItemReviews")
+                        .HasForeignKey("ItemId1");
 
                     b.HasOne("ReviewAnythingAPI.Models.ApplicationUser", "Creator")
                         .WithMany("UserReviews")

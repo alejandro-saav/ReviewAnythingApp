@@ -20,18 +20,19 @@
 <div class="write-review-wrapper">
     <h1 class="page-title">Write a Review</h1>
 
+
+    <EditForm Model="@ReviewModel" OnValidSubmit="CreateNewReview" FormName="CreateReview">
+        <DataAnnotationsValidator />
     <div class="categories">
         @foreach (var category in Categories) {
             <button 
                 class="category-btn @(SelectedCategory == category.CategoryName ? "active" : "")"
-                @onclick="() => SelectCategory(category.CategoryName)">
+                @onclick="() => SelectCategory(category)">
                 @category.CategoryName
             </button>
         }
+        <ValidationMessage For="@(() => ReviewModel.CategoryId)" />
     </div>
-
-    <EditForm Model="@ReviewModel" OnValidSubmit="CreateNewReview" FormName="CreateReview">
-        <DataAnnotationsValidator />
         <div class="form-group">
             <label class="form-label" for="reviewTitle">Review Title</label>
             <input type="text" id="reviewTitle" @bind="ReviewModel.Title" class="form-input review-title-input" placeholder="Enter your review title..." required>
@@ -47,7 +48,7 @@
                     {
                         int starValue = i;
                         <span
-                            class="star @(starValue <= (HoverRating > 0 ? HoverRating : Rating) ? "selected" : "")"
+                            class="star @(starValue <= (HoverRating > 0 ? HoverRating : ReviewModel.Rating) ? "selected" : "")"
                             @onclick="@(() => SetRating(starValue))"
                             @onmouseover="@(() => SetHoverRating(starValue))"
                             @onmouseout="@(() => ClearHover())">
@@ -63,7 +64,7 @@
             <div class="hellno">
                 <label for="tag-input">Tags:</label>
                 <ul>
-                    @foreach (var tag in Tags)
+                    @foreach (var tag in ReviewModel.Tags)
                     {
                         <li class="tag">
                             @tag
