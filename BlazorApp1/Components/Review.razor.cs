@@ -7,6 +7,7 @@ namespace BlazorApp1.Components;
 public partial class Review : ComponentBase
 {
     [Inject] private IReviewService ReviewService { get; set; }
+    [Inject] private IUserService UserService { get; set; }
     [SupplyParameterFromQuery]
     [Parameter]
     public int ReviewId { get; set; }
@@ -26,6 +27,7 @@ public partial class Review : ComponentBase
                 if (ReviewId == null || ReviewId == 0)
                 {
                     Navigation.NavigateTo("/element-not-found");
+                    return;
                 }
                 var review = await ReviewService.GetReviewByIdAsync(ReviewId);
                 if (review == null)
@@ -35,12 +37,18 @@ public partial class Review : ComponentBase
                 else
                 {
                     CurrentReview = review;
+                    await GetCommentsAsync();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error while trying to setting current review:",ex.Message);
+                Console.WriteLine("Error while trying to setting current review:" + ex.Message);
             }
         } 
+    }
+
+    private async Task GetCommentsAsync()
+    { 
+        var comments = await ReviewService.GetCommentsByReviewIdAsync(CurrentReview.ReviewId);
     }
 }

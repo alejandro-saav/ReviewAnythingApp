@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
+using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories.Interfaces;
 
@@ -17,9 +18,17 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
         {
             CommentId = c.CommentId,
             Content = c.Content,
-            CreatorUserName = c.User.UserName,
             LastEditDate = c.LastEditDate,
-            ReviewId = c.ReviewId
+            ReviewId = c.ReviewId,
+            Likes = _context.CommentVotes.Where(cv => cv.CommentId == c.CommentId && cv.VoteType == 1).Count(),
+            UserInformation = new UserCommentDto
+            {
+                UserId = c.UserId ?? 0,
+                UserName = c.User.UserName,
+                ProfileImage = c.User.ProfileImage,
+                ReviewCount = _context.Reviews.Where(r => r.UserId == c.UserId).Count(),
+                FollowerCount = _context.Follows.Where(f => f.FollowingUserId == c.UserId).Count(),
+            }
         }).ToListAsync();
     }
 
@@ -29,9 +38,17 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
         {
             CommentId = c.CommentId,
             Content = c.Content,
-            CreatorUserName = c.User.UserName,
+            ReviewId = c.ReviewId,
             LastEditDate = c.LastEditDate,
-            ReviewId = c.ReviewId
+            Likes = _context.CommentVotes.Where(cv => cv.CommentId == c.CommentId && cv.VoteType == 1).Count(),
+            UserInformation = new UserCommentDto
+            {
+                UserId = userId,
+                UserName = c.User.UserName,
+                ProfileImage = c.User.ProfileImage,
+                ReviewCount = _context.Reviews.Where(r => r.UserId == c.UserId).Count(),
+                FollowerCount = _context.Follows.Where(f => f.FollowingUserId == c.UserId).Count(),
+            }
         }).ToListAsync();
     }
 }
