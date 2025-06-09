@@ -1,46 +1,44 @@
 @page "/review"
 <div class="container">
     <div class="header">
-        <h1 class="title">The Lord of the Rings: The Fellowship of the Ring</h1>
+        <h1 class="title">@CurrentReview.Title</h1>
         <div class="meta-info">
-            <div class="username">by: john_reader_42</div>
-            <div class="last-edit">Last edited: March 15, 2024</div>
+            <div class="username">by: user_name</div>
+            <div class="last-edit">Last edited: @CurrentReview.LastEditDate</div>
         </div>
     </div>
 
     <div class="content-section">
         <div class="rating-section">
             <div class="stars">
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
-                <span class="star filled">★</span>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    int starValue = CurrentReview.Rating;
+                    <span
+                        class="star @(starValue >= i ? "selected" : "")">
+                            ★
+                        </span>
+                }
             </div>
             @* <div class="rating-text">5 out of 5 stars</div> *@
         </div>
 
         <div class="review-content">
-            This masterpiece by J.R.R. Tolkien is nothing short of extraordinary. The depth of world-building, the rich character development, and the epic scope of the adventure make this book an absolute must-read for fantasy enthusiasts and literature lovers alike.
-
-            Tolkien's attention to detail in creating Middle-earth is phenomenal - from the languages he invented to the intricate histories of different races and regions. The Fellowship's journey is both thrilling and emotionally resonant, with each character bringing their own unique strengths and vulnerabilities to the story.
-
-            The themes of friendship, sacrifice, courage, and the corruption of power are timeless and beautifully woven throughout the narrative. This book has rightfully earned its place as one of the greatest fantasy novels ever written and continues to inspire readers decades after its publication.
+         @CurrentReview.Content
         </div>
 
         <div class="tags-section">
             <div class="tags-title">Tags</div>
             <div class="tags">
-                <span class="tag">Fantasy</span>
-                <span class="tag">Classic Literature</span>
-                <span class="tag">Adventure</span>
-                <span class="tag">Epic</span>
-                <span class="tag">Must Read</span>
+                @foreach (var tag in CurrentReview.Tags)
+                {
+                    <span class="tag">@tag</span>
+                }
             </div>
         </div>
 
         <div class="voting-section">
-            <div class="votes-count">127 positive votes</div>
+            <div class="votes-count">@CurrentReview.Likes positive votes</div>
             <div class="vote-buttons">
                 <button class="vote-btn like">
                     👍 Like
@@ -52,27 +50,35 @@
         </div>
 
         <div class="comments-section">
-            <div class="comments-title">Comments (8)</div>
-
-            <div class="comment">
-                <div class="comment-header">
-                    <div class="profile-photo">AM</div>
-                    <div class="user-info">
-                        <div class="username-comment">alice_bookworm</div>
-                        <div class="user-stats">
-                            <span>42 reviews</span>
-                            <span>•</span>
-                            <span>1.2k followers</span>
+            <div class="comments-title">Comments (@CurrentReview.Comments.Count()</div>
+            @foreach(var comment in CurrentReview.Comments)
+            {
+                <div class="comment">
+                    <div class="comment-header">
+                        @if (string.IsNullOrWhiteSpace(comment.User.ProfileImage))
+                        {
+                        <div class="profile-photo">AM</div>
+                        }
+                        else
+                        {
+                            <img src="@comment.User.ProfileImage" alt="profile-picture" class="profile-picture-image"/>
+                        }
+                        <div class="user-info">
+                            <div class="username-comment">@comment.User.UserName</div>
+                            <div class="user-stats">
+                                <span>@comment.User.ReviewCount reviews</span>
+                                <span>•</span>
+                                <span>@comment.User.FollowerCount followers</span>
+                            </div>
                         </div>
+                        <button class="follow-btn">Follow</button>
                     </div>
-                    <button class="follow-btn">Follow</button>
-                </div>
                 <div class="comment-content">
-                    Completely agree with this review! Tolkien's world-building is unmatched. I've read this book at least 5 times and discover something new each time. The way he weaves language, mythology, and character development is simply masterful.
+                    @comment.Content
                 </div>
                 <div class="comment-footer">
                     <div class="comment-meta">
-                        <span>Edited: March 16, 2024</span>
+                        <span>Edited: @comment.LastEditDate</span>
                         <span class="likes-count">24 likes</span>
                     </div>
                     <div class="comment-actions">
@@ -82,94 +88,7 @@
                     </div>
                 </div>
             </div>
-
-            <div class="comment">
-                <div class="comment-header">
-                    <div class="profile-photo">BT</div>
-                    <div class="user-info">
-                        <div class="username-comment">bookish_tom</div>
-                        <div class="user-stats">
-                            <span>156 reviews</span>
-                            <span>•</span>
-                            <span>3.4k followers</span>
-                        </div>
-                    </div>
-                    <button class="follow-btn following">Following</button>
-                </div>
-                <div class="comment-content">
-                    While I appreciate the depth of world-building, I found the pacing a bit slow in parts. That said, the character relationships and the themes of friendship and sacrifice really resonated with me. Definitely deserves its classic status.
-                </div>
-                <div class="comment-footer">
-                    <div class="comment-meta">
-                        <span>Edited: March 17, 2024</span>
-                        <span class="likes-count">18 likes</span>
-                    </div>
-                    <div class="comment-actions">
-                        <button class="comment-btn active">👍</button>
-                        <button class="comment-btn">👎</button>
-                        <button class="comment-btn">💬 Reply</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="comment">
-                <div class="comment-header">
-                    <div class="profile-photo">SF</div>
-                    <div class="user-info">
-                        <div class="username-comment">sci_fi_sarah</div>
-                        <div class="user-stats">
-                            <span>89 reviews</span>
-                            <span>•</span>
-                            <span>756 followers</span>
-                        </div>
-                    </div>
-                    <button class="follow-btn">Follow</button>
-                </div>
-                <div class="comment-content">
-                    As someone who usually prefers sci-fi, this book completely won me over. The attention to detail in creating Middle-earth is incredible, and the emotional journey of the characters kept me engaged throughout. A true masterpiece!
-                </div>
-                <div class="comment-footer">
-                    <div class="comment-meta">
-                        <span>Edited: March 18, 2024</span>
-                        <span class="likes-count">31 likes</span>
-                    </div>
-                    <div class="comment-actions">
-                        <button class="comment-btn">👍</button>
-                        <button class="comment-btn">👎</button>
-                        <button class="comment-btn">💬 Reply</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="comment">
-                <div class="comment-header">
-                    <div class="profile-photo">DR</div>
-                    <div class="user-info">
-                        <div class="username-comment">dragon_reader_99</div>
-                        <div class="user-stats">
-                            <span>203 reviews</span>
-                            <span>•</span>
-                            <span>892 followers</span>
-                        </div>
-                    </div>
-                    <button class="follow-btn">Follow</button>
-                </div>
-                <div class="comment-content">
-                    The Fellowship is just the beginning of an epic journey! I love how Tolkien doesn't rush the story - every moment feels purposeful. The friendship between Frodo and Sam alone makes this worth reading. Can't wait to re-read the entire trilogy again.
-                </div>
-                <div class="comment-footer">
-                    <div class="comment-meta">
-                        <span>Edited: March 19, 2024</span>
-                        <span class="likes-count">15 likes</span>
-                    </div>
-                    <div class="comment-actions">
-                        <button class="comment-btn">👍</button>
-                        <button class="comment-btn">👎</button>
-                        <button class="comment-btn">💬 Reply</button>
-                    </div>
-                </div>
-            </div>
-
+            }
         </div>
     </div>
 </div>

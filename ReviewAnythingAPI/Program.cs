@@ -27,6 +27,7 @@ builder.Services.AddTransient<IResend, ResendClient>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IUserService, UserService>();
 // Add repositories to the container
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
@@ -37,6 +38,7 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IReviewVoteRepository, ReviewVoteRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IReviewTagRepository, ReviewTagRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 // For the generic repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // DbContext

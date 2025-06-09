@@ -4,6 +4,7 @@ public class CommentVote
 {
     public int? UserId { get; set; }
     public int CommentId { get; set; }
+    public int ReviewId { get; set; }
     public int VoteType { get; set; }
     public DateTime VoteDate { get; set; }
     

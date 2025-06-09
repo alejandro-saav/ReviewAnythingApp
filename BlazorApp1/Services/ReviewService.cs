@@ -47,7 +47,7 @@ public class ReviewService : IReviewService
             var response = await _httpClient.PostAsJsonAsync("api/review", review);
             if (response.IsSuccessStatusCode)
             {
-                var newReview = response.Content.ReadFromJsonAsync<ReviewModel>().Result;
+                var newReview = await response.Content.ReadFromJsonAsync<ReviewModel>();
                 CreatedReview = newReview;
                 return newReview;
             }
@@ -70,7 +70,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.GetAsync("api/review");
+            var response = await _httpClient.GetAsync($"api/review/{reviewId}");
             if (response.IsSuccessStatusCode)
             {
                 var review = await response.Content.ReadFromJsonAsync<ReviewModel>();
@@ -87,6 +87,31 @@ public class ReviewService : IReviewService
         {
             LastErrorMessage = "Something went wrong";
             return new ReviewModel();
+        }
+    }
+
+    public async Task<IEnumerable<Comment>> GetCommentsByReviewIdAsync(int reviewId)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/review/{reviewId}/comments");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<Comment>>();
+                return content;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                LastErrorMessage = $"Error while fetching the review, status code: {response.StatusCode} - error message:{errorContent}";
+                return [];
+            }
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = "Something went wrong";
+            return [];
         }
     }
 }

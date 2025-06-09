@@ -11,12 +11,10 @@ namespace BlazorApp1.Controllers;
 public class ReviewController : ControllerBase
 {
     private readonly HttpClient _httpClient;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ReviewController(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
+    public ReviewController(IHttpClientFactory httpClientFactory)
     {
         _httpClient = httpClientFactory.CreateClient("ReviewAnythingAPI");
-        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpGet("categories")]
@@ -44,7 +42,8 @@ public class ReviewController : ControllerBase
         var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
         if (response.IsSuccessStatusCode)
         {
-            return Ok(response.Content.ReadAsStringAsync().Result);
+            var content = await response.Content.ReadFromJsonAsync<ReviewViewModel>();
+            return Ok(content);
         }
         else
         {
@@ -57,5 +56,31 @@ public class ReviewController : ControllerBase
     public async Task<IActionResult> GetReviewById([FromQuery] int id)
     {
         var response = await _httpClient.GetAsync($"api/reviews/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadFromJsonAsync<ReviewViewModel>();
+            return Ok(content);
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            return StatusCode((int)response.StatusCode, errorContent);
+        }
+    }
+
+    [HttpGet("{id}/comments")]
+    public async Task<IActionResult> GetCommentsByReviewIdAsync([FromQuery] int reviewId)
+    {
+        var response = await _httpClient.GetAsync($"api/comment/reviews/{reviewId}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadFromJsonAsync<Comment>();
+            return Ok(content);
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            return StatusCode((int)response.StatusCode, errorContent);
+        }
     }
 }
