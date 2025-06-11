@@ -1,9 +1,9 @@
-@page "/review"
+@page "/review/{ReviewId:int}"
 <div class="container">
     <div class="header">
         <h1 class="title">@CurrentReview.Title</h1>
         <div class="meta-info">
-            <div class="username">by: user_name</div>
+            <div class="username">by: @CurrentReview.UserName</div>
             <div class="last-edit">Last edited: @CurrentReview.LastEditDate</div>
         </div>
     </div>
@@ -55,20 +55,20 @@
             {
                 <div class="comment">
                     <div class="comment-header">
-                        @if (string.IsNullOrWhiteSpace(comment.User.ProfileImage))
+                        @if (string.IsNullOrWhiteSpace(comment.UserInformation.ProfileImage))
                         {
                         <div class="profile-photo">AM</div>
                         }
                         else
                         {
-                            <img src="@comment.User.ProfileImage" alt="profile-picture" class="profile-picture-image"/>
+                            <img src="@comment.UserInformation.ProfileImage" alt="profile-picture" class="profile-picture-image"/>
                         }
                         <div class="user-info">
-                            <div class="username-comment">@comment.User.UserName</div>
+                            <div class="username-comment">@comment.UserInformation.UserName</div>
                             <div class="user-stats">
-                                <span>@comment.User.ReviewCount reviews</span>
+                                <span>@comment.UserInformation.ReviewCount reviews</span>
                                 <span>•</span>
-                                <span>@comment.User.FollowerCount followers</span>
+                                <span>@comment.UserInformation.FollowerCount followers</span>
                             </div>
                         </div>
                         <button class="follow-btn">Follow</button>

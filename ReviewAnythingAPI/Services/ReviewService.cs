@@ -304,6 +304,7 @@ public class ReviewService : IReviewService
             LastEditDate = r.LastEditDate,
             Rating = r.Rating,
             ItemId = r.ItemId,
+            UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
             UserId = r.UserId,
             Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
             UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),

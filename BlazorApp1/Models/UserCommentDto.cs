@@ -1,6 +1,6 @@
 namespace BlazorApp1.Models;
 
-public class UserCommentInformation
+public class UserCommentDto
 {
     public int UserId { get; set; }
     public string UserName { get; set; }

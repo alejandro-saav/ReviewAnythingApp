@@ -8,7 +8,6 @@ public class Comment
     public string Content { get; set; }
     public int ReviewId { get; set; }
     public DateTime LastEditDate { get; set; }
-    public int UserId { get; set; }
-    public UserCommentInformation User { get; set; } = new UserCommentInformation();
+    public UserCommentDto UserInformation { get; set; } = new UserCommentDto();
     public int Likes { get; set; }
 }

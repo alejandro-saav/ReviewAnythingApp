@@ -13,7 +13,7 @@ public class UserService : IUserService
         _httpClient = httpClientFactory.CreateClient("BlazorAppApi");
     }
 
-    public async Task<IEnumerable<UserCommentInformation?>> GetUsersInformationAsync(IEnumerable<int> userIds)
+    public async Task<IEnumerable<UserCommentDto?>> GetUsersInformationAsync(IEnumerable<int> userIds)
     {
         LastErrorMessage = null;
         try
@@ -21,7 +21,7 @@ public class UserService : IUserService
             var response = await _httpClient.PostAsJsonAsync("api/users", userIds);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<IEnumerable<UserCommentInformation>>().Result;
+                return response.Content.ReadFromJsonAsync<IEnumerable<UserCommentDto>>().Result;
             }
             else
             {

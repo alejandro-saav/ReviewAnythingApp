@@ -18,12 +18,6 @@ public class CommentController : ControllerBase
         _commentService = commentService;
     }
     
-    [HttpGet("{commentId}")]
-    public async Task<IActionResult> GetCommentByIdAsync([FromRoute] int commentId)
-    {
-        var comment = await _commentService.GetCommentByIdAsync(commentId);
-        return Ok(comment);
-    }
 
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetAllCommentsByUser([FromRoute] int userId)
@@ -49,7 +43,14 @@ public class CommentController : ControllerBase
         if (userName == null) return Unauthorized();
         
         var createdComment = await _commentService.CreateCommentAsync(comment, userId, userName);
-        return CreatedAtAction(nameof(GetCommentByIdAsync), new { commentId = createdComment.CommentId }, createdComment);
+        return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.CommentId }, createdComment);
+    }
+    
+    [HttpGet("{commentId}")]
+    public async Task<IActionResult> GetCommentById([FromRoute] int commentId)
+    {
+        var comment = await _commentService.GetCommentByIdAsync(commentId);
+        return Ok(comment);
     }
 
     [Authorize]
