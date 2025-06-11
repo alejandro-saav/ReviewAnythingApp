@@ -72,7 +72,6 @@ public class CommentService : ICommentService
                 Content = commentInserted.Content,
                 ReviewId = commentInserted.ReviewId,
                 LastEditDate = commentInserted.LastEditDate,
-                CreatorUserName = userName
             };
     }
 
@@ -97,7 +96,6 @@ public class CommentService : ICommentService
                 Content = comment.Content,
                 ReviewId = comment.ReviewId,
                 LastEditDate = comment.LastEditDate,
-                CreatorUserName = userName
             };
     }
 
@@ -121,7 +119,6 @@ public class CommentService : ICommentService
                 Content = comment.Content,
                 LastEditDate = comment.LastEditDate,
                 ReviewId = comment.ReviewId,
-                CreatorUserName = userName
             };
         
     }

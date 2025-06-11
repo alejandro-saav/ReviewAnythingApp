@@ -7,12 +7,10 @@ namespace BlazorApp1.Components;
 public partial class Review : ComponentBase
 {
     [Inject] private IReviewService ReviewService { get; set; }
-    [Inject] private IUserService UserService { get; set; }
-    [SupplyParameterFromQuery]
     [Parameter]
     public int ReviewId { get; set; }
     [Inject] private NavigationManager Navigation { get; set; } = default!;
-    private ReviewModel CurrentReview { get; set; } = null;
+    private ReviewModel CurrentReview { get; set; } = new ReviewModel();
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,6 +47,7 @@ public partial class Review : ComponentBase
 
     private async Task GetCommentsAsync()
     { 
-        var comments = await ReviewService.GetCommentsByReviewIdAsync(CurrentReview.ReviewId);
+        var commentsList = await ReviewService.GetCommentsByReviewIdAsync(CurrentReview.ReviewId);
+        CurrentReview.Comments = commentsList;
     }
 }

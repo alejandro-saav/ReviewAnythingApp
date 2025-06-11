@@ -53,12 +53,12 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetReviewById([FromQuery] int id)
+    public async Task<IActionResult> GetReviewById([FromRoute] int id)
     {
         var response = await _httpClient.GetAsync($"api/reviews/{id}");
         if (response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadFromJsonAsync<ReviewViewModel>();
+            var content = await response.Content.ReadFromJsonAsync<ReviewModel>();
             return Ok(content);
         }
         else
@@ -68,14 +68,14 @@ public class ReviewController : ControllerBase
         }
     }
 
-    [HttpGet("{id}/comments")]
-    public async Task<IActionResult> GetCommentsByReviewIdAsync([FromQuery] int reviewId)
+    [HttpGet("{reviewId}/comments")]
+    public async Task<IActionResult> GetCommentsByReviewIdAsync([FromRoute] int reviewId)
     {
         var response = await _httpClient.GetAsync($"api/comment/reviews/{reviewId}");
         if (response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadFromJsonAsync<Comment>();
-            return Ok(content);
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<Comment>>();
+                return Ok(content);
         }
         else
         {
