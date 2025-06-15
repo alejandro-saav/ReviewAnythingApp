@@ -50,6 +50,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+
 // Adding core identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -101,6 +102,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

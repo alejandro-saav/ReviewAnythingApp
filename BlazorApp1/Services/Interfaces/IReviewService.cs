@@ -12,7 +12,6 @@ public interface IReviewService
     
     string? LastErrorMessage { get; }
     
-    public ReviewModel? CreatedReview { get; set; }
-    Task<ReviewModel> GetReviewByIdAsync(int reviewId);
+    Task<ReviewModel?> GetReviewByIdAsync(int reviewId);
     Task<IEnumerable<Comment>> GetCommentsByReviewIdAsync(int reviewId);
 }

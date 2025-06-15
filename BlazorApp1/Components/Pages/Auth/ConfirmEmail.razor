@@ -6,7 +6,7 @@
 <div class="confirmation-container">
     <div class="confirmation-card">
         <div class="icon-container">
-            @if (!IsSuccess)
+            @if (IsSuccess)
             {
                 <div class="success-icon">
                     <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,7 +27,7 @@
             }
         </div>
         
-        @if (!IsSuccess)
+        @if (IsSuccess)
         {
             <h1 class="title success">Email Confirmed!</h1>
             
@@ -43,8 +43,8 @@
             </div>
             
             <div class="action-buttons">
-                <a href="/" class="btn btn-primary">
-                    Back to Home
+                <a href="/login" class="btn btn-primary">
+                    Back to Login Page
                 </a>
             </div>
         }
@@ -67,8 +67,8 @@
                 <button class="btn btn-primary" @onclick="ResendConfirmationEmail">
                     Resend Confirmation
                 </button>
-                <a href="/" class="btn btn-tertiary">
-                    Back to Home
+                <a href="/login" class="btn btn-tertiary">
+                    Back to Login Page
                 </a>
             </div>
         }

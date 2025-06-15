@@ -137,8 +137,7 @@ public class AuthService : IAuthService
         {
             throw new EntityNotFoundException("User not found!");
         }
-        var decodedToken = Uri.UnescapeDataString(token);
-        var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+        var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
             throw new InvalidOperationException($"Unable to confirm your email: {user.Email}");

@@ -1,5 +1,7 @@
 using BlazorApp1.Models.Auth;
 using BlazorApp1.Services;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -11,6 +13,7 @@ public partial class SignUp : ComponentBase
     
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
+    [Inject] Cloudinary Cloudinary { get; set; } = default!;
     
     public RegisterRequestDto SignUpModel { get; set; } = new RegisterRequestDto();
     public string? ErrorMessage { get; set; }
@@ -18,6 +21,7 @@ public partial class SignUp : ComponentBase
     private string? ImageNameSelected { get; set; }
     
     private string? ImagePreviewUrl { get; set; }
+    private IBrowserFile? ImageFile { get; set; } = null;
     private bool IsLoading { get; set; }
 
     protected override void OnInitialized()
@@ -32,6 +36,7 @@ public partial class SignUp : ComponentBase
     {
         ImageNameSelected = "";
         ImagePreviewUrl = "";
+        ImageFile = null;
         Console.WriteLine("HELLO?");
     }
 
@@ -47,6 +52,7 @@ public partial class SignUp : ComponentBase
             ImageErrorMessage = "File is too big, max size is 2MB";
             return;
         }
+        ImageFile = file;
 
         try
         {
@@ -87,6 +93,7 @@ public partial class SignUp : ComponentBase
 
         try
         {
+            await UploadImageToCloudinary();
             var success = await AuthService.RegisterAsync(SignUpModel);
 
             if (success)
@@ -118,6 +125,36 @@ public partial class SignUp : ComponentBase
         {
             ErrorMessage = null;
             StateHasChanged();
+        }
+    }
+    
+    private async Task UploadImageToCloudinary()
+    {
+        try
+        {
+            if (ImageFile == null) return;
+            const long maxFileSize = 1024 * 1024 * 2;
+            await using Stream stream = ImageFile.OpenReadStream(maxFileSize);
+            var uploadParams = new ImageUploadParams()
+            {
+                File = new FileDescription(ImageFile.Name, stream),
+                PublicId = $"profile-photos/{Guid.NewGuid().ToString()}", // Recommended: unique public ID
+                Overwrite = true, // Set to true if you want to overwrite existing assets with the same public ID
+                Folder = "ReviewAnythingAPP", // Optional: Organize uploads into a folder
+            };
+
+            var uploadResult = await Cloudinary.UploadAsync(uploadParams);
+
+            if (uploadResult.Error == null)
+            {
+               SignUpModel.ProfileImage = uploadResult.SecureUrl.ToString();
+                Console.WriteLine("SUCCESS");
+            }
+            Console.WriteLine("Error");
+        }
+        catch (Exception ex)
+        {
+            //asd
         }
     }
 }

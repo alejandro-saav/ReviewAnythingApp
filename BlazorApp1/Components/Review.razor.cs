@@ -14,12 +14,6 @@ public partial class Review : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        if (ReviewService.CreatedReview != null)
-        {
-            CurrentReview = ReviewService.CreatedReview;
-        }
-        else
-        {
             try
             {
                 if (ReviewId == null || ReviewId == 0)
@@ -41,8 +35,8 @@ public partial class Review : ComponentBase
             catch (Exception ex)
             {
                 Console.WriteLine("Error while trying to setting current review:" + ex.Message);
+                Navigation.NavigateTo("/element-not-found");
             }
-        } 
     }
 
     private async Task GetCommentsAsync()
