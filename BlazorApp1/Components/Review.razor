@@ -48,9 +48,15 @@
                 </button>
             </div>
         </div>
+        
+        <div class="leave-comment">
+            <div>
+                <input id="comment-input" placeholder="Leave a comment..." type="text"/>
+            </div>
+        </div>
 
         <div class="comments-section">
-            <div class="comments-title">Comments (@CurrentReview.Comments.Count()</div>
+            <div class="comments-title">Comments (@CurrentReview.Comments.Count())</div>
             @foreach(var comment in CurrentReview.Comments)
             {
                 <div class="comment">

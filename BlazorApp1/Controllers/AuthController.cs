@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlazorApp1.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly HttpClient _apiHttpClient; // This HttpClient calls your actual .NET 9 API
@@ -73,8 +73,8 @@ public class AuthController : ControllerBase
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return BadRequest("userId or token is empty");
         try
         {
-            var decodedToken = Uri.UnescapeDataString(token);
-            var apiResponse = await _apiHttpClient.GetAsync($"api/auth/confirm-email?userId={userId}&token={decodedToken}");
+            var encodedToken = Uri.EscapeDataString(token);
+            var apiResponse = await _apiHttpClient.GetAsync($"api/auth/confirm-email?userId={userId}&token={encodedToken}");
 
             if (apiResponse.IsSuccessStatusCode)
             {
@@ -132,36 +132,6 @@ public class AuthController : ControllerBase
         if (apiResponse.IsSuccessStatusCode)
         {
             return Ok(new { message = "Success."});
-        }
-        else
-        {
-            var errorContent = await apiResponse.Content.ReadAsStringAsync();
-            return StatusCode((int)apiResponse.StatusCode, errorContent);
-        }
-    }
-    [HttpGet("data")] // This would be called by your Blazor client to get protected data
-    // You'd need to add authorization here if you want to restrict access to the proxy endpoint
-    // [Authorize]
-    public async Task<IActionResult> GetData()
-    {
-        // Retrieve JWT from cookie (or session)
-        var authToken = Request.Cookies["AuthToken"];
-
-        if (string.IsNullOrEmpty(authToken))
-        {
-            return Unauthorized("No authentication token found.");
-        }
-
-        // Add JWT to the request to the actual API
-        _apiHttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
-
-        // Call the actual API
-        var apiResponse = await _apiHttpClient.GetAsync("protected-data"); // Assuming your API has a /protected-data endpoint
-
-        if (apiResponse.IsSuccessStatusCode)
-        {
-            var content = await apiResponse.Content.ReadAsStringAsync();
-            return Ok(content);
         }
         else
         {

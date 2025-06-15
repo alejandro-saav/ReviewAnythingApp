@@ -42,7 +42,7 @@ public class ReviewController : ControllerBase
         var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
         if (response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadFromJsonAsync<ReviewViewModel>();
+            var content = await response.Content.ReadFromJsonAsync<ReviewModel>();
             return Ok(content);
         }
         else

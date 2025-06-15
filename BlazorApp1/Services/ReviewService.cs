@@ -8,7 +8,6 @@ public class ReviewService : IReviewService
 {
     private readonly HttpClient _httpClient;
     public string? LastErrorMessage { get; private set; }
-    public ReviewModel? CreatedReview { get; set; }
 
     public ReviewService(IHttpClientFactory httpClientFactory)
     {
@@ -48,7 +47,6 @@ public class ReviewService : IReviewService
             if (response.IsSuccessStatusCode)
             {
                 var newReview = await response.Content.ReadFromJsonAsync<ReviewModel>();
-                CreatedReview = newReview;
                 return newReview;
             }
             else
@@ -65,7 +63,7 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<ReviewModel> GetReviewByIdAsync(int reviewId)
+    public async Task<ReviewModel?> GetReviewByIdAsync(int reviewId)
     {
         LastErrorMessage = null;
         try
@@ -80,13 +78,13 @@ public class ReviewService : IReviewService
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Error while fetching the review, status code: {response.StatusCode} - error message:{errorContent}";
-                return new ReviewModel();
+                return null;
             }
         }
         catch (Exception ex)
         {
             LastErrorMessage = "Something went wrong";
-            return new ReviewModel();
+            return null;
         }
     }
 

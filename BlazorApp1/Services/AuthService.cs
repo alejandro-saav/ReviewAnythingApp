@@ -22,7 +22,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, "api/auth/Login");
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, "auth/Login");
             var response = await _httpClient.PostAsJsonAsync(requestUri, request);
             if (response.IsSuccessStatusCode)
             {
@@ -48,8 +48,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, "api/auth/Register");
-            var response = await _httpClient.PostAsJsonAsync(requestUri, request);
+            var response = await _httpClient.PostAsJsonAsync("auth/Register", request);
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -72,8 +71,8 @@ public class AuthService : IAuthService
     {
         try
         {
-            // var encodedToken = Uri.EscapeDataString(token);
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/confirm-email?userId={userId}&token={token}");
+            var encodedToken = Uri.EscapeDataString(token);
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"auth/confirm-email?userId={userId}&token={encodedToken}");
             var response = await _httpClient.GetAsync(requestUri);
             if (response.IsSuccessStatusCode)
             {
@@ -97,7 +96,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/forgot-password");
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"auth/forgot-password");
             var response = await _httpClient.PostAsJsonAsync(requestUri, request);
             if (response.IsSuccessStatusCode)
             {
@@ -123,7 +122,7 @@ public class AuthService : IAuthService
         try
         {
             var encodedToken = Uri.EscapeDataString(token);
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"api/auth/reset-password?userId={userId}&token={encodedToken}");
+            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"auth/reset-password?userId={userId}&token={encodedToken}");
             var response = await _httpClient.PostAsJsonAsync(requestUri, newPassword);
             if (response.IsSuccessStatusCode)
             {
