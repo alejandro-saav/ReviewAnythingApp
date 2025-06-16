@@ -9,98 +9,112 @@
         <!-- SignUp Panel -->
         <div class="signup-panel">
             <h2 class="panel-title">Sign up</h2>
-            
+
             <EditForm Model="@SignUpModel" OnValidSubmit="HandleSignUp" FormName="signupForm">
                 <DataAnnotationsValidator />
-                <div class="form-group">
-                    <label for="username">Username:<span class="asterisk"> *</span></label>
-                    <input type="text" @bind="SignUpModel.UserName" @bind:event="oninput"
-                           placeholder="Username" class="form-input" id="username"/>
-                    <ValidationMessage For="@(() => SignUpModel.UserName)" class="validation-error"/>
-                </div>
-                
-                <div class="form-group">
-                    <label for="firstname">Firstname:<span class="asterisk"> *</span></label>
-                    <input type="text" @bind="SignUpModel.FirstName" @bind:event="oninput"
-                           placeholder="Firstname" class="form-input" id="firstname"/>
-                    <ValidationMessage For="@(() => SignUpModel.FirstName)" class="validation-error"/>
-                </div>
+                <div class="form-container">
+                    <div class="required-fields-container">
+                        <div class="form-group">
+                            <label for="username">Username:<span class="asterisk"> *</span></label>
+                            <input type="text" @bind="SignUpModel.UserName" @bind:event="oninput" placeholder="Username"
+                                class="form-input" id="username" />
+                            <ValidationMessage For="@(() => SignUpModel.UserName)" class="validation-error" />
+                        </div>
 
-                <div class="form-group">
-                    <label for="lastname">Lastname:</label>
-                    <input type="text" @bind="SignUpModel.LastName" @bind:event="oninput"
-                           placeholder="LastName" class="form-input" id="lastname"/>
-                    <ValidationMessage For="@(() => SignUpModel.LastName)" class="validation-error"/>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email:<span class="asterisk"> *</span></label>
-                    <input type="email" @bind="SignUpModel.Email" @bind:event="oninput"
-                           placeholder="Email Address" class="form-input" id="email"/>
-                    <ValidationMessage For="@(() => SignUpModel.Email)" class="validation-error"/>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password:<span class="asterisk"> *</span></label>
-                    <input type="password" @bind="SignUpModel.Password" @bind:event="oninput"
-                           placeholder="Password" class="form-input" id="password"/>
-                    <ValidationMessage For="@(() => SignUpModel.Password)" class="validation-error"/>
-                </div>
+                        <div class="form-group">
+                            <label for="firstname">Firstname:<span class="asterisk"> *</span></label>
+                            <input type="text" @bind="SignUpModel.FirstName" @bind:event="oninput"
+                                placeholder="Firstname" class="form-input" id="firstname" />
+                            <ValidationMessage For="@(() => SignUpModel.FirstName)" class="validation-error" />
+                        </div>
 
-                <div class="form-group">
-                    <label for="phone">Phone Number:</label>
-                    <input type="text" @bind="SignUpModel.Phone" @bind:event="oninput"
-                           placeholder="Phone number" class="form-input" id="phone"/>
-                    <ValidationMessage For="@(() => SignUpModel.Phone)" class="validation-error"/>
-                </div>
+                        <div class="form-group">
+                            <label for="email">Email:<span class="asterisk"> *</span></label>
+                            <input type="email" @bind="SignUpModel.Email" @bind:event="oninput"
+                                placeholder="Email Address" class="form-input" id="email" />
+                            <ValidationMessage For="@(() => SignUpModel.Email)" class="validation-error" />
+                        </div>
 
-                <div class="upload-container">
-                    <label for="profile-upload" class="profile-upload">
-                        @if (string.IsNullOrEmpty(ImagePreviewUrl)) {
-                            @* <div class="profile-icon">👤</div> *@
-                            <div class="profile-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none">
-                                    <!-- Circle background -->
-                                    <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
-                                    <!-- User icon -->
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="#FE5D26"/>
-                                </svg>
+                        <div class="form-group">
+                            <label for="password">Password:<span class="asterisk"> *</span></label>
+                            <input type="password" @bind="SignUpModel.Password" @bind:event="oninput"
+                                placeholder="Password" class="form-input" id="password" />
+                            <ValidationMessage For="@(() => SignUpModel.Password)" class="validation-error" />
+                        </div>
+                    </div>
+                    <div class="optional-fields-container">
+                        <div class="form-group">
+                            <label for="lastname">Lastname:</label>
+                            <input type="text" @bind="SignUpModel.LastName" @bind:event="oninput" placeholder="LastName"
+                                class="form-input" id="lastname" />
+                            <ValidationMessage For="@(() => SignUpModel.LastName)" class="validation-error" />
+                        </div>
 
-                            </div>
-                        }
-                        else
+
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number:</label>
+                            <input type="text" @bind="SignUpModel.Phone" @bind:event="oninput"
+                                placeholder="Phone number" class="form-input" id="phone" />
+                            <ValidationMessage For="@(() => SignUpModel.Phone)" class="validation-error" />
+                        </div>
+
+                        <div class="upload-container">
+                            <label for="profile-upload" class="profile-upload">
+                                Profile Picture: <span class="image-name">@ImageNameSelected</span>
+                            </label>
+                            @if (string.IsNullOrEmpty(ImagePreviewUrl))
+                            {
+                                @* <div class="profile-icon">👤</div> *@
+                                <label class="svg-container" for="profile-upload">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
+                                        fill="none">
+                                        <!-- Circle background -->
+                                        <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none" />
+                                        <!-- User icon -->
+                                        <path
+                                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                            fill="#FE5D26" />
+                                    </svg>
+                                    <span class="plus-sign">+</span>
+
+                                </label>
+                            }
+                            else
+                            {
+                                <label for="profile-upload">
+                                    <div class="image-preview" id="imagePreview">
+                                        <img id="previewImg" src="@ImagePreviewUrl" alt="Profile Preview">
+                                        <button type="button" class="remove-btn" @onclick="HandleRemovePhoto">×</button>
+                                    </div>
+                                </label>
+                            }
+                            <InputFile id="profile-upload" accept="image/*" OnChange="HandleImageSelected"
+                                style="display: none;" />
+                            @* <input type="file" id="profile-upload" accept="image/*" hidden> *@
+
+                            @* <!-- Preview area (hidden initially) --> *@
+                        </div>
+                        @if (!string.IsNullOrEmpty(ImageErrorMessage))
                         {
-                            <div class="image-preview" id="imagePreview">
-                                <img id="previewImg" src="@ImagePreviewUrl" alt="Profile Preview">
-                                <button type="button" class="remove-btn"  @onclick="HandleRemovePhoto">×</button>
+                            <div class="error-message img-error-message" style="margin-bottom: 10px">@ImageErrorMessage
                             </div>
-                         
                         }
-                        <span>Profile Picture: @ImageNameSelected</span>
-                        @* <input type="file" id="profile-upload" accept="image/*" hidden> *@
-                        <InputFile id="profile-upload" accept="image/*"
-                                   OnChange="HandleImageSelected" style="display: none;" />
-                    </label>
-
-                    @* <!-- Preview area (hidden initially) --> *@
-                </div >
-                @if (!string.IsNullOrEmpty(ImageErrorMessage))
-                {
-                    <div class="error-message" style="margin-bottom: 10px">@ImageErrorMessage</div>
-                }
-                <div class="form-group">
-                    <label for="bio">Biography:</label>
-                    <textarea type="text" @bind="SignUpModel.Bio" @bind:event="oninput"
-                           placeholder="Bio max length(500)" class="form-input" id="bio" maxlength="500" style="resize: none"></textarea>
-                    <ValidationMessage For="@(() => SignUpModel.Bio)" class="validation-error"/>
+                        <div class="form-group">
+                            <label for="bio">Biography:</label>
+                            <textarea type="text" @bind="SignUpModel.Bio" @bind:event="oninput"
+                                placeholder="Bio max length(500)" class="form-input" id="bio" maxlength="500"
+                                style="resize: none"></textarea>
+                            <ValidationMessage For="@(() => SignUpModel.Bio)" class="validation-error" />
+                        </div>
+                    </div>
                 </div>
-                
                 <button type="submit" class="btn-primary" disabled="@IsLoading">
-                    @if (IsLoading) 
-                    { 
+                    @if (IsLoading)
+                    {
                         <div class="spinner-container">
-                        <span class="spinner"></span>
-                        <span>Loading...</span>
+                            <span class="spinner"></span>
+                            <span>Loading...</span>
                         </div>
                     }
                     else
@@ -108,7 +122,7 @@
                         <span>Signup</span>
                     }
                 </button>
-                
+
                 @if (!string.IsNullOrEmpty(ErrorMessage))
                 {
                     <div class="error-message">@ErrorMessage</div>

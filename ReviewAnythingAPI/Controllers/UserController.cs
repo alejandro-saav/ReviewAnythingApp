@@ -9,7 +9,7 @@ namespace ReviewAnythingAPI.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
-    
+
     public UserController(IUserService userService) => _userService = userService;
 
 
@@ -18,5 +18,12 @@ public class UserController : ControllerBase
     {
         var usersInformation = await _userService.GetUsersCommentInformationAsync(userIds);
         return Ok(usersInformation);
+    }
+
+    [HttpGet("{userId}/summary")]
+    public async Task<IActionResult> GetUserSummaryAsync([FromRoute] int userId)
+    {
+        var user = await _userService.GetUserSummaryAsync(userId);
+        return Ok(user);
     }
 }
