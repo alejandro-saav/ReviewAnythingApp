@@ -7,4 +7,6 @@ public interface IUserService
 {
     Task<IEnumerable<UserCommentDto>> GetUsersCommentInformationAsync(IReadOnlyList<int> userIds);
 
+    Task<UserSummaryDto> GetUserSummaryAsync(int userId);
+
 }

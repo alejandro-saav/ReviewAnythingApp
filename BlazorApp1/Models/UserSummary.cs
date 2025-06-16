@@ -1,6 +1,4 @@
-namespace ReviewAnythingAPI.DTOs.UserDTOs;
-
-public class UserSummaryDto
+public class UserSummary
 {
     public int UserId { get; set; }
     public string UserName { get; set; }

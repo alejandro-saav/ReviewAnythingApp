@@ -1,7 +1,10 @@
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using BlazorApp1.Models;
+using BlazorApp1.Models.Auth;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Category = BlazorApp1.Models.Category;
@@ -16,17 +19,18 @@ public partial class WriteReview : ComponentBase
     private string ErrorTagMessage = "";
     private int HoverRating;
     private string NewTag = "";
+    private UserSummary? userSummary = null;
 
-    // private int Rating;
-    // private readonly List<string> Tags = [];
     private string SelectedCategory { get; set; }
     private ReviewViewModel ReviewModel { get; } = new();
 
     [Inject] private IJSRuntime JSRuntime { get; set; }
 
     [Inject] private IReviewService ReviewService { get; set; }
-    [Inject] IHttpContextAccessor HttpContextAccessor  { get; set; }
+    [Inject] private IUserService UserService { get; set; }
+    [Inject] IHttpContextAccessor HttpContextAccessor { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private AuthenticationStateProvider authenticationStateProvider { get; set; }
 
     private IEnumerable<Category> Categories { get; set; } = [];
 
@@ -56,6 +60,17 @@ public partial class WriteReview : ComponentBase
     {
         var response = await ReviewService.GetAllReviewCategoriesAsync();
         Categories = response;
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        string userId = "";
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+        }
+        if (int.TryParse(userId, out int id))
+        {
+            userSummary = await UserService.GetUserSummaryAsync(id);
+        }
     }
 
     private async Task CreateNewReview()
@@ -68,7 +83,8 @@ public partial class WriteReview : ComponentBase
             return;
         }
 
-        try {
+        try
+        {
             var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
             ReviewModel.jwtToken = jwt;
             var createdReview = await ReviewService.CreateReviewAsync(ReviewModel);

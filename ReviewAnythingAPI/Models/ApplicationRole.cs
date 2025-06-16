@@ -4,5 +4,5 @@ namespace ReviewAnythingAPI.Models;
 
 public class ApplicationRole : IdentityRole<int>
 {
-    
+
 }
