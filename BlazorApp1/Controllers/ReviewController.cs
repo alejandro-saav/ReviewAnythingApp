@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlazorApp1.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("client/[controller]")]
 
 public class ReviewController : ControllerBase
 {
@@ -32,7 +32,7 @@ public class ReviewController : ControllerBase
             return StatusCode((int)response.StatusCode, errorContent);
         }
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> CreateReview([FromBody] ReviewViewModel review)
     {
@@ -55,15 +55,19 @@ public class ReviewController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetReviewById([FromRoute] int id)
     {
+        Console.WriteLine("CONTROLLER CHECKPOINT");
         var response = await _httpClient.GetAsync($"api/reviews/{id}");
+        Console.WriteLine("CONTROLLER AFTER RESOPONSE");
         if (response.IsSuccessStatusCode)
         {
+            Console.WriteLine("CONTROLLER SUCCESS");
             var content = await response.Content.ReadFromJsonAsync<ReviewModel>();
             return Ok(content);
         }
         else
         {
             var errorContent = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"CONTROLLER FAIL {errorContent}");
             return StatusCode((int)response.StatusCode, errorContent);
         }
     }
@@ -74,8 +78,25 @@ public class ReviewController : ControllerBase
         var response = await _httpClient.GetAsync($"api/comment/reviews/{reviewId}");
         if (response.IsSuccessStatusCode)
         {
-                var content = await response.Content.ReadFromJsonAsync<IEnumerable<Comment>>();
-                return Ok(content);
+            var content = await response.Content.ReadFromJsonAsync<IEnumerable<Comment>>();
+            return Ok(content);
+        }
+        else
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            return StatusCode((int)response.StatusCode, errorContent);
+        }
+    }
+
+    [HttpPost("comment")]
+    public async Task<IActionResult> CreateCommentAsync([FromBody] CreateComment comment)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", comment.jwtToken);
+        var response = await _httpClient.PostAsJsonAsync("api/Comment", comment);
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadFromJsonAsync<Comment>();
+            return Ok(content);
         }
         else
         {

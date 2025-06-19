@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.Marshalling;
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
@@ -10,7 +11,7 @@ namespace ReviewAnythingAPI.Repositories;
 public class CommentRepository : Repository<Comment>, ICommentRepository
 {
     public CommentRepository(ReviewAnythingDbContext context) : base(context)
-    {}
+    { }
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByReviewIdAsync(int reviewId)
     {
@@ -50,5 +51,27 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
                 FollowerCount = _context.Follows.Where(f => f.FollowingUserId == c.UserId).Count(),
             }
         }).ToListAsync();
+    }
+
+    public async Task<CommentResponseDto> CreateCommentAsync(Comment comment)
+    {
+        var newComment = await _context.AddAsync(comment);
+        await _context.SaveChangesAsync();
+        return new CommentResponseDto
+        {
+            CommentId = comment.CommentId,
+            Content = comment.Content,
+            ReviewId = comment.ReviewId,
+            LastEditDate = comment.LastEditDate,
+            UserInformation = new UserCommentDto
+            {
+                UserId = comment.UserId,
+                UserName = comment.User.UserName,
+                ProfileImage = comment.User.ProfileImage,
+                ReviewCount = _context.Reviews.Where(r => r.UserId == comment.UserId).Count(),
+                FollowerCount = _context.Follows.Where(f => f.FollowingUserId == comment.UserId).Count(),
+            },
+            Likes = _context.CommentVotes.Where(cm => cm.CommentId == comment.CommentId && cm.VoteType == 1).Count(),
+        };
     }
 }

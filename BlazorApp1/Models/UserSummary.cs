@@ -1,3 +1,4 @@
+namespace BlazorApp1.Models;
 public class UserSummary
 {
     public int UserId { get; set; }
