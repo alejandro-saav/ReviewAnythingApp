@@ -16,10 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ReviewAnythingAPI\ReviewAnythingAPI.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
       <PackageReference Include="System.Net.Http.Json" Version="10.0.0-preview.5.25277.114" />
     </ItemGroup>

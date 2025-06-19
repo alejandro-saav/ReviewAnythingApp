@@ -1,4 +1,5 @@
 using BlazorApp1.Models.Auth;
+using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace BlazorApp1.Services;

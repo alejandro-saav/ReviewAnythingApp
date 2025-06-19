@@ -1,5 +1,5 @@
 using BlazorApp1.Models;
-using BlazorApp1.Models.Auth;
+using BlazorApp1.Services;
 
 namespace BlazorApp1.Services;
 
