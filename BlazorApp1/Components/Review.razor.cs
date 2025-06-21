@@ -4,6 +4,7 @@ using BlazorApp1.Services;
 // using BlazorApp1.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorApp1.Components;
 
@@ -20,29 +21,25 @@ public partial class Review : ComponentBase
     private UserSummary? userSummary { get; set; } = null;
     private CreateComment createComment { get; set; } = new();
     private bool showModal { get; set; }
+    private bool IsLoading { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Console.WriteLine("ENTER TRY");
-            Console.WriteLine($"REVIEWID:{ReviewId}");
             if (ReviewId == null || ReviewId == 0)
             {
-                Console.WriteLine("ENTER FIRST IF");
                 Navigation.NavigateTo("/");
                 return;
             }
             var review = await ReviewService.GetReviewByIdAsync(ReviewId);
             if (review == null)
             {
-                Console.WriteLine("ENTER SECOND IF");
                 Navigation.NavigateTo("/");
                 return;
             }
             else
             {
-                Console.WriteLine("ENTER ELSE");
                 CurrentReview = review;
                 await GetCommentsAsync();
             }
@@ -69,13 +66,14 @@ public partial class Review : ComponentBase
     private async Task GetCommentsAsync()
     {
         var commentsList = await ReviewService.GetCommentsByReviewIdAsync(CurrentReview.ReviewId);
-        CurrentReview.Comments = commentsList;
+        CurrentReview.Comments = commentsList.OrderByDescending(c => c.LastEditDate);
     }
 
     private async Task PostComment()
     {
         try
         {
+            IsLoading = true;
             var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
             createComment.jwtToken = jwt;
             createComment.ReviewId = ReviewId;
@@ -83,11 +81,52 @@ public partial class Review : ComponentBase
             if (newComment != null)
             {
                 CurrentReview.Comments = CurrentReview.Comments.Prepend(newComment).ToList();
+                createComment.Content = "";
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task PostReviewVote(int vote)
+    {
+        if (userSummary == null)
+        {
+            OpenModal();
+            return;
+        }
+
+        try
+        {
+            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
+            var reviewVote = new ReviewVote
+            {
+                ReviewId = CurrentReview.ReviewId,
+                VoteType = vote,
+                jwtToken = jwt
+            };
+            var isSuccessVoteRequest = await ReviewService.ReviewVoteAsync(reviewVote);
+            if (isSuccessVoteRequest)
+            {
+                if (vote == 1)
+                {
+                    CurrentReview.Likes++;
+                }
+                else
+                {
+                    CurrentReview.Likes--;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error on PostReviewVote, error: {ex.Message}");
         }
     }
     

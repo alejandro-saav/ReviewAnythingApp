@@ -79,4 +79,17 @@ public class ReviewsController : ControllerBase
             _ => StatusCode(500, "Internal server error")
         };
     }
+
+    [HttpGet("{reviewId}/page-data")]
+    public async Task<IActionResult> GetReviewPageData([FromRoute] int reviewId)
+    {
+        int? userId = null;
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        }
+        
+        var data = await _reviewService.GetReviewPageDataAsync(userId, reviewId);
+        return Ok(data);
+    }
 }

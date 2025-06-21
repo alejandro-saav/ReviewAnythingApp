@@ -348,4 +348,10 @@ public class ReviewService : IReviewService
         await _dbContext.SaveChangesAsync();
         return response;
     }
+
+    public async Task<ReviewPageDataDto> GetReviewPageDataAsync(int? userId, int reviewId)
+    {
+        // var review = await _reviewRepository.
+        if (userId != null){}
+    }
 }

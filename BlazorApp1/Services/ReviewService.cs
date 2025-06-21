@@ -145,4 +145,24 @@ public class ReviewService : IReviewService
             return null;
         }
     }
+
+    public async Task<bool> ReviewVoteAsync(ReviewVote reviewVote)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("client/review/vote", reviewVote);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Something went wrong ${ex.Message}";
+            return false;
+        }
+    }
 }

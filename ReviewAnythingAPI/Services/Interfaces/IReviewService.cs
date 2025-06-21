@@ -18,4 +18,5 @@ public interface IReviewService
     Task<bool> DeleteReviewAsync(int reviewId, int userId);
     
     Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId);
+    Task<ReviewPageDataDto> GetReviewPageDataAsync(int? userId, int reviewId);
 }
