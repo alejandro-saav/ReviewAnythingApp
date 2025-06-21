@@ -63,7 +63,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
         // Comments Constraints
         modelBuilder.Entity<Comment>().HasOne(c => c.Review).WithMany(r => r.ReviewComments).HasForeignKey(c => c.ReviewId).OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Comment>().HasOne(c => c.User).WithMany().HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.SetNull);
+        modelBuilder.Entity<Comment>().HasOne(c => c.User).WithMany(u => u.UserComments).HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Comment>().HasIndex(c => c.ReviewId);
         modelBuilder.Entity<Comment>().HasIndex(c => c.UserId);

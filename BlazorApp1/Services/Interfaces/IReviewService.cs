@@ -12,4 +12,6 @@ public interface IReviewService
     Task<ReviewModel?> GetReviewByIdAsync(int reviewId);
     Task<IEnumerable<Comment>> GetCommentsByReviewIdAsync(int reviewId);
     Task<Comment?> CreateCommentAsync(CreateComment comment);
+
+    Task<bool> ReviewVoteAsync(ReviewVote vote);
 }

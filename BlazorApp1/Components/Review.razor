@@ -1,7 +1,7 @@
 @page "/review/{ReviewId:int}"
 @rendermode InteractiveServer
 
-<div class="container">
+<div class="container" @onclick="CloseModal" @onclick:stopPropagation>
     <div class="header">
         <h1 class="title">@CurrentReview.Title</h1>
         <div class="meta-info">
@@ -41,10 +41,10 @@
         <div class="voting-section">
             <div class="votes-count">@CurrentReview.Likes positive votes</div>
             <div class="vote-buttons">
-                <button class="vote-btn like">
+                <button class="vote-btn like" @onclick="() => PostReviewVote(1)" @onclick:stopPropagation>
                     👍 Like
                 </button>
-                <button class="vote-btn dislike">
+                <button class="vote-btn dislike" @onclick="() => PostReviewVote(-1)">
                     👎 Dislike
                 </button>
             </div>
@@ -54,15 +54,14 @@
             <div class="leave-comment-container">
                 @if (string.IsNullOrEmpty(userSummary?.ProfileImage))
                 {
-        
                     <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none"
-                        class="profile-svg">
+                         class="profile-svg">
                         <!-- Circle background -->
-                        <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none" />
+                        <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
                         <!-- User icon -->
                         <path
                             d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                            fill="#FE5D26" />
+                            fill="#FE5D26"/>
                     </svg>
                 }
                 else
@@ -72,24 +71,31 @@
                 @if (userSummary == null)
                 {
                     <textarea id="leave-comment-input" class="leave-comment-input" placeholder="Leave a comment..."
-                        @onclick="OpenModal" readonly @onclick:stopPropagation>
+                              @onclick="OpenModal" readonly @onclick:stopPropagation>
                                                         </textarea>
                 }
                 else
                 {
-                    <textarea id="leave-comment-input" class="leave-comment-input" rows="1" placeholder="Leave a comment..."
-                        @bind="createComment.Content" @bind:event="oninput"></textarea>
+                    <textarea id="leave-comment-input" class="leave-comment-input" rows="1"
+                              placeholder="Leave a comment..."
+                              @bind="createComment.Content" @bind:event="oninput"></textarea>
                 }
                 <button class="follow-btn" type="submit"
-                    disabled="@string.IsNullOrWhiteSpace(createComment.Content)">Comment</button>
-                @if (showModal == true)
-                {
-                    <div class="modal">
-                        <h3 class="modal-header">Want to leave a comment?</h3>
-                        <h5 class="modal-content">Join with your account to continue</h5>
-                        <a class="modal-link" href="/login">Sign in</a>
-                    </div>
-                }
+                        disabled="@(string.IsNullOrWhiteSpace(createComment.Content) || IsLoading)">
+                    @if (IsLoading)
+                    {
+                        <div class="spinner-container">
+                            <span class="spinner"></span>
+                            <span>Loading...</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <span>
+                    Comment
+                    </span>
+                    }
+                </button>
             </div>
         </EditForm>
 
@@ -106,7 +112,7 @@
                         else
                         {
                             <img src="@comment.UserInformation.ProfileImage" alt="profile-picture"
-                                class="profile-picture-image" />
+                                 class="profile-picture-image"/>
                         }
                         <div class="user-info">
                             <div class="username-comment">@comment.UserInformation.UserName</div>
@@ -123,8 +129,8 @@
                     </div>
                     <div class="comment-footer">
                         <div class="comment-meta">
-                            <span>Edited: @comment.LastEditDate</span>
-                            <span class="likes-count">24 likes</span>
+                            <span>Edited: @comment.LastEditDate.ToString("dd/MM/yyyy")</span>
+                            <span class="likes-count">@comment.Likes likes</span>
                         </div>
                         <div class="comment-actions">
                             <button class="comment-btn">👍</button>
@@ -138,7 +144,14 @@
     </div>
 </div>
 
-
+@if (showModal)
+{
+    <div class="modal">
+        <h3 class="modal-header">Want to join the community?</h3>
+        <h5 class="modal-content">Join with your account to continue</h5>
+        <a class="modal-link" href="/login">Sign in</a>
+    </div>
+}
 
 @code {
 
