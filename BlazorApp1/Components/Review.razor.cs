@@ -20,6 +20,7 @@ public partial class Review : ComponentBase
     private ReviewModel CurrentReview { get; set; } = new ReviewModel();
     private UserSummary? userSummary { get; set; } = null;
     private CreateComment createComment { get; set; } = new();
+    private ReviewUserContextDto reviewUserContext { get; set; } = new();
     private bool showModal { get; set; }
     private bool IsLoading { get; set; }
 
@@ -32,16 +33,24 @@ public partial class Review : ComponentBase
                 Navigation.NavigateTo("/");
                 return;
             }
-            var review = await ReviewService.GetReviewByIdAsync(ReviewId);
-            if (review == null)
+            // var review = await ReviewService.GetReviewByIdAsync(ReviewId);
+            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
+            var reviewPageData = await ReviewService.GetReviewPageDataAsync(jwt, ReviewId);
+            if (reviewPageData == null)
             {
                 Navigation.NavigateTo("/");
                 return;
             }
             else
             {
-                CurrentReview = review;
-                await GetCommentsAsync();
+                CurrentReview = reviewPageData.Review;
+                CurrentReview.Comments = reviewPageData.Comments;
+                if (jwt != null)
+                {
+                    reviewUserContext.UserReviewVote = reviewPageData.UserReviewVote;
+                    reviewUserContext.CommentVotes = reviewPageData.CommentVotes;
+                    reviewUserContext.FollowedUserIds = reviewPageData.FollowedUserIds;
+                }
             }
         }
         catch (Exception ex)
@@ -61,12 +70,6 @@ public partial class Review : ComponentBase
         {
             userSummary = await UserService.GetUserSummaryAsync(id);
         }
-    }
-    
-    private async Task GetCommentsAsync()
-    {
-        var commentsList = await ReviewService.GetCommentsByReviewIdAsync(CurrentReview.ReviewId);
-        CurrentReview.Comments = commentsList.OrderByDescending(c => c.LastEditDate);
     }
 
     private async Task PostComment()
@@ -114,13 +117,21 @@ public partial class Review : ComponentBase
             var isSuccessVoteRequest = await ReviewService.ReviewVoteAsync(reviewVote);
             if (isSuccessVoteRequest)
             {
-                if (vote == 1)
-                {
-                    CurrentReview.Likes++;
-                }
-                else
+                if (vote == 1 && reviewUserContext.UserReviewVote == 1)
                 {
                     CurrentReview.Likes--;
+                    reviewUserContext.UserReviewVote = null;
+                }
+                else if (vote == 1 && reviewUserContext.UserReviewVote == null)
+                {
+                    CurrentReview.Likes++;
+                    reviewUserContext.UserReviewVote = 1;
+                } else if (vote == -1 && reviewUserContext.UserReviewVote == -1)
+                {
+                    reviewUserContext.UserReviewVote = null;
+                } else if (vote == -1 && reviewUserContext.UserReviewVote == null)
+                {
+                    reviewUserContext.UserReviewVote = -1;
                 }
             }
         }
@@ -146,5 +157,18 @@ public partial class Review : ComponentBase
         {
             showModal = true;
         }
+    }
+    
+    private string GetVoteClass(int commentId, int expectedVote)
+    {
+        var vote = reviewUserContext.CommentVotes
+            .FirstOrDefault(cv => cv.CommentId == commentId);
+
+        if (vote != null && vote.UserVote == expectedVote)
+        {
+            return "active";
+        }
+
+        return "";
     }
 }

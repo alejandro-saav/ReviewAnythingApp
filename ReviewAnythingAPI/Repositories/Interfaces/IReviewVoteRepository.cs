@@ -6,5 +6,5 @@ public interface IReviewVoteRepository : IRepository<ReviewVote>
 {
     public Task<int> GetVotesByReviewIdAsync(int reviewId);
     
-    public Task<ReviewVote?> GetByUserAndReviewIdAsync(int userId, int reviewId);
+    public Task<ReviewVote?> GetByUserAndReviewIdAsync(int? userId, int reviewId);
 }

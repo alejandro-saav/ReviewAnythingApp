@@ -165,4 +165,25 @@ public class ReviewService : IReviewService
             return false;
         }
     }
+
+    public async Task<ReviewPageData?> GetReviewPageDataAsync(string? jwt, int reviewId)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync($"client/review/{reviewId}/page-data", jwt);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<ReviewPageData>();
+                return content;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Something went wrong ${ex.Message}";
+            return null;
+        }
+    }
 }

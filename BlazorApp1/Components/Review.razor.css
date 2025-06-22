@@ -310,6 +310,10 @@
   color: white;
 }
 
+.vote-btn.like.active {
+  background: var(--primary);
+}
+
 .vote-btn.dislike {
   border-color: #ff6b6b;
 }
@@ -317,6 +321,10 @@
 .vote-btn.dislike:hover {
   background: #ff6b6b;
   color: white;
+}
+
+.vote-btn.dislike.active {
+  background: var(--primary);
 }
 
 .comments-section {

@@ -14,7 +14,7 @@ public class ReviewVoteRepository : Repository<ReviewVote>, IReviewVoteRepositor
         return await _context.ReviewVotes.Where(rv => rv.ReviewId == reviewId).SumAsync(rv => rv.VoteType);
     }
 
-    public async Task<ReviewVote?> GetByUserAndReviewIdAsync(int userId, int reviewId)
+    public async Task<ReviewVote?> GetByUserAndReviewIdAsync(int? userId, int reviewId)
     {
         return await _context.ReviewVotes.FirstOrDefaultAsync(rv => rv.UserId == userId && rv.ReviewId == reviewId);
     }

@@ -22,8 +22,11 @@ public class ReviewService : IReviewService
     private readonly IReviewTagRepository _reviewTagRepository;
     private readonly ReviewAnythingDbContext _dbContext;
     private readonly IReviewVoteRepository _reviewVoteRepository;
+    private readonly ICommentRepository _commentRepository;
+    private readonly ICommentVoteRepository _commentVoteRepository;
+    private readonly IFollowRepository _followRepository;
 
-    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, IReviewVoteRepository reviewVoteRepository)
+    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, IReviewVoteRepository reviewVoteRepository, ICommentRepository commentRepository, ICommentVoteRepository commentVoteRepository, IFollowRepository followRepository)
     {
         _reviewRepository = reviewRepository;
         _itemRepository = itemRepository;
@@ -31,6 +34,9 @@ public class ReviewService : IReviewService
         _reviewTagRepository = reviewTagRepository;
         _dbContext = dbContext;
         _reviewVoteRepository = reviewVoteRepository;
+        _commentRepository = commentRepository;
+        _commentVoteRepository = commentVoteRepository;
+        _followRepository = followRepository;
     }
 
     public async Task<ReviewSummaryDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId)
@@ -295,23 +301,9 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewDetailDto?> GetReviewByIdAsync(int reviewId)
     {
-        var review =  await _dbContext.Reviews.Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
-        {
-            ReviewId = r.ReviewId,
-            Title = r.Title,
-            Content = r.Content,
-            CreationDate = r.CreationDate,
-            LastEditDate = r.LastEditDate,
-            Rating = r.Rating,
-            ItemId = r.ItemId,
-            UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
-            UserId = r.UserId,
-            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
-            UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
-            DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
-            TotalVotes = r.ReviewVotes.Count()
-        }).FirstOrDefaultAsync();
-        return review != null ? review : null;
+        var review = await _reviewRepository.GetReviewDetailByIdAsync(reviewId);
+        if (review == null) throw new EntityNotFoundException("Review for the given id not found");
+        return review;
     }
 
     public async Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId)
@@ -351,7 +343,25 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewPageDataDto> GetReviewPageDataAsync(int? userId, int reviewId)
     {
-        // var review = await _reviewRepository.
-        if (userId != null){}
+        var result = new ReviewPageDataDto();
+        var review = await _reviewRepository.GetReviewDetailByIdAsync(reviewId);
+        if (review == null) throw new EntityNotFoundException("Review for the given id not found");
+        var comments = await _commentRepository.GetAllCommentsByReviewIdAsync(reviewId);
+        if (userId != null)
+        {
+            var userVote = await _reviewVoteRepository.GetByUserAndReviewIdAsync(userId, reviewId);
+            if (userVote != null)
+            {
+                result.UserReviewVote = userVote.VoteType;
+            }
+            var commentVotes = await _commentVoteRepository.GetVotesByReviewIdAndUserIdAsync(reviewId, (int)userId);
+            result.CommentVotes = commentVotes;
+            var userFollowings = await _followRepository.GetUserFollowingsIdsAsync((int)userId);
+            result.FollowedUserIds = userFollowings;
+        }
+
+        result.Review = review;
+        result.Comments = comments;
+        return result;
     }
 }
