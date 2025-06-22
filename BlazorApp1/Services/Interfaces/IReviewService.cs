@@ -10,6 +10,7 @@ public interface IReviewService
     string? LastErrorMessage { get; }
 
     Task<ReviewModel?> GetReviewByIdAsync(int reviewId);
+    Task<ReviewPageData?> GetReviewPageDataAsync(string? jwt, int reviewId);
     Task<IEnumerable<Comment>> GetCommentsByReviewIdAsync(int reviewId);
     Task<Comment?> CreateCommentAsync(CreateComment comment);
 

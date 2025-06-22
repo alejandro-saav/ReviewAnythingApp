@@ -117,4 +117,21 @@ public class ReviewController : ControllerBase
         var errorContent = await response.Content.ReadAsStringAsync();
         return StatusCode((int)response.StatusCode, errorContent);
     }
+
+    [HttpPost("{reviewId}/page-data")]
+    public async Task<IActionResult> GetReviewPageDataAsync([FromBody] string? jwtToken, [FromRoute] int reviewId)
+    {
+        if (jwtToken != null)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+        }
+        var response = await _httpClient.GetAsync($"api/reviews/{reviewId}/page-data");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadFromJsonAsync<ReviewPageData>();
+            return Ok(content);
+        }
+        var errorContent = await response.Content.ReadAsStringAsync();
+        return StatusCode((int)response.StatusCode, errorContent);
+    }
 }

@@ -11,11 +11,11 @@ public class FollowRepository : Repository<Follow>, IFollowRepository
     
     public async Task<IEnumerable<ApplicationUser>> GetUserFollowersAsync(int userId)
     {
-        return await _context.Follows.Where(f => f.FollowerUserId == userId).Select(f => f.Follower).ToListAsync();
+        return await _context.Follows.Where(f => f.FollowerUserId == userId).Select(f => f.Follower!).ToListAsync();
     }
 
-    public async Task<IEnumerable<ApplicationUser>> GetUserFollowingsAsync(int userId)
+    public async Task<IEnumerable<int>> GetUserFollowingsIdsAsync(int userId)
     {
-        return await _context.Follows.Where(f => f.FollowingUserId == userId).Select(f => f.Following).ToListAsync();
+        return await _context.Follows.Where(f => f.FollowerUserId == userId).Select(f => f.FollowingUserId!.Value).ToListAsync();
     }
 }

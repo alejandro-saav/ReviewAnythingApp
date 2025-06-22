@@ -41,10 +41,10 @@
         <div class="voting-section">
             <div class="votes-count">@CurrentReview.Likes positive votes</div>
             <div class="vote-buttons">
-                <button class="vote-btn like" @onclick="() => PostReviewVote(1)" @onclick:stopPropagation>
+                <button class="vote-btn like @(reviewUserContext.UserReviewVote == 1 ? "active" : "")" @onclick="() => PostReviewVote(1)" @onclick:stopPropagation>
                     👍 Like
                 </button>
-                <button class="vote-btn dislike" @onclick="() => PostReviewVote(-1)">
+                <button class="vote-btn dislike @(reviewUserContext.UserReviewVote == -1 ? "active" : "")" @onclick="() => PostReviewVote(-1)" @onclick:stopPropagation>
                     👎 Dislike
                 </button>
             </div>
@@ -122,7 +122,13 @@
                                 <span>@comment.UserInformation.FollowerCount followers</span>
                             </div>
                         </div>
-                        <button class="follow-btn">Follow</button>
+                        <button class="follow-btn">
+                            @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
+                            {
+                                <span>Following</span>
+                            }
+                            <span>Follow</span>
+                        </button>
                     </div>
                     <div class="comment-content">
                         @comment.Content
@@ -133,8 +139,8 @@
                             <span class="likes-count">@comment.Likes likes</span>
                         </div>
                         <div class="comment-actions">
-                            <button class="comment-btn">👍</button>
-                            <button class="comment-btn">👎</button>
+                            <button class="comment-btn @(GetVoteClass(comment.CommentId, 1))">👍</button>
+                            <button class="comment-btn @(GetVoteClass(comment.CommentId, -1))">👎</button>
                             <button class="comment-btn">💬 Reply</button>
                         </div>
                     </div>
