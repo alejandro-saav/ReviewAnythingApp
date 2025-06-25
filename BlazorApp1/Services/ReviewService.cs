@@ -186,4 +186,24 @@ public class ReviewService : IReviewService
             return null;
         }
     }
+    
+    public async Task<bool> CommentVoteAsync(CommentVoteRequest commentVote)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("client/review/comment-vote", commentVote);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Something went wrong while CommentVoteAsync Service layer ${ex.Message}";
+            return false;
+        }
+    }
 }

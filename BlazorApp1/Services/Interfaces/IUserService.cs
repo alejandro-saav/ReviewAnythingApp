@@ -8,4 +8,6 @@ public interface IUserService
     Task<IEnumerable<UserCommentDto?>> GetUsersInformationAsync(IEnumerable<int> userIds);
 
     Task<UserSummary?> GetUserSummaryAsync(int userId);
+    Task<bool> UnFollowUserAsync(FollowRequest followRequest);
+    Task<FollowResponse?> FollowUserAsync(FollowRequest followRequest);
 }

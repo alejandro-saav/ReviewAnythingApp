@@ -8,7 +8,7 @@ using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Controllers;
 [ApiController]
-[Route("/api/[controller]")]
+[Route("api/[controller]")]
 public class CommentController : ControllerBase
 {
     private readonly ICommentService _commentService;

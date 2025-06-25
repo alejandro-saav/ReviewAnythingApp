@@ -134,4 +134,18 @@ public class ReviewController : ControllerBase
         var errorContent = await response.Content.ReadAsStringAsync();
         return StatusCode((int)response.StatusCode, errorContent);
     }
+
+    [HttpPost("comment-vote")]
+    public async Task<IActionResult> CommentVoteAsync([FromBody] CommentVoteRequest voteRequest)
+    {
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", voteRequest.JwtToken);
+        var response = await _httpClient.PostAsJsonAsync("api/comment/comment-votes", voteRequest);
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadFromJsonAsync<CommentVoteResponse>();
+            return Ok(content);
+        }
+        var errorContent = await response.Content.ReadAsStringAsync();
+        return StatusCode((int)response.StatusCode, errorContent);
+    }
 }

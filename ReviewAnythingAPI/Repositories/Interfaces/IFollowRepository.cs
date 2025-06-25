@@ -7,4 +7,6 @@ public interface IFollowRepository : IRepository<Follow>
     public Task<IEnumerable<ApplicationUser>> GetUserFollowersAsync(int userId);
     
     public Task<IEnumerable<int>> GetUserFollowingsIdsAsync(int userId);
+    
+    public Task<Follow?> GetEntityByIdAsync(int userId, int targetId);
 }

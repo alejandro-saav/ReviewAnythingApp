@@ -1,3 +1,6 @@
+WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400.
+
+
 13/06/2025
 -Add reviews to the db 🌟
 -Add functionality to add a new comment. 🌟 

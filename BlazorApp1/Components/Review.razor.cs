@@ -141,6 +141,109 @@ public partial class Review : ComponentBase
         }
     }
     
+    private async Task PostCommentVote(int vote, int commentId)
+    {
+        if (userSummary == null)
+        {
+            OpenModal();
+            return;
+        }
+
+        try
+        {
+            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
+            var commentVote = new CommentVoteRequest
+            {
+                CommentId = commentId,
+                VoteType = vote,
+                ReviewId = ReviewId,
+                JwtToken = jwt
+            };
+            var isSuccessVoteRequest = await ReviewService.CommentVoteAsync(commentVote);
+            if (isSuccessVoteRequest)
+            {
+                // update commentVotesList
+                var existingVote = reviewUserContext.CommentVotes.FirstOrDefault(c => c.CommentId == commentVote.CommentId);
+                if (existingVote != null)
+                {
+                    if (existingVote.UserVote == vote)
+                    {
+                        reviewUserContext.CommentVotes.Remove(existingVote);
+                    }
+                    else
+                    {
+                        existingVote.UserVote = vote;
+                    }
+                }
+                else
+                {
+                    var newVote = new CommentVoteResponse
+                    {
+                        CommentId = commentVote.CommentId,
+                        UserVote = vote,
+                    };
+                    reviewUserContext.CommentVotes.Add(newVote);
+                }
+                // Update CommentLikesCount
+                var comment = CurrentReview.Comments.FirstOrDefault(c => c.CommentId == commentId);
+                if (existingVote != null)
+                {
+                    if (vote == 1 && existingVote.UserVote == 1)
+                    {
+                        comment!.Likes--;
+                    } else if (vote == 1 && existingVote.UserVote == -1)
+                    {
+                        comment!.Likes++;
+                    }
+                }
+                else
+                {
+                    if (vote == 1)
+                    {
+                        comment!.Likes++;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error on PostReviewVote, error: {ex.Message}");
+        }
+    }
+
+    private async Task FollowUser(int userId)
+    {
+        if (userSummary == null)
+        {
+            OpenModal();
+            return;
+        }
+        var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
+        var followRequest = new FollowRequest
+        {
+            TargetUserId = userId,
+            JwtToken = jwt
+        };
+        if (reviewUserContext.FollowedUserIds.Contains(userId))
+        {
+            // Unfollow?
+            var unfollowSuccess = await UserService.UnFollowUserAsync(followRequest);
+            if (unfollowSuccess)
+            {
+                reviewUserContext.FollowedUserIds.Remove(userId);
+            }
+        }
+        else
+        {
+            // follow
+            var follow = await UserService.FollowUserAsync(followRequest);
+            if (follow != null)
+            {
+                reviewUserContext.FollowedUserIds.Add(userId);
+            }
+        }
+    }
+    
     private void OpenModal()
     {
         showModal = true;
