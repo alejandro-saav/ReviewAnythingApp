@@ -3,8 +3,8 @@ namespace BlazorApp1.Models;
 public class ReviewPageData
 {
     public ReviewModel Review { get; set; } = new();
-    public IEnumerable<Comment> Comments { get; set; } = [];
+    public List<Comment> Comments { get; set; } = [];
     public int? UserReviewVote { get; set; } = null;
-    public IEnumerable<CommentVoteResponse> CommentVotes { get; set; } = [];
-    public IEnumerable<int> FollowedUserIds { get; set; } = [];
+    public List<CommentVoteResponse> CommentVotes { get; set; } = [];
+    public List<int> FollowedUserIds { get; set; } = [];
 }

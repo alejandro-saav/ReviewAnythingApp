@@ -122,7 +122,7 @@
                                 <span>@comment.UserInformation.FollowerCount followers</span>
                             </div>
                         </div>
-                        <button class="follow-btn">
+                        <button class="follow-btn" @onclick="() => FollowUser(comment.UserInformation.UserId)" @onclick:stopPropagation>
                             @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
                             {
                                 <span>Following</span>
@@ -139,8 +139,8 @@
                             <span class="likes-count">@comment.Likes likes</span>
                         </div>
                         <div class="comment-actions">
-                            <button class="comment-btn @(GetVoteClass(comment.CommentId, 1))">👍</button>
-                            <button class="comment-btn @(GetVoteClass(comment.CommentId, -1))">👎</button>
+                            <button class="comment-btn @(GetVoteClass(comment.CommentId, 1))" @onclick="() => PostCommentVote(1, comment.CommentId)" @onclick:stopPropagation>👍</button>
+                            <button class="comment-btn @(GetVoteClass(comment.CommentId, -1))" @onclick="() => PostCommentVote(-1, comment.CommentId)" @onclick:stopPropagation>👎</button>
                             <button class="comment-btn">💬 Reply</button>
                         </div>
                     </div>

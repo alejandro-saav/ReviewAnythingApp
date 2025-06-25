@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlazorApp1.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("client/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly HttpClient _httpClient;
@@ -41,4 +41,7 @@ public class UserController : ControllerBase
         var result = await response.Content.ReadFromJsonAsync<UserSummary>();
         return Ok(result);
     }
+    
+    // [HttpPost("follow")]
+    // public async Task<IActionResult> FollowUser([FromBody] FollowRequest followRequest) {}
 }

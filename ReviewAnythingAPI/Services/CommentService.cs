@@ -154,7 +154,8 @@ public class CommentService : ICommentService
                 UserId = userId,
                 CommentId = commentVoteRequestDto.CommentId,
                 VoteType = commentVoteRequestDto.VoteType,
-                VoteDate = DateTime.UtcNow
+                VoteDate = DateTime.UtcNow,
+                ReviewId = commentVoteRequestDto.ReviewId
             };
             await _commentVoteRepository.AddAsync(newCommentVote);
             response.ActionType = ActionType.Created;

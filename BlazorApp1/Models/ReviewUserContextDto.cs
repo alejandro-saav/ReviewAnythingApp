@@ -3,6 +3,6 @@ namespace BlazorApp1.Models;
 public class ReviewUserContextDto
 {
     public int? UserReviewVote { get; set; } = null;
-    public IEnumerable<CommentVoteResponse> CommentVotes { get; set; } = [];
-    public IEnumerable<int> FollowedUserIds { get; set; } = [];
+    public List<CommentVoteResponse> CommentVotes { get; set; } = [];
+    public List<int> FollowedUserIds { get; set; } = [];
 }

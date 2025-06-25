@@ -15,4 +15,5 @@ public interface IReviewService
     Task<Comment?> CreateCommentAsync(CreateComment comment);
 
     Task<bool> ReviewVoteAsync(ReviewVote vote);
+    Task<bool> CommentVoteAsync(CommentVoteRequest vote);
 }

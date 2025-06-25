@@ -16,6 +16,13 @@ public class FollowRepository : Repository<Follow>, IFollowRepository
 
     public async Task<IEnumerable<int>> GetUserFollowingsIdsAsync(int userId)
     {
-        return await _context.Follows.Where(f => f.FollowerUserId == userId).Select(f => f.FollowingUserId!.Value).ToListAsync();
+        return await _context.Follows.Where(f => f.FollowerUserId == userId).Select(f => f.FollowingUserId!.Value)
+            .ToListAsync();
+    }
+
+    public async Task<Follow?> GetEntityByIdAsync(int userId, int targetId)
+    {
+        var entity = await _dbSet.FindAsync(userId, targetId);
+        return entity;
     }
 }
