@@ -6,10 +6,15 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 -Add functionality to add a new comment. 🌟 
     - Fetch user data for the review page.  🌟
 
--Fetch everything in one go.
--Check if user has liked the current review    
--Fetch user follows for review comments
--Fetch user likes for review comments
+-Fetch everything in one go. 🌟
+-Check if user has liked the current review 🌟
+-Fetch user follows for review comments 🌟
+-Fetch user likes for review comments 🌟
 
--Create the model
--
+- I need to fix the signup flow 🌟
+- First need to know how to handle the raw file for sending it with the model 🌟
+- Second need to know if the request need to be different 🌟
+- Need to update the dto in the API so that it gets the file right 🌟
+- Need to update the service method in the api, make a transaction upload image to cloudinary. 🌟
+    - Need to set up cloudinary for the API 🌟
+    - Need to remove cloudinary from the blazor app 🌟

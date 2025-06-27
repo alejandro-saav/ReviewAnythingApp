@@ -1,8 +1,7 @@
+using BlazorApp1.Models;
 using BlazorApp1.Models.Auth;
 using BlazorApp1.Services;
 // using BlazorApp1.Services.Interfaces;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -11,11 +10,11 @@ namespace BlazorApp1.Components.Pages.Auth;
 public partial class SignUp : ComponentBase
 {
     [Inject] private IAuthService AuthService { get; set; } = default!;
+    [Inject] private IUserService UserService { get; set; } = default!;
     
     [Inject]
     private NavigationManager Navigation { get; set; } = default!;
-    [Inject] Cloudinary Cloudinary { get; set; } = default!;
-    
+
     public RegisterRequestDto SignUpModel { get; set; } = new RegisterRequestDto();
     public string? ErrorMessage { get; set; }
     public string? ImageErrorMessage { get; set; }
@@ -54,7 +53,9 @@ public partial class SignUp : ComponentBase
             return;
         }
         ImageFile = file;
+        SignUpModel.ProfileImage = file;
 
+        // Manage the preview image display
         try
         {
             await using var stream = file.OpenReadStream(maxFileSize);
@@ -94,11 +95,16 @@ public partial class SignUp : ComponentBase
 
         try
         {
-            await UploadImageToCloudinary();
             var success = await AuthService.RegisterAsync(SignUpModel);
 
             if (success)
             {
+                // var uploadCloudinarySuccess = await UploadImageToCloudinary();
+                // if (uploadCloudinarySuccess)
+                // {
+                //     // var userToUpdate = new UserInfoUpdateRequestDto { ProfileImage = SignUpModel.ProfileImage };
+                //     // await UserService.UpdateUserInfoAsync(userToUpdate);
+                // }
                 Navigation.NavigateTo("/email-confirmation-required", forceLoad: true);
             }
             else
@@ -129,33 +135,36 @@ public partial class SignUp : ComponentBase
         }
     }
     
-    private async Task UploadImageToCloudinary()
-    {
-        try
-        {
-            if (ImageFile == null) return;
-            const long maxFileSize = 1024 * 1024 * 2;
-            await using Stream stream = ImageFile.OpenReadStream(maxFileSize);
-            var uploadParams = new ImageUploadParams()
-            {
-                File = new FileDescription(ImageFile.Name, stream),
-                PublicId = $"profile-photos/{Guid.NewGuid().ToString()}", // Recommended: unique public ID
-                Overwrite = true, // Set to true if you want to overwrite existing assets with the same public ID
-                Folder = "ReviewAnythingAPP", // Optional: Organize uploads into a folder
-            };
-
-            var uploadResult = await Cloudinary.UploadAsync(uploadParams);
-
-            if (uploadResult.Error == null)
-            {
-               SignUpModel.ProfileImage = uploadResult.SecureUrl.ToString();
-                Console.WriteLine("SUCCESS");
-            }
-            Console.WriteLine("Error");
-        }
-        catch (Exception ex)
-        {
-            //asd
-        }
-    }
+    // private async Task<bool> UploadImageToCloudinary()
+    // {
+    //     try
+    //     {
+    //         if (ImageFile == null) return false;
+    //         const long maxFileSize = 1024 * 1024 * 2;
+    //         await using Stream stream = ImageFile.OpenReadStream(maxFileSize);
+    //         var uploadParams = new ImageUploadParams()
+    //         {
+    //             File = new FileDescription(ImageFile.Name, stream),
+    //             PublicId = $"profile-photos/{Guid.NewGuid().ToString()}", // Recommended: unique public ID
+    //             Overwrite = true, // Set to true if you want to overwrite existing assets with the same public ID
+    //             Folder = "ReviewAnythingAPP", // Optional: Organize uploads into a folder
+    //         };
+    //
+    //         var uploadResult = await Cloudinary.UploadAsync(uploadParams);
+    //
+    //         if (uploadResult.Error == null)
+    //         {
+    //            SignUpModel.ProfileImage = uploadResult.SecureUrl.ToString();
+    //             Console.WriteLine("SUCCESS");
+    //            return true;
+    //         }
+    //         Console.WriteLine("Error");
+    //         return false;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         //asd
+    //         return false;
+    //     }
+    // }
 }

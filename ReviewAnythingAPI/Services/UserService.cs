@@ -38,4 +38,16 @@ public class UserService : IUserService
             Email = user.Email
         };
     }
+
+    public async Task<bool> UpdateUserAsync(int userId, UserUpdateRequestDto updateDto)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null) throw new EntityNotFoundException("User not found");
+        if (updateDto.FirstName != null) user.FirstName = updateDto.FirstName;
+        if (updateDto.LastName != null) user.LastName = updateDto.LastName;
+        if (updateDto.ProfileImage != null) user.PhoneNumber = updateDto.PhoneNumber;
+        if (updateDto.ProfileImage != null) user.ProfileImage = updateDto.ProfileImage;
+        if (updateDto.Bio != null) user.ProfileImage = updateDto.Bio;
+        return true;
+    }
 }

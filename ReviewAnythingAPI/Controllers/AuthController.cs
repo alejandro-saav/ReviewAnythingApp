@@ -16,7 +16,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("Register")]
-    public async Task<IActionResult> Register([FromBody] UserRegistrationRequestDto userRegistrationDto)
+    public async Task<IActionResult> Register([FromForm] UserRegistrationRequestDto userRegistrationDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         

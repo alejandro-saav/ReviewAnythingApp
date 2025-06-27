@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ReviewAnythingAPI.DTOs.UserDTOs;
+namespace BlazorApp1.Models;
 
-public class UserUpdateRequestDto
+public class UserInfoUpdateRequestDto
 {
-    [StringLength(30)] public string? FirstName { get; set; }
-    [StringLength(30)] public string? LastName { get; set; }
+    [StringLength(30)]
+    public string? FirstName { get; set; }
+    [StringLength(30)]
+    public string? LastName { get; set; }
     [Phone]
     public string? PhoneNumber { get; set; }
     [Url]
