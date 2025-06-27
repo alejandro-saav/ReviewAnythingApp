@@ -2,10 +2,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Resend;
+using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
@@ -20,114 +23,116 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IResend _resend;
+    private readonly ReviewAnythingDbContext _context;
+    private readonly CloudinaryService _cloudinaryService;
+    private readonly EmailService _emailService;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IResend resend)
+    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IResend resend, ReviewAnythingDbContext context, CloudinaryService cloudinaryService, EmailService emailService)
     {
         _userManager = userManager;
         _configuration = configuration;
         _resend = resend;
+        _context = context;
+        _cloudinaryService = cloudinaryService;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto)
     {
-        // Check if user already exists
-        var existingUserByUsername = await _userManager.FindByNameAsync(userRegistrationDto.UserName);
-        if (existingUserByUsername != null)
+        // Start transaction
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
+            // Check if user already exists
+            var existingUserByUsername = await _userManager.FindByNameAsync(userRegistrationDto.UserName);
+            if (existingUserByUsername != null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    ErrorMessage = "Username already exists!"
+                };
+            }
+
+            var existingUserByEmail = await _userManager.FindByEmailAsync(userRegistrationDto.Email);
+            if (existingUserByEmail != null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    ErrorMessage = "Email already exists!"
+                };
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = userRegistrationDto.UserName,
+                Email = userRegistrationDto.Email,
+                FirstName = userRegistrationDto.FirstName,
+                LastName = userRegistrationDto.LastName,
+                Bio = userRegistrationDto.Bio,
+                CreationDate = DateTime.UtcNow,
+                IsActive = true,
+                PhoneNumber = userRegistrationDto.Phone,
+                ProfileImage = "",
+            };
+
+            var result = await _userManager.CreateAsync(user, userRegistrationDto.Password);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    ErrorMessage = "User registration failed!",
+                    Errors = errors
+                };
+            }
+            // Cloudinary upload image
+            if (userRegistrationDto.ProfileImage != null || userRegistrationDto.ProfileImage?.Length > 0)
+            {
+                try
+                {
+                    var imageUrl = await _cloudinaryService.UploadImageAsync(userRegistrationDto.ProfileImage, user.Id);
+                    user.ProfileImage = imageUrl;
+                    await _userManager.UpdateAsync(user);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error trying to upload profile image to cloudinary: {ex.Message}");
+                }
+            }
+
+            var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var encodedToken = Uri.EscapeDataString(verificationToken);
+
+            await _emailService.SendEmailConfirmationAsync(user, encodedToken);
+            await transaction.CommitAsync();
             return new AuthResponseDto
             {
-                Success = false,
-                ErrorMessage = "Username already exists!"
+                Success = true,
+                Message =
+                    "Registration Successful! Please confirm your email by clicking on the link sent to your email address.",
+                UserResponse = new UserResponseDto
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Bio = user.Bio,
+                    ProfileImage = user.ProfileImage,
+                    CreationDate = user.CreationDate,
+                    Phone = user.PhoneNumber
+                },
             };
         }
-
-        var existingUserByEmail = await _userManager.FindByEmailAsync(userRegistrationDto.Email);
-        if (existingUserByEmail != null)
+        catch (Exception ex)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "Email already exists!"
-            };
+            await transaction.RollbackAsync();
+           throw new TransactionFailedException("An error occured while trying to create a new user", ex);
         }
-        
-        var user = new ApplicationUser
-        {
-            UserName = userRegistrationDto.UserName,
-            Email = userRegistrationDto.Email,
-            FirstName = userRegistrationDto.FirstName,
-            LastName = userRegistrationDto.LastName,
-            Bio = userRegistrationDto.Bio,
-            CreationDate = DateTime.UtcNow,
-            IsActive = true,
-            PhoneNumber = userRegistrationDto.Phone,
-            ProfileImage = userRegistrationDto.ProfileImage,
-        };
-        
-        var result = await _userManager.CreateAsync(user, userRegistrationDto.Password);
-
-        if (!result.Succeeded)
-        {
-            var errors = result.Errors.Select(e => e.Description).ToList();
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "User registration failed!",
-                Errors = errors
-            };
-        }
-
-        // Generate Token
-        //var token = await GenerateJwtToken(user);
-        // Email verification
-        var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var encodedToken = Uri.EscapeDataString(verificationToken);
-        var verificationEmail = $"{_configuration["FrontendUrls:ConfirmEmailUrl"]}?userId={user.Id}&token={encodedToken}";
-        var message = new EmailMessage();
-        message.From = "onboarding@resend.dev";
-        message.To.Add(user.Email);
-        message.Subject = "ReviewAnything Verification Email";
-        message.HtmlBody = $@"
-    <div style=""font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#333;background:#f9f9f9;padding:20px;border-radius:8px;"">
-        <h2 style=""color:#222;"">Welcome to <span style=""color:#007bff;"">ReviewAnything</span>!</h2>
-        
-        <p>Hi {user.FirstName},</p>
-        
-        <p>Thanks for signing up. To get started, please confirm your email address by clicking the button below:</p>
-
-        <p style=""text-align:center;"">
-            <a href=""{verificationEmail}"" 
-               style=""background-color:#007bff;color:#fff;padding:12px 20px;text-decoration:none;
-                      border-radius:5px;display:inline-block;font-weight:bold;"">
-                Confirm Email
-            </a>
-        </p>
-
-        <p>If the button above doesn't work, copy and paste this link into your browser:</p>
-        <p><a href=""{verificationEmail}"" style=""color:#007bff;"">{verificationEmail}</a></p>
-
-        <p>If you didn’t create this account, you can safely ignore this email.</p>
-
-        <p style=""margin-top:30px;"">— The ReviewAnything Team</p>
-    </div>";
-
-        await _resend.EmailSendAsync(message);
-        return new AuthResponseDto
-        {
-            Success = true,
-            Message = "Registration Successful! Please confirm your email by clicking on the link sent to your email address.",
-            UserResponse = new UserResponseDto {
-                UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Bio = user.Bio,
-                ProfileImage = user.ProfileImage,
-                CreationDate = user.CreationDate,
-                Phone = user.PhoneNumber
-            },
-        };
     }
 
     public async Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token)

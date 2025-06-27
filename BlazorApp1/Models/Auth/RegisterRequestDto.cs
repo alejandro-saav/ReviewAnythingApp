@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace BlazorApp1.Models.Auth;
 
@@ -23,7 +24,7 @@ public class RegisterRequestDto
     public string Password { get; set; }
     [Phone]
     public string? Phone { get; set; }
-    public string? ProfileImage { get; set; }
+    public IBrowserFile? ProfileImage { get; set; }
     [StringLength(500)]
     [DataType(DataType.MultilineText)]
     public string? Bio { get; set; }

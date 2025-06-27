@@ -29,6 +29,16 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
 
         // Category Constrains
         modelBuilder.Entity<Category>().HasIndex(c => c.CategoryName).IsUnique();
+        modelBuilder.Entity<Category>().HasData(
+            new Category { CategoryId = 1, CategoryName = "Books" },
+            new Category { CategoryId = 2, CategoryName = "Movies" },
+            new Category { CategoryId = 3, CategoryName = "Music" },
+            new Category { CategoryId = 4, CategoryName = "Games" },
+            new Category { CategoryId = 5, CategoryName = "Technology" },
+            new Category { CategoryId = 6, CategoryName = "Art" },
+            new Category { CategoryId = 7, CategoryName = "Science" }
+        );
+
 
         // Items Constraints
         modelBuilder.Entity<Item>().HasOne(item => item.Creator).WithMany(user => user.UserItems).HasForeignKey(item => item.CreatedByUserId).OnDelete(DeleteBehavior.SetNull);
@@ -44,7 +54,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
 
         modelBuilder.Entity<Review>().HasOne(review => review.ReviewItem).WithMany(i => i.ItemReviews).HasForeignKey(review => review.ItemId).OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<Review>().ToTable(t => t.HasCheckConstraint("CHK_Rating", "[Rating] BETWEEN 1 AND 5"));
+        modelBuilder.Entity<Review>().ToTable(t => t.HasCheckConstraint("CHK_Rating", "\"Rating\" BETWEEN 1 AND 5"));
 
         modelBuilder.Entity<Review>().HasIndex(r => r.UserId);
         modelBuilder.Entity<Review>().HasIndex(r => r.ItemId);
@@ -82,7 +92,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
 
         modelBuilder.Entity<ReviewVote>().HasOne(rv => rv.Review).WithMany(r => r.ReviewVotes).HasForeignKey(rv => rv.ReviewId).OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<ReviewVote>().ToTable(t => t.HasCheckConstraint("CHK_VoteType", "[VoteType] IN (-1, 1)"));
+        modelBuilder.Entity<ReviewVote>().ToTable(t => t.HasCheckConstraint("CHK_VoteType", "\"VoteType\" IN (-1, 1)"));
 
         modelBuilder.Entity<ReviewVote>().HasIndex(rv => rv.ReviewId);
 
@@ -93,7 +103,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
 
         modelBuilder.Entity<CommentVote>().HasOne(cm => cm.Comment).WithMany().HasForeignKey(cm => cm.CommentId).OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<CommentVote>().ToTable(t => t.HasCheckConstraint("CHK_CommentVoteType", "[VoteType] IN (-1, 1)"));
+        modelBuilder.Entity<CommentVote>().ToTable(t => t.HasCheckConstraint("CHK_CommentVoteType", "\"VoteType\" IN (-1, 1)"));
 
         // Report Constraints
         modelBuilder.Entity<Report>().HasOne(r => r.StatusReportName).WithMany().HasForeignKey(r => r.StatusReportId).OnDelete(DeleteBehavior.Restrict);
@@ -105,7 +115,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
         modelBuilder.Entity<Report>().HasOne(r => r.ReviewerUser).WithMany().HasForeignKey(r => r.ReviewedByUserId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Report>()
-         .ToTable(t => t.HasCheckConstraint("CHK_ReportItemType", "[ReportedItemType] = 'Review' OR [ReportedItemType] = 'Comment'"));
+         .ToTable(t => t.HasCheckConstraint("CHK_ReportItemType", "\"ReportedItemType\" = 'Review' OR \"ReportedItemType\" = 'Comment'"));
 
         modelBuilder.Entity<Report>().HasIndex(r => r.StatusReportId);
     }

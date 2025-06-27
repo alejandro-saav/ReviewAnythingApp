@@ -3,22 +3,10 @@ using BlazorApp1.Controllers;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 //using BlazorApp1.Services.Interfaces;
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Configure Cloudinary settings
-builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
-
-// Register Cloudinary as a singleton (recommended)
-builder.Services.AddSingleton(sp =>
-{
-    var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CloudinarySettings>>().Value;
-    var account = new Account(config.CloudName, config.ApiKey, config.ApiSecret);
-    return new Cloudinary(account);
-});
 // builder.Services.AddScoped<ImageUploadService>();
 
 // Add services to the container.

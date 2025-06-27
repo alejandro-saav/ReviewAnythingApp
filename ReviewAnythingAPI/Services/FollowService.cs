@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
+using ReviewAnythingAPI.DTOs.FollowDTOs;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories;
@@ -21,7 +22,7 @@ public class FollowService : IFollowService
         _dbContext = dbContext;
     }
 
-    public async Task<Follow> FollowUserAsync(int userId, int targetUserId)
+    public async Task<FollowResponseDto> FollowUserAsync(int userId, int targetUserId)
     {
         var targetExist = await _userRepository.GetByIdAsync(targetUserId);
         if (targetExist == null)
@@ -33,11 +34,16 @@ public class FollowService : IFollowService
         {
             FollowerUserId = userId,
             FollowingUserId = targetUserId,
-            FollowDate = DateTime.Now
+            FollowDate = DateTime.UtcNow
         };
         await _followRepository.AddAsync(follow);
         await _dbContext.SaveChangesAsync();
-        return follow;
+        return new FollowResponseDto
+        {
+            UserId = userId,
+            TargetUserId = targetUserId,
+            FollowDate = follow.FollowDate
+        };
     }
 
     public async Task<bool> UnFollowUserAsync(int userId, int targetUserId)

@@ -14,7 +14,7 @@ public class AuthService : IAuthService
 
     public AuthService(IHttpClientFactory httpClientFactory, NavigationManager navigationManager)
     {
-        _httpClient = httpClientFactory.CreateClient("BlazorAppApi");
+        _httpClient = httpClientFactory.CreateClient("ReviewAnythingAPI");
         _navigationManager = navigationManager;
     }
 
@@ -23,8 +23,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, "auth/Login");
-            var response = await _httpClient.PostAsJsonAsync(requestUri, request);
+            var response = await _httpClient.PostAsJsonAsync("api/auth/Login",request);
             if (response.IsSuccessStatusCode)
             {
                 LoginResponse loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
@@ -49,7 +48,23 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("auth/Register", request);
+            using var content = new MultipartFormDataContent();
+            content.Add(new  StringContent(request.UserName), "UserName");
+            content.Add(new  StringContent(request.Email), "Email");
+            content.Add(new  StringContent(request.FirstName), "FirstName");
+            content.Add(new  StringContent(request.LastName ?? ""), "LastName");
+            content.Add(new  StringContent(request.Password), "Password");
+            content.Add(new  StringContent(request.Phone ?? ""), "Phone");
+            content.Add(new  StringContent(request.Bio ?? ""), "Bio");
+
+            if (request.ProfileImage != null)
+            {
+                const long maxFileSize = 1024 * 1024 * 2;
+                var fileStream = request.ProfileImage.OpenReadStream(maxFileSize);
+                var streamContent = new StreamContent(fileStream);
+                content.Add(streamContent, "ProfileImage", request.ProfileImage.Name);
+            }
+            var response = await _httpClient.PostAsync("api/auth/Register", content);
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -73,8 +88,7 @@ public class AuthService : IAuthService
         try
         {
             var encodedToken = Uri.EscapeDataString(token);
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"auth/confirm-email?userId={userId}&token={encodedToken}");
-            var response = await _httpClient.GetAsync(requestUri);
+            var response = await _httpClient.GetAsync($"api/auth/confirm-email?userId={userId}&token={encodedToken}");
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -97,8 +111,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"auth/forgot-password");
-            var response = await _httpClient.PostAsJsonAsync(requestUri, request);
+            var response = await _httpClient.PostAsJsonAsync("api/auth/forgot-password", request);
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -123,8 +136,7 @@ public class AuthService : IAuthService
         try
         {
             var encodedToken = Uri.EscapeDataString(token);
-            Uri requestUri = new Uri(_httpClient.BaseAddress!, $"auth/reset-password?userId={userId}&token={encodedToken}");
-            var response = await _httpClient.PostAsJsonAsync(requestUri, newPassword);
+            var response = await _httpClient.PostAsJsonAsync($"api/auth/reset-password?userId={userId}&token={encodedToken}", newPassword);
             if (response.IsSuccessStatusCode)
             {
                 return true;

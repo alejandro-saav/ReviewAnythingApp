@@ -1,4 +1,5 @@
 using System.Text;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,18 @@ using ReviewAnythingAPI.Services;
 using ReviewAnythingAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Cloudinary settings
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+// Register Cloudinary as a singleton (recommended)
+builder.Services.AddSingleton(sp =>
+{
+    var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CloudinarySettings>>().Value;
+    var account = new Account(config.CloudName, config.ApiKey, config.ApiSecret);
+    return new Cloudinary(account);
+});
+// Cloudinary Service
+builder.Services.AddSingleton<CloudinaryService>();
 
 // Resend config
 builder.Services.AddOptions();
@@ -30,6 +43,8 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<CloudinaryService>();
 // Add repositories to the container
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
@@ -45,7 +60,10 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // DbContext
 builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQL")));
+// // DbContext
+// builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

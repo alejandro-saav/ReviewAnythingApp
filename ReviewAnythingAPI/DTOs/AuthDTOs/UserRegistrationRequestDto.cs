@@ -23,10 +23,7 @@ public class UserRegistrationRequestDto
     public string Password { get; set; }
     [Phone]
     public string? Phone { get; set; }
-    [Url]
-    [RegularExpression(@".*\.(gif|jpe?g|bmp|png)$", ErrorMessage = "URL must end with a valid image extension (.jpg, .jpeg, .png, .gif, or .bmp)")]
-    [DataType(DataType.ImageUrl)]
-    public string? ProfileImage { get; set; }
+    public IFormFile? ProfileImage { get; set; }
     [StringLength(500)]
     [DataType(DataType.MultilineText)]
     public string? Bio { get; set; }

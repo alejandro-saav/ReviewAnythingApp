@@ -7,6 +7,7 @@ using ReviewAnythingAPI.Enums;
 using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class CommentController : ControllerBase
@@ -17,20 +18,20 @@ public class CommentController : ControllerBase
     {
         _commentService = commentService;
     }
-    
+
 
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetAllCommentsByUser([FromRoute] int userId)
     {
-            var comments = await _commentService.GetAllCommentsByUserAsync(userId);
-            return Ok(comments);
+        var comments = await _commentService.GetAllCommentsByUserAsync(userId);
+        return Ok(comments);
     }
 
     [HttpGet("reviews/{reviewId}")]
     public async Task<IActionResult> GetAllCommentsByReview([FromRoute] int reviewId)
     {
-            var comments = await _commentService.GetAllCommentsByReviewAsync(reviewId);
-            return Ok(comments);
+        var comments = await _commentService.GetAllCommentsByReviewAsync(reviewId);
+        return Ok(comments);
     }
 
     [Authorize]
@@ -39,13 +40,13 @@ public class CommentController : ControllerBase
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var userName = User.FindFirst(ClaimTypes.Name)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId)) return Unauthorized();
         if (userName == null) return Unauthorized();
-        
+
         var createdComment = await _commentService.CreateCommentAsync(comment, userId, userName);
         return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.CommentId }, createdComment);
     }
-    
+
     [HttpGet("{commentId}")]
     public async Task<IActionResult> GetCommentById([FromRoute] int commentId)
     {
@@ -60,20 +61,20 @@ public class CommentController : ControllerBase
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var userName = User.FindFirst(ClaimTypes.Name)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId)) return Unauthorized();
         if (userName == null) return Unauthorized();
 
         var updatedComment = await _commentService.UpdateCommentAsync(comment, commentId, userId, userName);
         return Ok(updatedComment);
     }
-    
+
 
     [Authorize]
     [HttpDelete("{commentId}")]
     public async Task<IActionResult> DeleteCommentByIdAsync([FromRoute] int commentId)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId)) return Unauthorized();
         await _commentService.DeleteCommentByIdAsync(commentId, userId);
         return NoContent();
     }
@@ -83,7 +84,7 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> PostCommentVotes([FromBody] CommentVoteRequestDto vote)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId)) return Unauthorized();
         var response = await _commentService.CommentVoteAsync(vote, userId);
         return response.ActionType switch
         {

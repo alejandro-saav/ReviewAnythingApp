@@ -52,4 +52,14 @@ public class UserController : ControllerBase
         if (!success) return BadRequest();
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPatch]
+    public async Task<IActionResult> UpdateUserAsync([FromBody] UserUpdateRequestDto updateDto)
+    {
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
+        var success = await _userService.UpdateUserAsync(userId, updateDto);
+        if (!success) return BadRequest();
+        return NoContent();
+    }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace ReviewAnythingAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateUserToApplicationUser : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,11 +16,11 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -30,28 +31,28 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfileImage = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Bio = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreationDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FirstName = table.Column<string>(type: "text", nullable: true),
+                    LastName = table.Column<string>(type: "text", nullable: true),
+                    ProfileImage = table.Column<string>(type: "text", nullable: true),
+                    Bio = table.Column<string>(type: "text", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,9 +63,9 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    CategoryId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CategoryName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    CategoryId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CategoryName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -75,9 +76,9 @@ namespace ReviewAnythingAPI.Migrations
                 name: "ReportReasons",
                 columns: table => new
                 {
-                    ReportReasonId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReportReasonContent = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ReportReasonId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ReportReasonContent = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,9 +89,9 @@ namespace ReviewAnythingAPI.Migrations
                 name: "StatusReports",
                 columns: table => new
                 {
-                    StatusReportId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StatusReportContent = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    StatusReportId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StatusReportContent = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -101,9 +102,9 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Tags",
                 columns: table => new
                 {
-                    TagId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TagName = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    TagId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TagName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -114,11 +115,11 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -135,11 +136,11 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -156,10 +157,10 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -176,8 +177,8 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    RoleId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -200,10 +201,10 @@ namespace ReviewAnythingAPI.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -220,19 +221,13 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Follows",
                 columns: table => new
                 {
-                    FollowerUserId = table.Column<int>(type: "int", nullable: false),
-                    FollowingUserId = table.Column<int>(type: "int", nullable: false),
-                    FollowDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: true)
+                    FollowerUserId = table.Column<int>(type: "integer", nullable: false),
+                    FollowingUserId = table.Column<int>(type: "integer", nullable: false),
+                    FollowDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Follows", x => new { x.FollowerUserId, x.FollowingUserId });
-                    table.ForeignKey(
-                        name: "FK_Follows_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Follows_AspNetUsers_FollowerUserId",
                         column: x => x.FollowerUserId,
@@ -251,12 +246,12 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Items",
                 columns: table => new
                 {
-                    ItemId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ItemName = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedByUserId = table.Column<int>(type: "int", nullable: true)
+                    ItemId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ItemName = table.Column<string>(type: "text", nullable: false),
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -279,23 +274,23 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Reports",
                 columns: table => new
                 {
-                    ReportId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ReporterUserId = table.Column<int>(type: "int", nullable: true),
-                    TargetId = table.Column<int>(type: "int", nullable: false),
-                    ReportedItemType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReportReasonId = table.Column<int>(type: "int", nullable: false),
-                    ReportDetails = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReportDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StatusReportId = table.Column<int>(type: "int", nullable: false),
-                    ReviewedByUserId = table.Column<int>(type: "int", nullable: true),
-                    ReviewedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: true)
+                    ReportId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ReporterUserId = table.Column<int>(type: "integer", nullable: true),
+                    TargetId = table.Column<int>(type: "integer", nullable: false),
+                    ReportedItemType = table.Column<string>(type: "text", nullable: false),
+                    ReportReasonId = table.Column<int>(type: "integer", nullable: false),
+                    ReportDetails = table.Column<string>(type: "text", nullable: false),
+                    ReportDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    StatusReportId = table.Column<int>(type: "integer", nullable: false),
+                    ReviewedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    ReviewedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ApplicationUserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reports", x => x.ReportId);
-                    table.CheckConstraint("CHK_ReportItemType", "[ReportedItemType] = 'Review' OR [ReportedItemType] = 'Comment'");
+                    table.CheckConstraint("CHK_ReportItemType", "\"ReportedItemType\" = 'Review' OR \"ReportedItemType\" = 'Comment'");
                     table.ForeignKey(
                         name: "FK_Reports_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
@@ -331,20 +326,20 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Reviews",
                 columns: table => new
                 {
-                    ReviewId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastEditDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Rating = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    ItemId = table.Column<int>(type: "int", nullable: false)
+                    ReviewId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastEditDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Rating = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true),
+                    ItemId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reviews", x => x.ReviewId);
-                    table.CheckConstraint("CHK_Rating", "[Rating] BETWEEN 1 AND 5");
+                    table.CheckConstraint("CHK_Rating", "\"Rating\" BETWEEN 1 AND 5");
                     table.ForeignKey(
                         name: "FK_Reviews_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -363,23 +358,17 @@ namespace ReviewAnythingAPI.Migrations
                 name: "Comments",
                 columns: table => new
                 {
-                    CommentId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReviewId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LastEditDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: true)
+                    CommentId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    ReviewId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastEditDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.CommentId);
-                    table.ForeignKey(
-                        name: "FK_Comments_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Comments_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -398,8 +387,8 @@ namespace ReviewAnythingAPI.Migrations
                 name: "ReviewTags",
                 columns: table => new
                 {
-                    ReviewId = table.Column<int>(type: "int", nullable: false),
-                    TagId = table.Column<int>(type: "int", nullable: false)
+                    ReviewId = table.Column<int>(type: "integer", nullable: false),
+                    TagId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -409,7 +398,7 @@ namespace ReviewAnythingAPI.Migrations
                         column: x => x.ReviewId,
                         principalTable: "Reviews",
                         principalColumn: "ReviewId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ReviewTags_Tags_TagId",
                         column: x => x.TagId,
@@ -422,16 +411,16 @@ namespace ReviewAnythingAPI.Migrations
                 name: "ReviewVotes",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    ReviewId = table.Column<int>(type: "int", nullable: false),
-                    VoteType = table.Column<int>(type: "int", nullable: false),
-                    VoteDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    ReviewId = table.Column<int>(type: "integer", nullable: false),
+                    VoteType = table.Column<int>(type: "integer", nullable: false),
+                    VoteDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ApplicationUserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ReviewVotes", x => new { x.UserId, x.ReviewId });
-                    table.CheckConstraint("CHK_VoteType", "[VoteType] IN (-1, 1)");
+                    table.CheckConstraint("CHK_VoteType", "\"VoteType\" IN (-1, 1)");
                     table.ForeignKey(
                         name: "FK_ReviewVotes_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
@@ -455,16 +444,17 @@ namespace ReviewAnythingAPI.Migrations
                 name: "CommentVotes",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    CommentId = table.Column<int>(type: "int", nullable: false),
-                    VoteType = table.Column<int>(type: "int", nullable: false),
-                    VoteDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ApplicationUserId = table.Column<int>(type: "int", nullable: true)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    CommentId = table.Column<int>(type: "integer", nullable: false),
+                    ReviewId = table.Column<int>(type: "integer", nullable: false),
+                    VoteType = table.Column<int>(type: "integer", nullable: false),
+                    VoteDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ApplicationUserId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CommentVotes", x => new { x.UserId, x.CommentId });
-                    table.CheckConstraint("CHK_CommentVoteType", "[VoteType] IN (-1, 1)");
+                    table.CheckConstraint("CHK_CommentVoteType", "\"VoteType\" IN (-1, 1)");
                     table.ForeignKey(
                         name: "FK_CommentVotes_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
@@ -493,8 +483,7 @@ namespace ReviewAnythingAPI.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -520,19 +509,13 @@ namespace ReviewAnythingAPI.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_CategoryName",
                 table: "Categories",
                 column: "CategoryName",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_ApplicationUserId",
-                table: "Comments",
-                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_ReviewId",
@@ -553,11 +536,6 @@ namespace ReviewAnythingAPI.Migrations
                 name: "IX_CommentVotes_CommentId",
                 table: "CommentVotes",
                 column: "CommentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Follows_ApplicationUserId",
-                table: "Follows",
-                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Follows_FollowingUserId",

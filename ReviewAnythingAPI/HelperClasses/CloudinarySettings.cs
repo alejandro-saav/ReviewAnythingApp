@@ -1,4 +1,4 @@
-namespace BlazorApp1.Models;
+namespace ReviewAnythingAPI.HelperClasses;
 
 public class CloudinarySettings
 {
