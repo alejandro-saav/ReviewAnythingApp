@@ -95,7 +95,7 @@
 .stars {
   display: flex;
   gap: 0.3rem;
-  border-bottom: 1px solid var(--dark);
+  /*border-bottom: 1px solid var(--dark);*/
 }
 
 .star {
@@ -104,16 +104,22 @@
   transition: all 0.2s ease;
 }
 
-.star.filled {
-  color: yellow;
-  text-shadow: 0 2px 4px rgba(242, 192, 120, 0.3);
-  transform: scale(1.1);
-}
+/*.star.filled {*/
+/*  color: yellow;*/
+/*  text-shadow: 0 2px 4px rgba(242, 192, 120, 0.3);*/
+/*  transform: scale(1.1);*/
+/*}*/
 
 .selected {
-  color: yellow;
   text-shadow: 0 2px 4px rgba(242, 192, 120, 0.3);
   transform: scale(1.1);
+  font-size: 1.5rem;
+}
+
+.no-selected {
+  transform: scale(1.1);
+  font-size: 1.5rem;
+    color: red;
 }
 
 .rating-text {

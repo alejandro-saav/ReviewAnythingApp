@@ -30,7 +30,7 @@ public partial class Review : ComponentBase
         {
             if (ReviewId == null || ReviewId == 0)
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/home");
                 return;
             }
             // var review = await ReviewService.GetReviewByIdAsync(ReviewId);
@@ -38,7 +38,7 @@ public partial class Review : ComponentBase
             var reviewPageData = await ReviewService.GetReviewPageDataAsync(jwt, ReviewId);
             if (reviewPageData == null)
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/home");
                 return;
             }
             else
