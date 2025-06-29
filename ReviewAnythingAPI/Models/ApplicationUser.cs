@@ -22,3 +22,6 @@ public class ApplicationUser : IdentityUser<int>
     public ICollection<CommentVote> UserCommentVotes { get; set; }
     public ICollection<Report> UserReports { get; set; }
 }
+
+
+

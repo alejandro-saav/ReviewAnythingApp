@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
       <PackageReference Include="System.Net.Http.Json" Version="10.0.0-preview.5.25277.114" />
     </ItemGroup>
 

@@ -2,12 +2,11 @@ using BlazorApp1.Components;
 using BlazorApp1.Controllers;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
-//using BlazorApp1.Services.Interfaces;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 var builder = WebApplication.CreateBuilder(args);
-// builder.Services.AddScoped<ImageUploadService>();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -19,6 +18,9 @@ builder.Services.AddServerSideBlazor()
 
 
 builder.Services.AddControllers();
+
+// local storage service
+builder.Services.AddBlazoredLocalStorage();
 
 // Custom services
 builder.Services.AddScoped<IAuthService, AuthService>();

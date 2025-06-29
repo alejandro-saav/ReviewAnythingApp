@@ -1,0 +1,261 @@
+@page "/Explore"
+
+<div class="explore-container">
+        <div class="page-header">
+            <h1 class="page-title">Explore Reviews</h1>
+            <p class="page-subtitle">Discover authentic reviews from our community. Find insights on books, movies, technology, and everything in between.</p>
+        </div>
+
+        <div class="filters-section">
+            <input type="text" class="search-bar" placeholder="Search reviews, titles, authors, or anything..." id="searchInput">
+
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <h3>Categories</h3>
+                    <div class="category-filters">
+                        <div class="category-chip active" data-category="all">All</div>
+                        <div class="category-chip" data-category="books">📚 Books</div>
+                        <div class="category-chip" data-category="movies">🎬 Movies</div>
+                        <div class="category-chip" data-category="music">🎵 Music</div>
+                        <div class="category-chip" data-category="games">🎮 Games</div>
+                        <div class="category-chip" data-category="technology">💻 Technology</div>
+                        <div class="category-chip" data-category="art">🎨 Art</div>
+                        <div class="category-chip" data-category="science">🔬 Science</div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Rating</h3>
+                    <div class="rating-filter">
+                        <div class="rating-option active" data-rating="all">
+                            <span>All Ratings</span>
+                        </div>
+                        <div class="rating-option" data-rating="5">
+                            <span class="rating-stars">★★★★★</span>
+                            <span>5 Stars</span>
+                        </div>
+                        <div class="rating-option" data-rating="4">
+                            <span class="rating-stars">★★★★☆</span>
+                            <span>4+ Stars</span>
+                        </div>
+                        <div class="rating-option" data-rating="3">
+                            <span class="rating-stars">★★★☆☆</span>
+                            <span>3+ Stars</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Sort By</h3>
+                    <select class="sort-dropdown" id="sortSelect">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="highest">Highest Rated</option>
+                        <option value="lowest">Lowest Rated</option>
+                        <option value="most-helpful">Most Helpful</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Tags</h3>
+                    <input type="text" class="tag-input" placeholder="Add tag..." id="tagInput">
+                    <div class="filter-tags" id="filterTags"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-header">
+            <div class="results-count" id="resultsCount">Showing 1,247 reviews</div>
+            <div class="view-toggle">
+                <button class="view-btn active" id="gridView">Grid</button>
+                <button class="view-btn" id="listView">List</button>
+            </div>
+        </div>
+
+        <div class="reviews-grid" id="reviewsContainer">
+            <!-- Sample Review Cards -->
+            <div class="review-card" data-category="books" data-rating="5" data-tags="fantasy,epic,bestseller">
+                <div class="review-header">
+                    <div>
+                        <h3 class="review-title">The Name of the Wind</h3>
+                        <div class="review-category">Books</div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <span class="stars">★★★★★</span>
+                    <span class="rating-text">5/5 stars</span>
+                </div>
+                <div class="review-content">
+                    This is absolutely one of the best fantasy novels I've ever read. Patrick Rothfuss has created a masterpiece with incredible world-building, complex characters, and beautiful prose. The story of Kvothe is captivating from start to finish, and I couldn't put it down. The magic system is unique and well-thought-out, and the university setting adds a wonderful academic feel to the adventure.
+                </div>
+                <div class="review-tags">
+                    <span class="review-tag">fantasy</span>
+                    <span class="review-tag">epic</span>
+                    <span class="review-tag">bestseller</span>
+                </div>
+                <div class="review-meta">
+                    <span class="review-author">BookLover2024</span>
+                    <span class="review-date">2 days ago</span>
+                    <div class="review-actions">
+                        <button class="action-btn">👍 24</button>
+                        <button class="action-btn">💬 5</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card" data-category="movies" data-rating="4" data-tags="sci-fi,action,blockbuster">
+                <div class="review-header">
+                    <div>
+                        <h3 class="review-title">Dune: Part Two</h3>
+                        <div class="review-category">Movies</div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <span class="stars">★★★★☆</span>
+                    <span class="rating-text">4/5 stars</span>
+                </div>
+                <div class="review-content">
+                    Denis Villeneuve has done it again! This sequel surpasses the first film in every way. The cinematography is breathtaking, the sound design is immersive, and the performances are top-notch. While the pacing can be slow at times, the payoff is absolutely worth it. A must-watch for sci-fi fans.
+                </div>
+                <div class="review-tags">
+                    <span class="review-tag">sci-fi</span>
+                    <span class="review-tag">action</span>
+                    <span class="review-tag">blockbuster</span>
+                </div>
+                <div class="review-meta">
+                    <span class="review-author">CinematicReviews</span>
+                    <span class="review-date">4 days ago</span>
+                    <div class="review-actions">
+                        <button class="action-btn">👍 67</button>
+                        <button class="action-btn">💬 12</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card" data-category="technology" data-rating="5" data-tags="laptop,performance,productivity">
+                <div class="review-header">
+                    <div>
+                        <h3 class="review-title">MacBook Pro M3 Max</h3>
+                        <div class="review-category">Technology</div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <span class="stars">★★★★★</span>
+                    <span class="rating-text">5/5 stars</span>
+                </div>
+                <div class="review-content">
+                    This machine is an absolute powerhouse. The M3 Max chip handles everything I throw at it - from 4K video editing to running multiple VMs simultaneously. Battery life is incredible, easily lasting a full workday. The display is gorgeous and the build quality is top-notch. Worth every penny for professional work.
+                </div>
+                <div class="review-tags">
+                    <span class="review-tag">laptop</span>
+                    <span class="review-tag">performance</span>
+                    <span class="review-tag">productivity</span>
+                </div>
+                <div class="review-meta">
+                    <span class="review-author">TechExpert</span>
+                    <span class="review-date">1 week ago</span>
+                    <div class="review-actions">
+                        <button class="action-btn">👍 89</button>
+                        <button class="action-btn">💬 23</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card" data-category="games" data-rating="3" data-tags="rpg,open-world,bugs">
+                <div class="review-header">
+                    <div>
+                        <h3 class="review-title">Cyberpunk 2077</h3>
+                        <div class="review-category">Games</div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <span class="stars">★★★☆☆</span>
+                    <span class="rating-text">3/5 stars</span>
+                </div>
+                <div class="review-content">
+                    After the recent updates, this game has improved significantly. The story is engaging and the world is beautifully crafted. However, I still encounter occasional bugs and the AI can be inconsistent. It's a good game now, but still feels like it could have been great with more polish.
+                </div>
+                <div class="review-tags">
+                    <span class="review-tag">rpg</span>
+                    <span class="review-tag">open-world</span>
+                    <span class="review-tag">bugs</span>
+                </div>
+                <div class="review-meta">
+                    <span class="review-author">GamerReviews</span>
+                    <span class="review-date">3 days ago</span>
+                    <div class="review-actions">
+                        <button class="action-btn">👍 45</button>
+                        <button class="action-btn">💬 18</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card" data-category="music" data-rating="5" data-tags="album,indie,emotional">
+                <div class="review-header">
+                    <div>
+                        <h3 class="review-title">The Record - Boygenius</h3>
+                        <div class="review-category">Music</div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <span class="stars">★★★★★</span>
+                    <span class="rating-text">5/5 stars</span>
+                </div>
+                <div class="review-content">
+                    This album is a masterclass in songwriting and emotional depth. The harmonies between Phoebe Bridgers, Lucy Dacus, and Julien Baker are absolutely stunning. Each track tells a story and the production is crisp and intimate. This is definitely one of the best albums of the year.
+                </div>
+                <div class="review-tags">
+                    <span class="review-tag">album</span>
+                    <span class="review-tag">indie</span>
+                    <span class="review-tag">emotional</span>
+                </div>
+                <div class="review-meta">
+                    <span class="review-author">MusicLover</span>
+                    <span class="review-date">5 days ago</span>
+                    <div class="review-actions">
+                        <button class="action-btn">👍 32</button>
+                        <button class="action-btn">💬 8</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-card" data-category="art" data-rating="4" data-tags="exhibition,modern,interactive">
+                <div class="review-header">
+                    <div>
+                        <h3 class="review-title">Digital Art Exhibition - MoMA</h3>
+                        <div class="review-category">Art</div>
+                    </div>
+                </div>
+                <div class="review-rating">
+                    <span class="stars">★★★★☆</span>
+                    <span class="rating-text">4/5 stars</span>
+                </div>
+                <div class="review-content">
+                    A fascinating exploration of digital art and its impact on contemporary culture. The interactive installations are particularly engaging, and the curation is thoughtful. Some pieces feel repetitive, but overall it's a worthwhile experience that challenges traditional notions of art.
+                </div>
+                <div class="review-tags">
+                    <span class="review-tag">exhibition</span>
+                    <span class="review-tag">modern</span>
+                    <span class="review-tag">interactive</span>
+                </div>
+                <div class="review-meta">
+                    <span class="review-author">ArtCritic</span>
+                    <span class="review-date">1 week ago</span>
+                    <div class="review-actions">
+                        <button class="action-btn">👍 18</button>
+                        <button class="action-btn">💬 6</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn">← Previous</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn">Next →</button>
+        </div>
+    </div>

@@ -19,6 +19,7 @@ public class Login : PageModel
     [BindProperty]
     public LoginRequest LoginModel { get; set; } = new LoginRequest();
 
+
     public Login(IAuthService authService)
     {
         _authService = authService;
@@ -57,9 +58,10 @@ public class Login : PageModel
             
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, loginResponse.UserResponse.UserId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, loginResponse.UserResponse!.UserId.ToString()),
                 new Claim(ClaimTypes.Name, loginResponse.UserResponse.UserName),
                 new Claim(ClaimTypes.Email, loginResponse.UserResponse.Email),
+                new Claim("profile_image", loginResponse.UserResponse.ProfileImage ?? "")
             };
             
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
