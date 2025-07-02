@@ -77,8 +77,6 @@ public partial class Review : ComponentBase
         try
         {
             IsLoading = true;
-            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
-            createComment.jwtToken = jwt;
             createComment.ReviewId = ReviewId;
             var newComment = await ReviewService.CreateCommentAsync(createComment);
             if (newComment != null)
@@ -107,12 +105,10 @@ public partial class Review : ComponentBase
 
         try
         {
-            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
             var reviewVote = new ReviewVote
             {
                 ReviewId = CurrentReview.ReviewId,
                 VoteType = vote,
-                jwtToken = jwt
             };
             var isSuccessVoteRequest = await ReviewService.ReviewVoteAsync(reviewVote);
             if (isSuccessVoteRequest)
@@ -151,13 +147,11 @@ public partial class Review : ComponentBase
 
         try
         {
-            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
             var commentVote = new CommentVoteRequest
             {
                 CommentId = commentId,
                 VoteType = vote,
                 ReviewId = ReviewId,
-                JwtToken = jwt
             };
             var isSuccessVoteRequest = await ReviewService.CommentVoteAsync(commentVote);
             if (isSuccessVoteRequest)
@@ -218,11 +212,9 @@ public partial class Review : ComponentBase
             OpenModal();
             return;
         }
-        var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
         var followRequest = new FollowRequest
         {
             TargetUserId = userId,
-            JwtToken = jwt
         };
         if (reviewUserContext.FollowedUserIds.Contains(userId))
         {

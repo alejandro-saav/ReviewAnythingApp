@@ -7,5 +7,4 @@ public class CreateComment
     public int ReviewId { get; set; }
     [MaxLength(1000)]
     public string Content { get; set; }
-    public string jwtToken { get; set; } = string.Empty;
 }

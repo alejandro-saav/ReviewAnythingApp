@@ -35,7 +35,6 @@ public class UserService : IUserService
             UserName = user.UserName,
             ProfileImage = user.ProfileImage,
             FirstName = user.FirstName,
-            Email = user.Email
         };
     }
 
@@ -49,5 +48,13 @@ public class UserService : IUserService
         if (updateDto.ProfileImage != null) user.ProfileImage = updateDto.ProfileImage;
         if (updateDto.Bio != null) user.ProfileImage = updateDto.Bio;
         return true;
+    }
+
+    public async Task<UserPageDataDto> GetUserPageDataAsync(int userId)
+    {
+        var user = await _userRepository.GetByIdAsync(userId);
+        if(user == null) throw new EntityNotFoundException("User not found");
+        var userPageDate = await _userRepository.GetUserPageDataAsync(userId);
+        return userPageDate;
     }
 }

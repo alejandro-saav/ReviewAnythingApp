@@ -62,4 +62,11 @@ public class UserController : ControllerBase
         if (!success) return BadRequest();
         return NoContent();
     }
+
+    [HttpGet("{userId}/page-data")]
+    public async Task<IActionResult> GetUserProfilePageData([FromRoute] int userId)
+    {
+        var success = await _userService.GetUserPageDataAsync(userId);
+        return Ok(success);
+    }
 }

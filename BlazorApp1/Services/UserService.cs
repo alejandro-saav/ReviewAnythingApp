@@ -113,7 +113,6 @@ public class UserService : IUserService
         LastErrorMessage = null;
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", followRequest.JwtToken);
             var response = await _httpClient.DeleteAsync($"api/user/{followRequest.TargetUserId}/follow");
             if (response.IsSuccessStatusCode) return true;
             return false;
@@ -130,8 +129,6 @@ public class UserService : IUserService
         LastErrorMessage = null;
         try
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", followRequest.JwtToken);
             var response = await _httpClient.PostAsync($"api/user/{followRequest.TargetUserId}/follow", null);
             if (response.IsSuccessStatusCode)
             {
@@ -144,6 +141,26 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             LastErrorMessage = $"catch exception: {ex.Message}";
+            return null;
+        }
+    }
+
+    public async Task<UserPageData?> GetUserPageDataAsync(int userId)
+    {
+        try
+        {
+
+            var response = await _httpClient.GetAsync($"api/user/{userId}/page-data");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<UserPageData>();
+                return content;
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetUserPageData service: {ex.Message}");
             return null;
         }
     }

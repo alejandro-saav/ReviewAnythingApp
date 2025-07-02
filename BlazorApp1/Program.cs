@@ -1,5 +1,4 @@
 using BlazorApp1.Components;
-using BlazorApp1.Controllers;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 using Blazored.LocalStorage;
@@ -16,9 +15,6 @@ builder.Services.AddRazorComponents()
 builder.Services.AddServerSideBlazor()
     .AddCircuitOptions(options => { options.DetailedErrors = true; });
 
-
-builder.Services.AddControllers();
-
 // local storage service
 builder.Services.AddBlazoredLocalStorage();
 
@@ -31,13 +27,16 @@ string? blazorAppBaseUrl = builder.Configuration["BlazorAppBaseUrl"];
 builder.Services.AddHttpClient("BlazorAppApi", client =>
 {
     client.BaseAddress = new Uri(blazorAppBaseUrl);
-
 });
+
+// Http bearer handler
+builder.Services.AddTransient<BearerTokenHandler>();
+
 builder.Services.AddHttpClient("ReviewAnythingAPI", client =>
 {
-    // This base address MUST point to your separate .NET 9 API's URL
-    client.BaseAddress = new Uri(builder.Configuration["YourApi:BaseUrl"] ?? "https://localhost:5026/"); // Set a fallback URL
-});
+    client.BaseAddress = new Uri(builder.Configuration["YourApi:BaseUrl"] ?? "https://localhost:5026/");
+}).AddHttpMessageHandler<BearerTokenHandler>();
+
 // HttpContextAccessor for accessing the auth token
 builder.Services.AddHttpContextAccessor();
 

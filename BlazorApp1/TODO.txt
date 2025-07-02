@@ -21,6 +21,6 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 
 - Add modal when hovering the image profile icon 🌟
 - Add the logout functionality 🌟
-- do i need to fix the jwt approach?
+- do i need to fix the jwt approach? 🌟
 - add the profile page
 - add functionality to edit the user profile
