@@ -57,7 +57,6 @@
         if (_user.Identity != null && _user.Identity.IsAuthenticated)
         {
             _userSummary.UserName = _user.Identity.Name!;
-            _userSummary.Email = _user.FindFirstValue(ClaimTypes.Email)!;
             _userSummary.ProfileImage = _user.FindFirstValue("profile_image");
         }
     }

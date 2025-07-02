@@ -8,7 +8,9 @@ namespace ReviewAnythingAPI.Repositories;
 
 public class UserRepository : Repository<ApplicationUser>, IUserRepository
 {
-    public UserRepository(ReviewAnythingDbContext context) : base(context) {}
+    public UserRepository(ReviewAnythingDbContext context) : base(context)
+    {
+    }
 
     public async Task<IEnumerable<UserCommentDto>> GetUsersCommentInformationAsync(IReadOnlyList<int> userIds)
     {
@@ -21,5 +23,57 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
             FollowerCount = _context.Follows.Where(f => f.FollowingUserId == u.Id).Count()
         }).ToListAsync();
         return usersInfo;
+    }
+
+    public async Task<UserPageDataDto> GetUserPageDataAsync(int userId)
+    {
+        var user = await _context.Users
+            .Where(u => u.Id == userId)
+            .Select(u => new UserSummaryDto
+            {
+                UserId = u.Id,
+                UserName = u.UserName ?? "",
+                FirstName = u.FirstName ?? "",
+                LastName = u.LastName ?? "",
+                ProfileImage = u.ProfileImage,
+                CreationDate = u.CreationDate,
+                Bio = u.Bio ?? "",
+            })
+            .FirstOrDefaultAsync();
+
+        var totalReviews = await _context.Reviews
+            .Where(r => r.UserId == userId)
+            .CountAsync();
+
+        var totalComments = await _context.Comments
+            .Where(c => c.UserId == userId)
+            .CountAsync();
+
+        var followers = await _context.Follows
+            .Where(f => f.FollowingUserId == userId)
+            .Select(f => new UserSummaryDto
+            {
+                UserName = f.Follower!.UserName!,
+                ProfileImage = f.Follower.ProfileImage,
+            })
+            .ToListAsync();
+
+        var following = await _context.Follows
+            .Where(f => f.FollowerUserId == userId)
+            .Select(f => new UserSummaryDto
+            {
+                UserName = f.Following!.UserName!,
+                ProfileImage = f.Following.ProfileImage,
+            })
+            .ToListAsync();
+
+        return new UserPageDataDto
+        {
+            UserSummary = user,
+            TotalReviews = totalReviews,
+            TotalComments = totalComments,
+            Followers = followers,
+            Following = following,
+        };
     }
 }

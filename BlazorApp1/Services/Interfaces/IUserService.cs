@@ -10,4 +10,6 @@ public interface IUserService
     Task<UserSummary?> GetUserSummaryAsync(int userId);
     Task<bool> UnFollowUserAsync(FollowRequest followRequest);
     Task<FollowResponse?> FollowUserAsync(FollowRequest followRequest);
+
+    Task<UserPageData?> GetUserPageDataAsync(int userId);
 }

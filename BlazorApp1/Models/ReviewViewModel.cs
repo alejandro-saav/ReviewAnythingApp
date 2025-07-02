@@ -21,5 +21,4 @@ public class ReviewViewModel
     
     [Required(ErrorMessage = "Please select a category")]
     public int? CategoryId { get; set; }
-    public string jwtToken { get; set; } = string.Empty;
 }

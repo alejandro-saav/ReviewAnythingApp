@@ -1,0 +1,87 @@
+@page "/Profile/{UserId:int}"
+@using System.Globalization
+
+
+<div class="container">
+    <div class="profile-header">
+        <img
+            src="@UserData.UserSummary.ProfileImage"
+            alt="Profile Picture" class="profile-image" id="profileImage">
+
+        <div class="profile-info">
+            <h1 class="profile-name" id="fullName">@UserData.UserSummary.FirstName @UserData.UserSummary.LastName</h1>
+            <div class="username" id="username">@UserData.UserSummary.UserName</div>
+            <div class="join-date" id="joinDate">Member
+                since @UserData.UserSummary.CreationDate?.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</div>
+            <p class="bio" id="bio">@UserData.UserSummary.Bio</p>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="reviewCount">@UserData.TotalReviews</span>
+                    <span class="stat-label">Reviews</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="commentCount">@UserData.TotalComments</span>
+                    <span class="stat-label">Comments</span>
+                </div>
+                <button class="follow-btn" @onclick="FollowUser"
+                        @onclick:stopPropagation>
+                    @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
+                    {
+                        <span>Following</span>
+                    }
+                    else
+                    {
+                        <span>Follow</span>
+                    }
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="social-sections">
+        <div class="followers-section">
+            <h3>Followers (<span id="followerCount">@UserData?.Followers.Count()</span>)</h3>
+            <div class="followers-grid" id="followersGrid">
+                <!-- Followers will be populated by JavaScript -->
+                @if (UserData?.Followers != null)
+                {
+                    foreach (var user in UserData.Followers)
+                    {
+                        <a href="#" class="follower-item">
+                            <img src="@user.ProfileImage" alt="@user.UserName" class="follower-avatar" width="50"
+                                 height="50">
+                            <div class="follower-name">@user.UserName</div>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <p>No followers to show.</p>
+                }
+            </div>
+        </div>
+
+        <div class="following-section">
+            <h3>Following (<span id="followingCount">@UserData?.Following.Count()</span>)</h3>
+            <div class="following-grid" id="followingGrid">
+                <!-- Following will be populated by JavaScript -->
+                @if (UserData?.Following != null)
+                {
+                    @foreach (var user in UserData.Following)
+                    {
+                        <a href="#" class="follower-item">
+                            <img src="@user.ProfileImage" alt="@user.UserName" class="follower-avatar" width="50"
+                                 height="50">
+                            <div class="follower-name">@user.UserName</div>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <p>No users following this user yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

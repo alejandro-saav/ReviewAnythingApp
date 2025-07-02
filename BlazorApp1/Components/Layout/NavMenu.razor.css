@@ -55,7 +55,7 @@
     height: 45px;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 0 3px #FE5D26;
+    box-shadow: 0 0 3px #FFF;
 }
 
 .modal-overlay {

@@ -86,8 +86,6 @@ public partial class WriteReview : ComponentBase
 
         try
         {
-            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
-            ReviewModel.jwtToken = jwt;
             var createdReview = await ReviewService.CreateReviewAsync(ReviewModel);
             NavigationManager.NavigateTo($"/review/{createdReview.ReviewId}");
             Console.WriteLine("SUCCESS");
