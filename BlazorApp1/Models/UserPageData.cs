@@ -7,4 +7,5 @@ public class UserPageData
     public int TotalComments { get; set; }
     public IEnumerable<UserSummary> Followers { get; set; } = [];
     public IEnumerable<UserSummary> Following { get; set; } = [];
+    public bool IsCurrentUserFollowing { get; set; } = false;
 }

@@ -11,7 +11,7 @@ public class ReviewService : IReviewService
 
     public ReviewService(IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClientFactory.CreateClient("BlazorAppApi");
+        _httpClient = httpClientFactory.CreateClient("ReviewAnythingAPI");
     }
 
     public async Task<IEnumerable<Category>> GetAllReviewCategoriesAsync()
@@ -19,7 +19,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.GetAsync("client/review/categories");
+            var response = await _httpClient.GetAsync("api/categories");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<Category>>();
@@ -44,7 +44,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("client/review", review);
+            var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
             if (response.IsSuccessStatusCode)
             {
                 var newReview = await response.Content.ReadFromJsonAsync<ReviewModel>();
@@ -66,17 +66,12 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewModel?> GetReviewByIdAsync(int reviewId)
     {
-        Console.WriteLine("ENTER REVIEW SERVICE METHOD");
-        Console.WriteLine($"HTTPCLIENT: {_httpClient.BaseAddress}");
         LastErrorMessage = null;
         try
         {
-            Console.WriteLine("ENTER REVIEW SERVICE METHOD BEFORE RESPONSE");
-            var response = await _httpClient.GetAsync($"client/review/{reviewId}");
-            Console.WriteLine("ENTER REVIEW SERVICE METHOD AFTER RESPONSE");
+            var response = await _httpClient.GetAsync($"api/reviews/{reviewId}");
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("REVIEW SERVICE SUCCESS");
                 var review = await response.Content.ReadFromJsonAsync<ReviewModel>();
                 return review;
             }
@@ -84,7 +79,6 @@ public class ReviewService : IReviewService
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Error while fetching the review, status code: {response.StatusCode} - error message:{errorContent}";
-                Console.WriteLine($"REVIEW SERVICE FAILURE: {errorContent}");
                 return null;
             }
         }
@@ -101,7 +95,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.GetAsync($"client/review/{reviewId}/comments");
+            var response = await _httpClient.GetAsync($"api/comment/reviews/{reviewId}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<Comment>>();
@@ -126,7 +120,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("client/review/comment", comment);
+            var response = await _httpClient.PostAsJsonAsync("api/comment", comment);
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<Comment>();
@@ -151,7 +145,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("client/review/vote", reviewVote);
+            var response = await _httpClient.PostAsJsonAsync("api/reviews/review-votes", reviewVote);
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -166,12 +160,12 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<ReviewPageData?> GetReviewPageDataAsync(string? jwt, int reviewId)
+    public async Task<ReviewPageData?> GetReviewPageDataAsync(int reviewId)
     {
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync($"client/review/{reviewId}/page-data", jwt);
+            var response = await _httpClient.GetAsync($"api/reviews/{reviewId}/page-data");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<ReviewPageData>();
@@ -192,7 +186,7 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("client/review/comment-vote", commentVote);
+            var response = await _httpClient.PostAsJsonAsync("api/comment/comment-votes", commentVote);
             if (response.IsSuccessStatusCode)
             {
                 return true;

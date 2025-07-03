@@ -1,4 +1,5 @@
 @page "/review/{ReviewId:int}"
+@using BlazorApp1.Components.HelperComponents
 @rendermode InteractiveServer
 
 <div class="container" @onclick="CloseModal" @onclick:stopPropagation>
@@ -63,7 +64,7 @@
 
         <EditForm Model="@createComment" OnSubmit="PostComment" FormName="PostComment">
             <div class="leave-comment-container">
-                @if (string.IsNullOrEmpty(userSummary?.ProfileImage))
+                @if (string.IsNullOrEmpty(UserProfileImage))
                 {
                     <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none"
                          class="profile-svg">
@@ -77,9 +78,9 @@
                 }
                 else
                 {
-                    <img id="previewImg" src="@userSummary?.ProfileImage" alt="Profile Image" class="profile-image">
+                    <img id="previewImg" src="@UserProfileImage alt="Profile Image" class="profile-image">
                 }
-                @if (userSummary == null)
+                @if (!IsLoggedIn)
                 {
                     <textarea id="leave-comment-input" class="leave-comment-input" placeholder="Leave a comment..."
                               @onclick="OpenModal" readonly @onclick:stopPropagation>
@@ -91,9 +92,9 @@
                               placeholder="Leave a comment..."
                               @bind="createComment.Content" @bind:event="oninput"></textarea>
                 }
-                <button class="follow-btn" type="submit"
+                    <button class="follow-btn" type="submit"
                         disabled="@(string.IsNullOrWhiteSpace(createComment.Content) || IsLoading)">
-                    @if (IsLoading)
+                                 @if (IsLoading)
                     {
                         <div class="spinner-container">
                             <span class="spinner"></span>
@@ -171,15 +172,7 @@
 
 @if (showModal)
 {
-    <div class="modal">
-        <h3 class="modal-header">Want to join the community?</h3>
-        <h5 class="modal-content">Join with your account to continue</h5>
-        <a class="modal-link" href="/login">Sign in</a>
-    </div>
-}
-
-@code {
-
+    <Modal />
 }
 
 <script>

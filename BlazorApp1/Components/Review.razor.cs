@@ -11,14 +11,15 @@ namespace BlazorApp1.Components;
 public partial class Review : ComponentBase
 {
     [Inject] private IReviewService ReviewService { get; set; }
-    [Parameter]
-    public int ReviewId { get; set; }
+    [Parameter] public int ReviewId { get; set; }
     [Inject] private NavigationManager Navigation { get; set; }
     [Inject] private AuthenticationStateProvider authenticationStateProvider { get; set; }
     [Inject] private IUserService UserService { get; set; }
     [Inject] IHttpContextAccessor HttpContextAccessor { get; set; }
     private ReviewModel CurrentReview { get; set; } = new ReviewModel();
-    private UserSummary? userSummary { get; set; } = null;
+    // private UserSummary? userSummary { get; set; } = null;
+    private bool IsLoggedIn;
+    private string? UserProfileImage { get; set; } = "";
     private CreateComment createComment { get; set; } = new();
     private ReviewUserContextDto reviewUserContext { get; set; } = new();
     private bool showModal { get; set; }
@@ -26,26 +27,30 @@ public partial class Review : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            IsLoggedIn = true;
+            UserProfileImage = user.FindFirst("profile_image")?.Value;
+        }
         try
         {
-            if (ReviewId == null || ReviewId == 0)
+            if (ReviewId < 1)
             {
                 Navigation.NavigateTo("/home");
                 return;
             }
-            // var review = await ReviewService.GetReviewByIdAsync(ReviewId);
-            var jwt = HttpContextAccessor.HttpContext.Request.Cookies["jwt"];
-            var reviewPageData = await ReviewService.GetReviewPageDataAsync(jwt, ReviewId);
+            var reviewPageData = await ReviewService.GetReviewPageDataAsync(ReviewId);
             if (reviewPageData == null)
             {
-                Navigation.NavigateTo("/home");
-                return;
+                Navigation.NavigateTo("/");
             }
             else
             {
                 CurrentReview = reviewPageData.Review;
                 CurrentReview.Comments = reviewPageData.Comments;
-                if (jwt != null)
+                if (user.Identity != null && user.Identity.IsAuthenticated)
                 {
                     reviewUserContext.UserReviewVote = reviewPageData.UserReviewVote;
                     reviewUserContext.CommentVotes = reviewPageData.CommentVotes;
@@ -57,18 +62,6 @@ public partial class Review : ComponentBase
         {
             Console.WriteLine("Error while trying to setting current review:" + ex.Message);
             Navigation.NavigateTo("/");
-        }
-    
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        string userId = "";
-        if (user.Identity?.IsAuthenticated == true)
-        {
-            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-        }
-        if (int.TryParse(userId, out int id))
-        {
-            userSummary = await UserService.GetUserSummaryAsync(id);
         }
     }
 
@@ -97,7 +90,7 @@ public partial class Review : ComponentBase
 
     private async Task PostReviewVote(int vote)
     {
-        if (userSummary == null)
+        if (!IsLoggedIn)
         {
             OpenModal();
             return;
@@ -122,10 +115,12 @@ public partial class Review : ComponentBase
                 {
                     CurrentReview.Likes++;
                     reviewUserContext.UserReviewVote = 1;
-                } else if (vote == -1 && reviewUserContext.UserReviewVote == -1)
+                }
+                else if (vote == -1 && reviewUserContext.UserReviewVote == -1)
                 {
                     reviewUserContext.UserReviewVote = null;
-                } else if (vote == -1 && reviewUserContext.UserReviewVote == null)
+                }
+                else if (vote == -1 && reviewUserContext.UserReviewVote == null)
                 {
                     reviewUserContext.UserReviewVote = -1;
                 }
@@ -136,10 +131,10 @@ public partial class Review : ComponentBase
             Console.WriteLine($"Error on PostReviewVote, error: {ex.Message}");
         }
     }
-    
+
     private async Task PostCommentVote(int vote, int commentId)
     {
-        if (userSummary == null)
+        if (!IsLoggedIn)
         {
             OpenModal();
             return;
@@ -157,7 +152,8 @@ public partial class Review : ComponentBase
             if (isSuccessVoteRequest)
             {
                 // update commentVotesList
-                var existingVote = reviewUserContext.CommentVotes.FirstOrDefault(c => c.CommentId == commentVote.CommentId);
+                var existingVote =
+                    reviewUserContext.CommentVotes.FirstOrDefault(c => c.CommentId == commentVote.CommentId);
                 if (existingVote != null)
                 {
                     if (existingVote.UserVote == vote)
@@ -178,6 +174,7 @@ public partial class Review : ComponentBase
                     };
                     reviewUserContext.CommentVotes.Add(newVote);
                 }
+
                 // Update CommentLikesCount
                 var comment = CurrentReview.Comments.FirstOrDefault(c => c.CommentId == commentId);
                 if (existingVote != null)
@@ -185,7 +182,8 @@ public partial class Review : ComponentBase
                     if (vote == 1 && existingVote.UserVote == 1)
                     {
                         comment!.Likes--;
-                    } else if (vote == 1 && existingVote.UserVote == -1)
+                    }
+                    else if (vote == 1 && existingVote.UserVote == -1)
                     {
                         comment!.Likes++;
                     }
@@ -207,11 +205,12 @@ public partial class Review : ComponentBase
 
     private async Task FollowUser(int userId)
     {
-        if (userSummary == null)
+        if (!IsLoggedIn)
         {
             OpenModal();
             return;
         }
+
         var followRequest = new FollowRequest
         {
             TargetUserId = userId,
@@ -235,25 +234,25 @@ public partial class Review : ComponentBase
             }
         }
     }
-    
+
     private void OpenModal()
     {
         showModal = true;
     }
-    
+
     private void CloseModal()
     {
         showModal = false;
     }
-    
+
     private void HandleCommentFocus()
     {
-        if (userSummary == null)
+        if (!IsLoggedIn)
         {
             showModal = true;
         }
     }
-    
+
     private string GetVoteClass(int commentId, int expectedVote)
     {
         var vote = reviewUserContext.CommentVotes

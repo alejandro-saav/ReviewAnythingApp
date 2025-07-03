@@ -61,7 +61,8 @@ public class Login : PageModel
                 new Claim(ClaimTypes.NameIdentifier, loginResponse.UserResponse!.UserId.ToString()),
                 new Claim(ClaimTypes.Name, loginResponse.UserResponse.UserName),
                 new Claim(ClaimTypes.Email, loginResponse.UserResponse.Email),
-                new Claim("profile_image", loginResponse.UserResponse.ProfileImage ?? "")
+                new Claim("profile_image", loginResponse.UserResponse.ProfileImage ?? ""),
+                new Claim("jwt", jwt)
             };
             
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
