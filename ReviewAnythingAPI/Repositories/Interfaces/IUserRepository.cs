@@ -7,5 +7,5 @@ namespace ReviewAnythingAPI.Repositories.Interfaces;
 public interface IUserRepository : IRepository<ApplicationUser>
 {
     public Task<IEnumerable<UserCommentDto>> GetUsersCommentInformationAsync(IReadOnlyList<int> userIds);
-    public Task<UserPageDataDto> GetUserPageDataAsync(int userId);
+    public Task<UserPageDataDto> GetUserPageDataAsync(int targetUserId, int currentUserId);
 }

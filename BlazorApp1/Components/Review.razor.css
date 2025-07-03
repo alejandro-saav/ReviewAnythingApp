@@ -476,28 +476,6 @@
   margin-top: 0.2rem;
 }
 
-.follow-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.follow-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.follow-btn:hover {
-  background: #e54a1f;
-  transform: translateY(-1px);
-}
-
 .follow-btn.following {
   background: var(--accent);
   color: var(--dark);
@@ -508,6 +486,7 @@
   line-height: 1.6;
   margin-bottom: 1rem;
   font-size: 1rem;
+  overflow-wrap: break-word;
 }
 
 .comment-footer {
@@ -624,23 +603,6 @@
     height: 40px;
     font-size: 1rem;
   }
-}
-
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-}
-
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-  display: block;
 }
 
 @keyframes spin {
