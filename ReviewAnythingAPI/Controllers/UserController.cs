@@ -63,10 +63,12 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("{userId}/page-data")]
-    public async Task<IActionResult> GetUserProfilePageData([FromRoute] int userId)
+    [HttpGet("{targetUserId}/page-data")]
+    public async Task<IActionResult> GetUserProfilePageData([FromRoute] int targetUserId)
     {
-        var success = await _userService.GetUserPageDataAsync(userId);
+        int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int currentUserId);
+
+        var success = await _userService.GetUserPageDataAsync(targetUserId, currentUserId);
         return Ok(success);
     }
 }

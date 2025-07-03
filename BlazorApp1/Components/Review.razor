@@ -1,185 +1,191 @@
 @page "/review/{ReviewId:int}"
 @using BlazorApp1.Components.HelperComponents
 @rendermode InteractiveServer
-
-<div class="container" @onclick="CloseModal" @onclick:stopPropagation>
-    <div class="header">
-        <h1 class="title">@CurrentReview.Title</h1>
-        <div class="meta-info">
-            <div class="username">by: @CurrentReview.UserName</div>
-            <div class="last-edit">Last edited: @CurrentReview.LastEditDate</div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <div class="rating-section">
-            <div class="stars">
-                @for (int i = 1; i <= 5; i++)
-                {
-                    int starValue = CurrentReview.Rating;
-                    if (starValue >= i)
-                    {
-                        <span class="star selected">
-                        ⭐
-                    </span>
-                    }
-                    else
-                    {
-                        <span class="star no-selected">
-                            ☆
-                        </span>
-                    }
-                }
-            </div>
-            @* <div class="rating-text">5 out of 5 stars</div> *@
-        </div>
-
-        <div class="review-content">
-            @CurrentReview.Content
-        </div>
-
-        <div class="tags-section">
-            <div class="tags-title">Tags</div>
-            <div class="tags">
-                @foreach (var tag in CurrentReview.Tags)
-                {
-                    <span class="tag">@tag</span>
-                }
+@if (CurrentReview == null && _notFound == false)
+{
+    <span>Loading...</span>
+}
+else if (CurrentReview != null)
+{
+    <div class="container" @onclick="CloseModal" @onclick:stopPropagation>
+        <div class="header">
+            <h1 class="title">@CurrentReview.Title</h1>
+            <div class="meta-info">
+                <div class="username">by: @CurrentReview.UserName</div>
+                <div class="last-edit">Last edited: @CurrentReview.LastEditDate</div>
             </div>
         </div>
 
-        <div class="voting-section">
-            <div class="votes-count">@CurrentReview.Likes positive votes</div>
-            <div class="vote-buttons">
-                <button class="vote-btn like @(reviewUserContext.UserReviewVote == 1 ? "active" : "")"
-                        @onclick="() => PostReviewVote(1)" @onclick:stopPropagation>
-                    👍 Like
-                </button>
-                <button class="vote-btn dislike @(reviewUserContext.UserReviewVote == -1 ? "active" : "")"
-                        @onclick="() => PostReviewVote(-1)" @onclick:stopPropagation>
-                    👎 Dislike
-                </button>
-            </div>
-        </div>
-
-        <EditForm Model="@createComment" OnSubmit="PostComment" FormName="PostComment">
-            <div class="leave-comment-container">
-                @if (string.IsNullOrEmpty(UserProfileImage))
-                {
-                    <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none"
-                         class="profile-svg">
-                        <!-- Circle background -->
-                        <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
-                        <!-- User icon -->
-                        <path
-                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                            fill="#FE5D26"/>
-                    </svg>
-                }
-                else
-                {
-                    <img id="previewImg" src="@UserProfileImage alt="Profile Image" class="profile-image">
-                }
-                @if (!IsLoggedIn)
-                {
-                    <textarea id="leave-comment-input" class="leave-comment-input" placeholder="Leave a comment..."
-                              @onclick="OpenModal" readonly @onclick:stopPropagation>
-                                                        </textarea>
-                }
-                else
-                {
-                    <textarea id="leave-comment-input" class="leave-comment-input" rows="1"
-                              placeholder="Leave a comment..."
-                              @bind="createComment.Content" @bind:event="oninput"></textarea>
-                }
-                    <button class="follow-btn" type="submit"
-                        disabled="@(string.IsNullOrWhiteSpace(createComment.Content) || IsLoading)">
-                                 @if (IsLoading)
+        <div class="content-section">
+            <div class="rating-section">
+                <div class="stars">
+                    @for (int i = 1; i <= 5; i++)
                     {
-                        <div class="spinner-container">
-                            <span class="spinner"></span>
-                            <span>Loading...</span>
-                        </div>
-                    }
-                    else
-                    {
-                        <span>
-                    Comment
-                    </span>
-                    }
-                </button>
-            </div>
-        </EditForm>
-
-        <div class="comments-section">
-            <div class="comments-title">Comments (@CurrentReview.Comments.Count())</div>
-            @foreach (var comment in CurrentReview.Comments)
-            {
-                <div class="comment">
-                    <div class="comment-header">
-                        @if (string.IsNullOrWhiteSpace(comment.UserInformation.ProfileImage))
+                        int starValue = CurrentReview.Rating;
+                        if (starValue >= i)
                         {
-                            <div class="profile-photo">AM</div>
+                            <span class="star selected">
+                                ⭐
+                            </span>
                         }
                         else
                         {
-                            <img src="@comment.UserInformation.ProfileImage" alt="profile-picture"
-                                 class="profile-picture-image"/>
+                            <span class="star no-selected">
+                                ☆
+                            </span>
                         }
-                        <div class="user-info">
-                            <div class="username-comment">@comment.UserInformation.UserName</div>
-                            <div class="user-stats">
-                                <span>@comment.UserInformation.ReviewCount reviews</span>
-                                <span>•</span>
-                                <span>@comment.UserInformation.FollowerCount followers</span>
-                            </div>
-                        </div>
-                        <button class="follow-btn" @onclick="() => FollowUser(comment.UserInformation.UserId)"
-                                @onclick:stopPropagation>
-                            @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
+                    }
+                </div>
+                @* <div class="rating-text">5 out of 5 stars</div> *@
+            </div>
+
+            <div class="review-content">
+                @CurrentReview.Content
+            </div>
+
+            <div class="tags-section">
+                <div class="tags-title">Tags</div>
+                <div class="tags">
+                    @foreach (var tag in CurrentReview.Tags)
+                    {
+                        <span class="tag">@tag</span>
+                    }
+                </div>
+            </div>
+
+            <div class="voting-section">
+                <div class="votes-count">@CurrentReview.Likes positive votes</div>
+                <div class="vote-buttons">
+                    <button class="vote-btn like @(reviewUserContext.UserReviewVote == 1 ? "active" : "")"
+                            @onclick="() => PostReviewVote(1)" @onclick:stopPropagation>
+                        👍 Like
+                    </button>
+                    <button class="vote-btn dislike @(reviewUserContext.UserReviewVote == -1 ? "active" : "")"
+                            @onclick="() => PostReviewVote(-1)" @onclick:stopPropagation>
+                        👎 Dislike
+                    </button>
+                </div>
+            </div>
+
+            <EditForm Model="@createComment" OnSubmit="PostComment" FormName="PostComment">
+                <div class="leave-comment-container">
+                    @if (string.IsNullOrEmpty(UserProfileImage))
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none"
+                             class="profile-svg">
+                            <!-- Circle background -->
+                            <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
+                            <!-- User icon -->
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                fill="#FE5D26"/>
+                        </svg>
+                    }
+                    else
+                    {
+                        <img id="previewImg" src="@UserProfileImage" alt="Profile Image" class="profile-image"/>
+                    }
+                    @if (!IsLoggedIn)
+                    {
+                        <textarea id="leave-comment-input" class="leave-comment-input" placeholder="Leave a comment..."
+                                  @onclick="OpenModal" readonly @onclick:stopPropagation>
+                                                        </textarea>
+                    }
+                    else
+                    {
+                        <textarea id="leave-comment-input" class="leave-comment-input" rows="1"
+                                  placeholder="Leave a comment..."
+                                  @bind="createComment.Content" @bind:event="oninput"></textarea>
+                    }
+
+                    <Button Text="Comment" BtnType="submit"
+                            BtnDisable="@(string.IsNullOrWhiteSpace(createComment.Content) || IsLoading)">
+                        @if (IsLoading)
+                        {
+                            <LoadingSpinner/>
+                        }
+                        else
+                        {
+                            <span>Comment</span>
+                        }
+                    </Button>
+                </div>
+            </EditForm>
+            <div class="comments-section">
+                <div class="comments-title"> Comments(@CurrentReview.Comments.Count())</div>
+                @foreach (var comment in CurrentReview.Comments)
+                {
+                    <div class="comment">
+                        <div class="comment-header">
+                            @if (string.IsNullOrWhiteSpace(comment.UserInformation.ProfileImage))
                             {
-                                <span>Following</span>
+                                <div class="profile-photo">AM</div>
                             }
                             else
                             {
-                                <span>Follow</span>
+                                <img src="@comment.UserInformation.ProfileImage" alt="profile-picture"
+                                     class="profile-picture-image"/>
                             }
-                        </button>
-                    </div>
-                    <div class="comment-content">
-                        @comment.Content
-                    </div>
-                    <div class="comment-footer">
-                        <div class="comment-meta">
-                            <span>Edited: @comment.LastEditDate.ToString("dd/MM/yyyy")</span>
-                            <span class="likes-count">@comment.Likes likes</span>
-                        </div>
-                        <div class="comment-actions">
-                            <button class="comment-btn @(GetVoteClass(comment.CommentId, 1))"
-                                    @onclick="() => PostCommentVote(1, comment.CommentId)" @onclick:stopPropagation>👍
+                            <div class="user-info">
+                                <div class="username-comment">@comment.UserInformation.UserName</div>
+                                <div class="user-stats">
+                                    <span>@comment.UserInformation.ReviewCount reviews</span>
+                                    <span>•</span>
+                                    <span>@comment.UserInformation.FollowerCount followers</span>
+                                </div>
+                            </div>
+                            <button class="follow-btn"
+                                    @onclick="() => FollowUser(comment.UserInformation.UserId)"
+                                    @onclick:stopPropagation>
+                                @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
+                                {
+                                    <span>Following</span>
+                                }
+                                else
+                                {
+                                    <span>Follow</span>
+                                }
                             </button>
-                            <button class="comment-btn @(GetVoteClass(comment.CommentId, -1))"
-                                    @onclick="() => PostCommentVote(-1, comment.CommentId)" @onclick:stopPropagation>👎
-                            </button>
-                            <button class="comment-btn">💬 Reply</button>
+                        </div>
+                        <div class="comment-content">
+                            @comment.Content
+                        </div>
+                        <div class="comment-footer">
+                            <div class="comment-meta">
+                                <span>Edited: @comment.LastEditDate.ToString("dd/MM/yyyy")</span>
+                                <span class="likes-count">@comment.Likes likes</span>
+                            </div>
+                            <div class="comment-actions">
+                                <button class="comment-btn @(GetVoteClass(comment.CommentId, 1))"
+                                        @onclick="() => PostCommentVote(1, comment.CommentId)"
+                                        @onclick:stopPropagation>👍
+                                </button>
+                                <button class="comment-btn @(GetVoteClass(comment.CommentId, -1))"
+                                        @onclick="() => PostCommentVote(-1, comment.CommentId)"
+                                        @onclick:stopPropagation>👎
+                                </button>
+                                <button class="comment-btn">💬 Reply</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
     </div>
-</div>
-
+}
+else if (_notFound)
+{
+    <NotFound/>
+}
 @if (showModal)
 {
-    <Modal />
+    <Modal/>
 }
-
-<script>
-    const textarea = document.getElementById('leave-comment-input');
-
-    textarea.addEventListener('input', () => {
-        textarea.style.height = 'auto'; // reset height
-        textarea.style.height = textarea.scrollHeight + 'px'; // set to full content height
-    });
-</script>
+@* <script> *@
+@*     const textarea = document.getElementById('leave-comment-input'); *@
+@* *@
+@*     textarea.addEventListener('input', () => { *@
+@*         textarea.style.height = 'auto'; // reset height *@
+@*         textarea.style.height = textarea.scrollHeight + 'px'; // set to full content height *@
+@*     }); *@
+@* </script> *@

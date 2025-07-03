@@ -171,7 +171,8 @@ public class ReviewService : IReviewService
                 var content = await response.Content.ReadFromJsonAsync<ReviewPageData>();
                 return content;
             }
-
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error while fetching the review page data in GetReviewPageDataAsync, status code: {response.StatusCode} - error message:{errorContent}";
             return null;
         }
         catch (Exception ex)

@@ -10,5 +10,5 @@ public interface IUserService
     Task<UserSummaryDto> GetUserSummaryAsync(int userId);
 
     Task<bool> UpdateUserAsync(int userId, UserUpdateRequestDto updateDto);
-    Task<UserPageDataDto> GetUserPageDataAsync(int userId);
+    Task<UserPageDataDto> GetUserPageDataAsync(int targetUserId, int currentUserId);
 }

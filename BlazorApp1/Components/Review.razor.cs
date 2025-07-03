@@ -5,6 +5,7 @@ using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace BlazorApp1.Components;
 
@@ -16,7 +17,10 @@ public partial class Review : ComponentBase
     [Inject] private AuthenticationStateProvider authenticationStateProvider { get; set; }
     [Inject] private IUserService UserService { get; set; }
     [Inject] IHttpContextAccessor HttpContextAccessor { get; set; }
-    private ReviewModel CurrentReview { get; set; } = new ReviewModel();
+    [Inject] private IJSRuntime JSRuntime { get; set; }
+
+    private ReviewModel? CurrentReview { get; set; } = null;
+
     // private UserSummary? userSummary { get; set; } = null;
     private bool IsLoggedIn;
     private string? UserProfileImage { get; set; } = "";
@@ -24,6 +28,8 @@ public partial class Review : ComponentBase
     private ReviewUserContextDto reviewUserContext { get; set; } = new();
     private bool showModal { get; set; }
     private bool IsLoading { get; set; }
+    private bool _scriptInitialized = false;
+    private bool _notFound = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,34 +40,44 @@ public partial class Review : ComponentBase
             IsLoggedIn = true;
             UserProfileImage = user.FindFirst("profile_image")?.Value;
         }
+
         try
         {
             if (ReviewId < 1)
             {
-                Navigation.NavigateTo("/home");
+                _notFound = true;
                 return;
             }
+
             var reviewPageData = await ReviewService.GetReviewPageDataAsync(ReviewId);
             if (reviewPageData == null)
             {
-                Navigation.NavigateTo("/");
+                _notFound = true;
+                return;
             }
-            else
+
+            CurrentReview = reviewPageData.Review;
+            CurrentReview.Comments = reviewPageData.Comments;
+            if (user.Identity != null && user.Identity.IsAuthenticated)
             {
-                CurrentReview = reviewPageData.Review;
-                CurrentReview.Comments = reviewPageData.Comments;
-                if (user.Identity != null && user.Identity.IsAuthenticated)
-                {
-                    reviewUserContext.UserReviewVote = reviewPageData.UserReviewVote;
-                    reviewUserContext.CommentVotes = reviewPageData.CommentVotes;
-                    reviewUserContext.FollowedUserIds = reviewPageData.FollowedUserIds;
-                }
+                reviewUserContext.UserReviewVote = reviewPageData.UserReviewVote;
+                reviewUserContext.CommentVotes = reviewPageData.CommentVotes;
+                reviewUserContext.FollowedUserIds = reviewPageData.FollowedUserIds;
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error while trying to setting current review:" + ex.Message);
             Navigation.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_scriptInitialized && !string.IsNullOrEmpty(CurrentReview?.Title))
+        {
+            _scriptInitialized = true;
+            await JSRuntime.InvokeVoidAsync("autoResizeTextarea", "leave-comment-input");
         }
     }
 
@@ -76,6 +92,7 @@ public partial class Review : ComponentBase
             {
                 CurrentReview.Comments = CurrentReview.Comments.Prepend(newComment).ToList();
                 createComment.Content = "";
+                await JSRuntime.InvokeVoidAsync("resetTextareaHeight");
             }
         }
         catch (Exception ex)

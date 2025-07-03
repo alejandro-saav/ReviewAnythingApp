@@ -50,11 +50,11 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<UserPageDataDto> GetUserPageDataAsync(int userId)
+    public async Task<UserPageDataDto> GetUserPageDataAsync(int targetUserId, int currentUserId)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.GetByIdAsync(targetUserId);
         if(user == null) throw new EntityNotFoundException("User not found");
-        var userPageDate = await _userRepository.GetUserPageDataAsync(userId);
+        var userPageDate = await _userRepository.GetUserPageDataAsync(targetUserId, currentUserId);
         return userPageDate;
     }
 }

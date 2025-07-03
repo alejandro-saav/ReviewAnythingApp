@@ -25,5 +25,11 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 - add the profile page 🌟
 - add functionality to edit the user profile
 
-- Check review page auth logic
-- Do i need to fetch user summary? 
+- Check review page auth logic 🌟
+- Do i need to fetch user summary? 🌟
+
+- Fix comment textarea to rezise it when submit a comment 🌟
+- Fix comments that are wider than the container width 🌟
+
+- Lets make a button component so i can use it in different places
+- Lets make a comment component so to reduce code in the review component

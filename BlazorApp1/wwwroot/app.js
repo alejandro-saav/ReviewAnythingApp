@@ -12,3 +12,26 @@ window.blazorHelpers = {
         }
     }
 };
+
+// Resize textarea when it gets wider
+window.autoResizeTextarea = function(id) {
+    const textarea = document.getElementById(id);
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+    });
+
+    // Store reference for future reset
+    window._autoResizeTextareaElement = textarea;
+};
+
+// Reset size of text area
+window.resetTextareaHeight = function () {
+    const textarea = window._autoResizeTextareaElement;
+    if (textarea) {
+        textarea.style.height = ''; // Resets to default height (usually one line)
+    }
+};

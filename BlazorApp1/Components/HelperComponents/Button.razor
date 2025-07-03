@@ -1,0 +1,12 @@
+<button class="btn" type="@BtnType" disabled="@BtnDisable">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter] public string BtnType { get; set; } = "";
+    [Parameter] public bool BtnDisable { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}
