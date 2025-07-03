@@ -1,6 +1,7 @@
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BlazorApp1.Components;
 
@@ -10,11 +11,18 @@ public partial class Profile : ComponentBase
     [Parameter] public int UserId { get; set; }
 
     [Inject] private NavigationManager Navigation { get; set; }
+    [Inject] private AuthenticationStateProvider AuthState { get; set; }
 
     private UserPageData UserData { get; set; } = new();
+    private bool IsLoggedIn;
+    private bool showModal { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthState.GetAuthenticationStateAsync();
+        var user = authState.User;
+        IsLoggedIn = user.Identity != null && user.Identity.IsAuthenticated;
         try
         {
             var userPageDataRequest = await UserService.GetUserPageDataAsync(UserId);
@@ -31,24 +39,24 @@ public partial class Profile : ComponentBase
         }
     }
 
-    private async Task FollowUser(int userId)
+    private async Task FollowUser()
     {
-        if (userSummary == null)
+        if (!IsLoggedIn)
         {
             OpenModal();
             return;
         }
         var followRequest = new FollowRequest
         {
-            TargetUserId = userId,
+            TargetUserId = UserId,
         };
-        if (reviewUserContext.FollowedUserIds.Contains(userId))
+        if (UserData.IsCurrentUserFollowing)
         {
             // Unfollow?
             var unfollowSuccess = await UserService.UnFollowUserAsync(followRequest);
             if (unfollowSuccess)
             {
-                reviewUserContext.FollowedUserIds.Remove(userId);
+                UserData.IsCurrentUserFollowing = false;
             }
         }
         else
@@ -57,8 +65,18 @@ public partial class Profile : ComponentBase
             var follow = await UserService.FollowUserAsync(followRequest);
             if (follow != null)
             {
-                reviewUserContext.FollowedUserIds.Add(userId);
+                UserData.IsCurrentUserFollowing = true;
             }
         }
+    }
+
+    private void OpenModal()
+    {
+        showModal = true;
+    }
+    
+    private void CloseModal()
+    {
+        showModal = false;
     }
 } 
