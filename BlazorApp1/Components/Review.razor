@@ -98,7 +98,7 @@ else if (CurrentReview != null)
                                   @bind="createComment.Content" @bind:event="oninput"></textarea>
                     }
 
-                    <Button Text="Comment" BtnType="submit"
+                    <Button BtnType="submit"
                             BtnDisable="@(string.IsNullOrWhiteSpace(createComment.Content) || IsLoading)">
                         @if (IsLoading)
                         {
@@ -134,18 +134,19 @@ else if (CurrentReview != null)
                                     <span>@comment.UserInformation.FollowerCount followers</span>
                                 </div>
                             </div>
-                            <button class="follow-btn"
-                                    @onclick="() => FollowUser(comment.UserInformation.UserId)"
-                                    @onclick:stopPropagation>
-                                @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
-                                {
-                                    <span>Following</span>
-                                }
-                                else
-                                {
-                                    <span>Follow</span>
-                                }
-                            </button>
+                            <div @onclick="() => FollowUser(comment.UserInformation.UserId)"
+                                 @onclick:stopPropagation>
+                                <Button>
+                                    @if (reviewUserContext.FollowedUserIds.Contains(comment.UserInformation.UserId))
+                                    {
+                                        <span>Following</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Follow</span>
+                                    }
+                                </Button>
+                            </div>
                         </div>
                         <div class="comment-content">
                             @comment.Content

@@ -97,6 +97,12 @@
     border-radius: 10px;
 }
 
+.following-section {
+    background-color: rgba(0, 0, 0, 0.075);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
 .followers-grid, .following-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
