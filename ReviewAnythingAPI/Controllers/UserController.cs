@@ -27,11 +27,22 @@ public class UserController : ControllerBase
         return Ok(usersInformation);
     }
 
-    [HttpGet("{userId}/summary")]
-    public async Task<IActionResult> GetUserSummaryAsync([FromRoute] int userId)
+    [Authorize]
+    [HttpGet("summary")]
+    public async Task<IActionResult> GetUserSummaryAsync()
     {
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
         var user = await _userService.GetUserSummaryAsync(userId);
         return Ok(user);
+    }
+
+    [Authorize]
+    [HttpPut("summary")]
+    public async Task<IActionResult> UpdateUserSummaryAsync([FromBody] UserUpdateSummaryDto updateDto)
+    {
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
+        var result = await _userService.UpdateUserSummaryAsync(userId, updateDto);
+        return Ok(result);
     }
 
     [Authorize]
@@ -48,7 +59,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UnfollowUser([FromRoute] int targetUserId)
     {
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
-        var success = await _followService.UnFollowUserAsync(targetUserId, userId);
+        var success = await _followService.UnFollowUserAsync(userId, targetUserId);
         if (!success) return BadRequest();
         return NoContent();
     }

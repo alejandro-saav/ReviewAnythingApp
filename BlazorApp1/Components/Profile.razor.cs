@@ -13,9 +13,10 @@ public partial class Profile : ComponentBase
     [Inject] private NavigationManager Navigation { get; set; }
     [Inject] private AuthenticationStateProvider AuthState { get; set; }
 
-    private UserPageData UserData { get; set; } = new();
+    private UserPageData? UserData { get; set; } = null;
     private bool IsLoggedIn;
     private bool showModal { get; set; }
+    private bool _notFound { get; set; } = false;
 
 
     protected override async Task OnInitializedAsync()
@@ -28,10 +29,11 @@ public partial class Profile : ComponentBase
             var userPageDataRequest = await UserService.GetUserPageDataAsync(UserId);
             if (userPageDataRequest == null)
             {
-                Navigation.NavigateTo("/");
+                _notFound = true;
             }
             UserData = userPageDataRequest!;
             Console.WriteLine($"HELLO: {UserData.UserSummary.CreationDate}");
+            Console.WriteLine($"Is user following: {userPageDataRequest?.IsCurrentUserFollowing}");
         }
         catch (Exception ex)
         {

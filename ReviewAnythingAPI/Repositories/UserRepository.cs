@@ -88,4 +88,14 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
             IsCurrentUserFollowing = IsUserFollowing,
         };
     }
+
+    public async Task<UserSummaryDto> UpdateUserSummaryAsync(ApplicationUser user, UserSummaryDto summary)
+    {
+        user.FirstName = summary.FirstName;
+        user.LastName = summary.LastName;
+        user.ProfileImage = summary.ProfileImage;
+        user.Bio = summary.Bio;
+        await _context.SaveChangesAsync();
+        return summary;
+    }
 }

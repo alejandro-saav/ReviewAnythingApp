@@ -3,8 +3,11 @@
 @using BlazorApp1.Components.HelperComponents
 @rendermode InteractiveServer
 
-
-<div class="container">
+@if (UserData == null && !_notFound)
+{
+    <span>loading...</span>
+} else if (UserData != null){
+<div class="container" @onclick="CloseModal" @onclick:stopPropagation>
     <div class="profile-header">
         <img
             src="@UserData.UserSummary.ProfileImage"
@@ -26,17 +29,19 @@
                     <span class="stat-number" id="commentCount">@UserData.TotalComments</span>
                     <span class="stat-label">Comments</span>
                 </div>
-                <button class="follow-btn" @onclick="FollowUser"
-                        @onclick:stopPropagation>
-                    @if (UserData.IsCurrentUserFollowing)
-                    {
-                        <span>Following</span>
-                    }
-                    else
-                    {
-                        <span>Follow</span>
-                    }
-                </button>
+                <div @onclick="FollowUser"
+                     @onclick:stopPropagation>
+                    <Button>
+                        @if (UserData.IsCurrentUserFollowing)
+                        {
+                            <span>Following</span>
+                        }
+                        else
+                        {
+                            <span>Follow</span>
+                        }
+                    </Button>
+                </div>
             </div>
         </div>
     </div>
@@ -87,8 +92,11 @@
         </div>
     </div>
 </div>
-
+} else if (_notFound)
+{
+    <NotFound />
+}
 @if (showModal)
 {
-    <Modal />
+    <Modal/>
 }

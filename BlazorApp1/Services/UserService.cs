@@ -61,12 +61,12 @@ public class UserService : IUserService
     //     }
     // }
 
-    public async Task<UserSummary?> GetUserSummaryAsync(int userId)
+    public async Task<UserSummary?> GetUserSummaryAsync()
     {
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.GetAsync($"api/user/{userId}/summary");
+            var response = await _httpClient.GetAsync($"api/user/summary");
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadFromJsonAsync<UserSummary>();
@@ -115,6 +115,8 @@ public class UserService : IUserService
         {
             var response = await _httpClient.DeleteAsync($"api/user/{followRequest.TargetUserId}/follow");
             if (response.IsSuccessStatusCode) return true;
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error UnFollowUserAsync, status code: {response.StatusCode} - error message:{errorContent}";
             return false;
         }
         catch (Exception ex)
@@ -161,6 +163,20 @@ public class UserService : IUserService
         catch (Exception ex)
         {
             Console.WriteLine($"Error in GetUserPageData service: {ex.Message}");
+            return null;
+        }
+    }
+
+    private async Task<UserSummary?> UpdateUserSummaryAsync(UserSummaryModel model)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/user", model);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in UpdateUserSummaryAsync service: {ex.Message}");
             return null;
         }
     }
