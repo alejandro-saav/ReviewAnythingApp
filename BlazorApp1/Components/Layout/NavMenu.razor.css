@@ -50,6 +50,13 @@
     position: relative;
 }
 
+.svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
 .profile_image {
     width: 45px;
     height: 45px;

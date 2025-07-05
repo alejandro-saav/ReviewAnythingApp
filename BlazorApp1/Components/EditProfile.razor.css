@@ -1,4 +1,10 @@
-.container {
+.edit-profile-container {
+    width: 100vw;
+    background-color: var(--bg-dark);
+    height: 100%;
+}
+
+.edit-profile-wrapper {
     max-width: 600px;
     margin: 0 auto;
     background: var(--card-dark);
@@ -26,7 +32,71 @@
 
 .profile-image-section {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
+}
+
+.image-preview {
+    position: relative;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: rgba(244, 67, 54, 1);
+    color: black;
+}
+
+.upload-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.svg-container {
+    position: relative;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.svg-container:hover {
+    background-color: #4a4a4a;
+}
+.plus-sign {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    stroke: #ddd;
+    color: #ddd;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+    font-weight: bolder;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
 }
 
 .profile-image {
@@ -36,6 +106,19 @@
     object-fit: cover;
     border: 3px solid var(--primary);
     margin-bottom: 20px;
+}
+
+#previewImg {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+
+.choose-new-img {
+    display: block; 
+    margin-top: 8px; 
+    font-size: 0.9rem;
+    color: #ccc;
 }
 
 .form-group {
@@ -80,11 +163,11 @@
     display: flex;
     gap: 16px;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 10px;
 }
 
 .btn {
-    padding: 16px 32px;
+    padding: 8px 32px;
     border: none;
     border-radius: 8px;
     font-size: 1rem;

@@ -70,7 +70,7 @@ public partial class WriteReview : ComponentBase
         }
         if (int.TryParse(userId, out int id))
         {
-            userSummary = await UserService.GetUserSummaryAsync(id);
+            userSummary = await UserService.GetUserSummaryAsync();
         }
     }
 

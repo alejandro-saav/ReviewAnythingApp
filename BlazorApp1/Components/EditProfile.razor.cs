@@ -8,7 +8,6 @@ namespace BlazorApp1.Components;
 public partial class EditProfile : ComponentBase
 {
     [Inject] private IUserService UserService { get; set; }
-    private UserSummary? _userSummary { get; set; } = null;
     private UserSummaryModel UserModel { get; set; } = new();
     private bool _notFound { get; set; } = false;
     private IBrowserFile? ImageFile { get; set; } = null;
@@ -27,7 +26,10 @@ public partial class EditProfile : ComponentBase
                 _notFound = true;
                 return;
             }
-            _userSummary = response;
+            UserModel.FirstName = response.FirstName;
+            UserModel.LastName = response.LastName;
+            UserModel.Bio = response.Bio;
+            ImagePreviewUrl = response.ProfileImage;
         }
         catch (Exception ex)
         {
@@ -42,7 +44,15 @@ public partial class EditProfile : ComponentBase
         IsLoading = true;
         try
         {
-            
+            var newUserSummary = await UserService.UpdateUserSummaryAsync(UserModel);
+            if (newUserSummary != null)
+            {
+               Console.WriteLine($"Success");
+            }
+            else
+            {
+                ErrorMessage = $"An error occured while updating user profile, please try again.";
+            }
         }
         catch (Exception ex)
         {
@@ -57,6 +67,9 @@ public partial class EditProfile : ComponentBase
     private void HandleRemovePhoto()
     {
         ImageFile = null;
+        ImageErrorMessage = null;
+        ImagePreviewUrl =  null;
+        UserModel.DeleteImage = true;
     }
     
     private async Task HandleImageSelected(InputFileChangeEventArgs e)
@@ -73,6 +86,7 @@ public partial class EditProfile : ComponentBase
         }
         ImageFile = file;
         UserModel.ProfileImage = file;
+        UserModel.DeleteImage = false;
 
         // Manage the preview image display
         try

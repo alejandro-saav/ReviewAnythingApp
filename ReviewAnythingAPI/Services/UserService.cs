@@ -37,6 +37,8 @@ public class UserService : IUserService
             UserName = user.UserName,
             ProfileImage = user.ProfileImage,
             FirstName = user.FirstName,
+            LastName = user.LastName,
+            Bio = user.Bio,
         };
     }
 
@@ -82,6 +84,9 @@ public class UserService : IUserService
                 Console.WriteLine($"Error trying to upload profile image to cloudinary: {ex.Message}");
                 throw new InvalidOperationException("Error while uploading the image");
             }
+        } else if (updateDto.ProfileImage == null && updateDto.DeleteImage)
+        {
+            user.ProfileImage = null;
         }
         await _userRepository.UpdateUserSummaryAsync(user,  summary);
         return summary;

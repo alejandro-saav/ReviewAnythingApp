@@ -14,4 +14,5 @@ public class UserUpdateSummaryDto
     [DataType(DataType.MultilineText)]
     public string? Bio { get; set; }
     public IFormFile? ProfileImage { get; set; }
+    public bool DeleteImage  { get; set; }
 }
