@@ -289,4 +289,11 @@ button {
     --input-background-color: #FAEDCA;
     --light-shadow: 0 0 10px #FE5D26;
     --lighter-shadow: 0 0 5px #FE5D26;
+    
+    /* These are only use in the edit profile page*/
+    --bg-dark: #1a1a1a;
+    --card-dark: #2a2a2a;
+    --text-light: #e0e0e0;
+    --text-muted: #999;
+    --border-dark: #404040;
 }

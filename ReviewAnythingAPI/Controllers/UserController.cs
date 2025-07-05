@@ -37,9 +37,10 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("summary")]
-    public async Task<IActionResult> UpdateUserSummaryAsync([FromBody] UserUpdateSummaryDto updateDto)
+    [HttpPatch("summary")]
+    public async Task<IActionResult> UpdateUserSummaryAsync([FromForm] UserUpdateSummaryDto updateDto)
     {
+        // if (!ModelState.IsValid) return BadRequest(ModelState);
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
         var result = await _userService.UpdateUserSummaryAsync(userId, updateDto);
         return Ok(result);

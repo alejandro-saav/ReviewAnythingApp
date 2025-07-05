@@ -93,7 +93,6 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
     {
         user.FirstName = summary.FirstName;
         user.LastName = summary.LastName;
-        user.ProfileImage = summary.ProfileImage;
         user.Bio = summary.Bio;
         await _context.SaveChangesAsync();
         return summary;

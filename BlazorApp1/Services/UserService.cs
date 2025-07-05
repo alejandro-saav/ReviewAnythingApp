@@ -167,12 +167,34 @@ public class UserService : IUserService
         }
     }
 
-    private async Task<UserSummary?> UpdateUserSummaryAsync(UserSummaryModel model)
+    public async Task<UserSummary?> UpdateUserSummaryAsync(UserSummaryModel model)
     {
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/user", model);
+            using var content = new MultipartFormDataContent();
+            content.Add(new StringContent(model.FirstName), "FirstName");
+            content.Add(new StringContent(model.LastName), "LastName");
+            content.Add(new StringContent(model.Bio), "Bio");
+            content.Add(new StringContent(model.DeleteImage.ToString()), "DeleteImage");
+
+            if (model.ProfileImage != null)
+            {
+                const long maxFileSize = 1024 * 1024 * 2;
+                var fileStream = model.ProfileImage.OpenReadStream(maxFileSize);
+                var streamContent = new StreamContent(fileStream);
+                content.Add(streamContent, "ProfileImage", model.ProfileImage.Name);
+            }
+            var response = await _httpClient.PatchAsync("api/user/summary", content);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<UserSummary>();
+                return result;
+            }
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"response failed on UpdateUserSummaryAsync Service error message: {errorContent}";
+            Console.WriteLine($"{LastErrorMessage}");
+            return null;
         }
         catch (Exception ex)
         {

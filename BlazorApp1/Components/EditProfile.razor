@@ -1,4 +1,10 @@
-<div class="container">
+@using System.Reflection.Metadata
+@page "/edit-profile"
+@rendermode InteractiveServer
+@using BlazorApp1.Components.HelperComponents
+
+<div class="edit-profile-container">
+    <div class="edit-profile-wrapper">
         <div class="header">
             <h1>Edit Profile</h1>
             <p>Update your profile information</p>
@@ -7,72 +13,77 @@
         <EditForm Model="@UserModel" OnValidSubmit="HandleProfileEdit" FormName="ProfileEdit">
             <div class="profile-image-section">
                 <div class="upload-container">
-                            <label for="profile-upload" class="profile-upload">
-                                Profile Picture:
-                            </label>
-                            @if (string.IsNullOrEmpty(_userSummary?.ProfileImage))
-                            {
-                                <label class="svg-container" for="profile-upload">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24"
-                                        fill="none">
-                                        <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none" />
-                                        <path
-                                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
-                                            fill="#FE5D26" />
-                                    </svg>
-                                    <span class="plus-sign">+</span>
-
-                                </label>
-                            }
-                            else
-                            {
-                                <label for="profile-upload">
-                                    <div class="image-preview" id="imagePreview">
-                                        @if (string.IsNullOrEmpty(ImagePreviewUrl))
-                                        {
-                                        <img id="previewImg" src="@_userSummary?.ProfileImage" alt="Profile Preview">
-                                        }
-                                        else
-                                        {
-                                            <img id="previewImg" src="@ImagePreviewUrl" alt="Profile Preview">
-                                        }
-                                        <button type="button" class="remove-btn" @onclick="HandleRemovePhoto">×</button>
+                    @if (string.IsNullOrEmpty(ImagePreviewUrl))
+                    {
+                        <label class="svg-container" for="profile-upload">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="65" height="65" viewBox="0 0 24 24"
+                                 fill="none">
+                                <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
+                                <path
+                                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                                    fill="#FE5D26"/>
+                            </svg>
+                            <span class="plus-sign">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-25 h-25" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </span>
+                        </label>
+                    }
+                    else
+                    {
+                        <label for="profile-upload">
+                            <div class="image-preview" id="imagePreview">
+                                <img id="previewImg" src="@ImagePreviewUrl" alt="Profile Preview" />
+                                <button type="button" class="remove-btn" @onclick="HandleRemovePhoto">×</button>
+                                @if (!string.IsNullOrEmpty(ImageErrorMessage))
+                                {
+                                    <div class="error-message img-error-message"
+                                         style="margin-bottom: 10px">@ImageErrorMessage
                                     </div>
-                                </label>
-                            }
-                            <InputFile id="profile-upload" accept="image/*" OnChange="HandleImageSelected"
-                                style="display: none;" />
-                        </div>
-                <div class="file-upload-group">
-                    <input type="file" id="profileImageFile" name="profileImageFile" 
-                           accept="image/*" class="file-upload-input">
-                    <label for="profileImageFile" style="display: block; margin-top: 8px; font-size: 0.9rem;">
-                        Choose a new profile image
-                    </label>
+                                }
+                            </div>
+                        </label>
+                    }
+                    <InputFile id="profile-upload" accept="image/*" OnChange="HandleImageSelected"
+                               style="display: none;"/>
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="firstName">First Name</label>
-                <input type="text" id="firstName" name="firstName" class="form-input" 
-                       value="@_userSummary?.FirstName" placeholder="Enter your first name">
+                <input type="text" id="firstName" name="firstName" class="form-input" @bind="UserModel.FirstName" placeholder="Enter your first name" @bind:event="oninput">
+                <ValidationMessage For="@(() => UserModel.FirstName)"/>
             </div>
 
             <div class="form-group">
                 <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" class="form-input" 
-                       value="@_userSummary?.LastName" placeholder="Enter your last name">
+                <input type="text" id="lastName" name="lastName" class="form-input"
+                        @bind="UserModel.LastName" placeholder="Enter your last name" @bind:event="oninput">
+                <ValidationMessage For="@(() => UserModel.LastName)"/>
             </div>
 
             <div class="form-group">
                 <label for="bio">Bio</label>
-                <textarea id="bio" name="bio" class="form-input textarea" 
-                          placeholder="Tell us about yourself...">@_userSummary?.Bio</textarea>
+                <textarea id="bio" name="bio" class="form-input textarea"
+                          placeholder="Tell us about yourself..." @bind:event="oninput" @bind="UserModel.Bio"></textarea>
+                <ValidationMessage For="@(() => UserModel.Bio)"/>
             </div>
 
             <div class="action-buttons">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="submit" class="btn btn-primary">
+                    @if (IsLoading)
+                    {
+                        <LoadingSpinner />
+                    }
+                    else
+                    {
+                        <span>Save Changes</span>
+                    }
+                    
+                </button>
                 <button type="reset" class="btn btn-secondary">Cancel</button>
             </div>
         </EditForm>
     </div>
+</div>
