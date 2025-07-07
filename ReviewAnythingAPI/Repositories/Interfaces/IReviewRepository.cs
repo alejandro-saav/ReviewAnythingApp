@@ -11,4 +11,5 @@ public interface IReviewRepository : IRepository<Review>
     
     public Task<Review> GetReviewByUserIdAndItemIdAsync(int userId, int itemId);
     public Task<ReviewDetailDto?> GetReviewDetailByIdAsync(int reviewId);
+    public Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId);
 }

@@ -8,6 +8,7 @@ namespace BlazorApp1.Components;
 public partial class EditProfile : ComponentBase
 {
     [Inject] private IUserService UserService { get; set; }
+    [Inject] private NavigationManager Navigation { get; set; }
     private UserSummaryModel UserModel { get; set; } = new();
     private bool _notFound { get; set; } = false;
     private IBrowserFile? ImageFile { get; set; } = null;
@@ -47,6 +48,8 @@ public partial class EditProfile : ComponentBase
             var newUserSummary = await UserService.UpdateUserSummaryAsync(UserModel);
             if (newUserSummary != null)
             {
+                var currentRelativeUrl = Navigation.ToAbsoluteUri(Navigation.Uri).PathAndQuery;
+                Navigation.NavigateTo($"/updateclaims?returnUrl={Uri.EscapeDataString(currentRelativeUrl)}", forceLoad: true);
                Console.WriteLine($"Success");
             }
             else

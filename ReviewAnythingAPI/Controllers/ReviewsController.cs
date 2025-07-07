@@ -92,4 +92,13 @@ public class ReviewsController : ControllerBase
         var data = await _reviewService.GetReviewPageDataAsync(userId, reviewId);
         return Ok(data);
     }
+
+    [Authorize]
+    [HttpGet("myreviews")]
+    public async Task<IActionResult> GetMyReviewsAsync()
+    {
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
+        var reviews = await _reviewService.GetMyReviewsAsync(userId);
+        return Ok(reviews);
+    }
 }

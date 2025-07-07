@@ -19,4 +19,5 @@ public interface IReviewService
     
     Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId);
     Task<ReviewPageDataDto> GetReviewPageDataAsync(int? userId, int reviewId);
+    Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId);
 }

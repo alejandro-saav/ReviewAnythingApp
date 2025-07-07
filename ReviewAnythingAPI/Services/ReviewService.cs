@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Transactions;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ReviewAnythingAPI.Context;
@@ -25,8 +26,9 @@ public class ReviewService : IReviewService
     private readonly ICommentRepository _commentRepository;
     private readonly ICommentVoteRepository _commentVoteRepository;
     private readonly IFollowRepository _followRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, IReviewVoteRepository reviewVoteRepository, ICommentRepository commentRepository, ICommentVoteRepository commentVoteRepository, IFollowRepository followRepository)
+    public ReviewService(IReviewRepository reviewRepository, IItemRepository itemRepository, ITagRepository tagRepository, IReviewTagRepository reviewTagRepository, ReviewAnythingDbContext dbContext, IReviewVoteRepository reviewVoteRepository, ICommentRepository commentRepository, ICommentVoteRepository commentVoteRepository, IFollowRepository followRepository, UserManager<ApplicationUser> userManager)
     {
         _reviewRepository = reviewRepository;
         _itemRepository = itemRepository;
@@ -37,6 +39,7 @@ public class ReviewService : IReviewService
         _commentRepository = commentRepository;
         _commentVoteRepository = commentVoteRepository;
         _followRepository = followRepository;
+        _userManager = userManager;
     }
 
     public async Task<ReviewSummaryDto> CreateReviewAsync(ReviewCreateRequestDto reviewCreateRequestDto, int userId)
@@ -363,5 +366,13 @@ public class ReviewService : IReviewService
         result.Review = review;
         result.Comments = comments;
         return result;
+    }
+
+    public async Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null) throw new EntityNotFoundException("User not found");
+        var userReviews = await _reviewRepository.GetMyReviewsAsync(userId);
+        return userReviews;
     }
 }
