@@ -201,4 +201,28 @@ public class ReviewService : IReviewService
             return false;
         }
     }
+
+    public async Task<IEnumerable<MyReviewsModel>> GetMyReviewsAsync()
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/reviews/myreviews");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<MyReviewsModel>>();
+                return content;
+            }
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error request unsuccessfull: {response.StatusCode} - error message:{errorContent}";
+            Console.WriteLine($"{LastErrorMessage}");
+            return [];
+        }
+        catch (Exception ex)
+        {
+            LastErrorMessage = $"Catch exception on GetMyReviewsAsync ${ex.Message}";
+            Console.WriteLine(LastErrorMessage);
+            return [];
+        }
+    }
 }

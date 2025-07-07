@@ -3,6 +3,7 @@ using BlazorApp1.Models;
 using BlazorApp1.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +40,9 @@ builder.Services.AddHttpClient("ReviewAnythingAPI", client =>
 
 // HttpContextAccessor for accessing the auth token
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<CustomAuthStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<CustomAuthStateProvider>());
 
 //login service
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

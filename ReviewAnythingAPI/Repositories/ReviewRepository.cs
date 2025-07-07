@@ -46,4 +46,20 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
         }).FirstOrDefaultAsync();
         return review;
     }
+
+    public async Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId)
+    {
+        var myReviews = await _context.Reviews.Where(r => r.UserId == userId).Select(r => new  MyReviewsDto
+        {
+            ReviewId = r.ReviewId,
+            Title = r.Title,
+            Content = r.Content,
+            LastEditDate = r.LastEditDate,
+            Rating = r.Rating,
+            Likes = r.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
+            NumberOfComments = r.ReviewComments.Count(),
+            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+        }).ToListAsync();
+        return myReviews;
+    }
 }
