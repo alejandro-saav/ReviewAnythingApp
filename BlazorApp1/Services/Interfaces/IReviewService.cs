@@ -17,4 +17,7 @@ public interface IReviewService
     Task<bool> ReviewVoteAsync(ReviewVote vote);
     Task<bool> CommentVoteAsync(CommentVoteRequest vote);
     Task<IEnumerable<MyReviewsModel>> GetMyReviewsAsync();
+    Task<IEnumerable<LikesReviewsModel>> GetLikesReviewsAsync();
+
+    Task<IEnumerable<MyCommentsPageModel>> GetMyCommentsPage();
 }

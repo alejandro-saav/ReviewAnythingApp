@@ -15,4 +15,6 @@ public interface ICommentService
     public Task DeleteCommentByIdAsync(int commentId, int userId);
     
     public Task<CommentVoteResponseDto> CommentVoteAsync(CommentVoteRequestDto commentVoteRequestDto, int userId);
+
+    public Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId);
 }

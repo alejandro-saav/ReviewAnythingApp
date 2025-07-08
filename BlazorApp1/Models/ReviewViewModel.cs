@@ -9,7 +9,7 @@ public class ReviewViewModel
     public string Title { get; set; }
     
     [Required]
-    [MaxLength(1000)]
+    [MaxLength(10000)]
     public string Content { get; set; }
     
     // [Required(ErrorMessage = "Please select a star rating.")]

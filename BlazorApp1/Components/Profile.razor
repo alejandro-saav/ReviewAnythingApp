@@ -17,7 +17,7 @@
             <h1 class="profile-name" id="fullName">@UserData.UserSummary.FirstName @UserData.UserSummary.LastName</h1>
             <div class="username" id="username">@UserData.UserSummary.UserName</div>
             <div class="join-date" id="joinDate">Member
-                since @UserData.UserSummary.CreationDate?.ToString("MMMM yyyy", CultureInfo.InvariantCulture)</div>
+                since @UserData.UserSummary.CreationDate?.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</div>
             <p class="bio" id="bio">@UserData.UserSummary.Bio</p>
 
             <div class="stats">

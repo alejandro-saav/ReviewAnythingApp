@@ -75,4 +75,20 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
             Likes = _context.CommentVotes.Where(cm => cm.CommentId == comment.CommentId && cm.VoteType == 1).Count(),
         };
     }
+
+    public async Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId)
+    {
+        var comments = await _context.Comments.Where(c => c.UserId == userId).Select(c => new MyCommentsPageDto
+        {
+            CommentId = c.CommentId,
+            Content = c.Content,
+            LastEditDate = c.LastEditDate,
+            ReviewId = c.ReviewId,
+            Likes = _context.CommentVotes.Where(cv => cv.CommentId == c.CommentId && cv.VoteType == 1).Count(),
+            ReviewTitle = c.Review.Title,
+            UserName = c.User.UserName,
+            ProfileImage = c.User.ProfileImage,
+        }).ToListAsync();
+        return comments;
+    }
 }

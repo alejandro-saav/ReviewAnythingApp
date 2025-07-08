@@ -9,4 +9,5 @@ public interface ICommentRepository : IRepository<Comment>
 
     public Task<IEnumerable<CommentResponseDto>> GetAllCommentsByUserIdAsync(int userId);
     public Task<CommentResponseDto> CreateCommentAsync(Comment comment);
+    public Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId);
 }

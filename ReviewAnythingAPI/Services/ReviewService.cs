@@ -375,4 +375,12 @@ public class ReviewService : IReviewService
         var userReviews = await _reviewRepository.GetMyReviewsAsync(userId);
         return userReviews;
     }
+
+    public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null) throw new EntityNotFoundException("User not found");
+        var  userReviews = await _reviewRepository.GetLikesReviewsAsync(userId);
+        return userReviews;
+    }
 }

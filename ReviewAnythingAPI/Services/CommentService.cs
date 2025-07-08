@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
@@ -17,15 +18,17 @@ public class CommentService : ICommentService
     private readonly IRepository<Review> _reviewRepository;
     private readonly ReviewAnythingDbContext _dbContext;
     private readonly ICommentVoteRepository _commentVoteRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public CommentService(ICommentRepository commentRepository, ILogger<CommentService> logger,
-        IRepository<Review> reviewRepository, ReviewAnythingDbContext dbContext, ICommentVoteRepository commentVoteRepository)
+        IRepository<Review> reviewRepository, ReviewAnythingDbContext dbContext, ICommentVoteRepository commentVoteRepository, UserManager<ApplicationUser> userManager)
     {
         _commentRepository = commentRepository;
         _logger = logger;
         _reviewRepository = reviewRepository;
         _dbContext = dbContext;
         _commentVoteRepository = commentVoteRepository;
+        _userManager = userManager;
     }
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByUserAsync(int userId)
@@ -173,5 +176,13 @@ public class CommentService : ICommentService
         }
         await _dbContext.SaveChangesAsync();
         return response;
+    }
+
+    public async Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null) throw new EntityNotFoundException("User not found");
+        var comments = await _commentRepository.GetAllCommentsPageAsync(userId);
+        return comments;
     }
 }

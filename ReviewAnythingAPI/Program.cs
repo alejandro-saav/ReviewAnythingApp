@@ -69,6 +69,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Seed services
+builder.Services.AddHttpClient(); 
+builder.Services.AddTransient<UserSeederService>();
 
 // Adding core identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -126,6 +129,9 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<UserSeederService>();
+    await seeder.SeedUsersAsync(50);
     app.MapOpenApi();
 }
 
