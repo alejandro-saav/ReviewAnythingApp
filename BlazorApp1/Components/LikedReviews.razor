@@ -1,0 +1,73 @@
+@page "/LikedReviews"
+@using System.Globalization
+@using BlazorApp1.Components.HelperComponents
+@rendermode InteractiveServer
+
+ <div class="container">
+        <div class="header">
+            <h1>♥ Liked Reviews</h1>
+            <p>Reviews you've liked from the community</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">@_likesReviews.Count()</div>
+                    <div class="stat-label">Reviews Liked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">@_likesReviews.Select(r => r.User?.UserName).Distinct().Count()</div>
+                    <div class="stat-label">Different Authors</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">@(_likesReviews.Any() ? _likesReviews.Average(r => r.Rating).ToString("0.0") : 0)</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="reviews-grid">
+            <!-- Sample liked reviews -->
+            @foreach(var review in _likesReviews) {
+            <a class="review-card" href="/review/@review.ReviewId">
+                <div class="review-author">
+                    @if (string.IsNullOrEmpty(review.User?.ProfileImage))
+                    {
+                        <ProfileIcon/>
+                    } else {
+                        <img src="@review.User.ProfileImage" alt="Profile" class="profile-img">
+                    }
+                    <div class="author-info">
+                        <div class="username">@review.User.UserName</div>
+                        <div class="author-badge">Followers: @review.CreatorFollowers</div>
+                    </div>
+                </div>
+                <h3 class="review-title">@review.Title</h3>
+                <div class="review-rating">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <span class="star @(i <= review.Rating ? "" : "empty")">★</span>
+                    }
+                </div>
+                <p class="review-content">@(review.Content.Length > 80
+                    ? review.Content.Substring(0, 80) + "..."
+                    : review.Content)</p>
+                <div class="review-meta">
+                    <span>Last edited: @review.LastEditDate.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</span>
+                    <span class="like-status">♥ Liked</span>
+                </div>
+                <div class="review-actions">
+                    <div class="action-item">
+                        <span>♥ @review.Likes likes</span>
+                    </div>
+                    <div class="action-item">
+                        <span>💬 @review.NumberOfComments comments</span>
+                    </div>
+                </div>
+                <div class="tags">
+                    @foreach (var tag in review.Tags)
+                    {
+                        <span class="tag">@tag</span>
+                    }
+                </div>
+            </a>
+            }
+        </div>
+    </div>

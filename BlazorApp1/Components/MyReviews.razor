@@ -1,51 +1,57 @@
 @page "/MyReviews"
+@using System.Globalization
 @rendermode InteractiveServer
 
-<div class="container">
-    <div class="header">
-        <h1>My Reviews</h1>
-        <p>All your reviews in one place</p>
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number" id="totalReviews">8</div>
-                <div class="stat-label">Total Reviews</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="avgRating">4.2</div>
-                <div class="stat-label">Average Rating</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="totalLikes">127</div>
-                <div class="stat-label">Total Likes</div>
+<div class="myreviews-container">
+    <div class="myreviews-wrapper">
+        <div class="header">
+            <h1>My Reviews</h1>
+            <p>All your reviews in one place</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalReviews">@myReviews.Count()</div>
+                    <div class="stat-label">Total Reviews</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number"
+                         id="avgRating">@(myReviews.Any() ? myReviews.Average(r => r.Rating) : 0)</div>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="totalLikes">@myReviews.Select(r => r.Likes).Count()</div>
+                    <div class="stat-label">Total Likes</div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="search-bar">
-        <input type="text" class="search-input" placeholder="Search your reviews..." id="searchInput">
-    </div>
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="Search your reviews..." id="searchInput">
+        </div>
 
-    <div class="reviews-grid" id="reviewsGrid">
-        <!-- Reviews will be populated by JavaScript -->
-            @foreach(var review in myReviews){
-                <div class="review-card">
+        <div class="reviews-grid" id="reviewsGrid">
+            <!-- Reviews will be populated by JavaScript -->
+            @foreach (var review in myReviews)
+            {
+                <a class="review-card" href="/review/@review.ReviewId">
                     <div class="review-header">
                         <div>
                             <h3 class="review-title">@review.Title</h3>
                             <div class="review-rating">
-                                @* ${createStars(review.rating)} *@rating
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star @(i <= review.Rating ? "" : "empty")">★</span>
+                                }
                             </div>
                         </div>
                     </div>
-                    <p class="review-content">@review.Content</p>
+                    <p class="review-content">@(review.Content.Length > 80
+                            ? review.Content.Substring(0, 80) + "..."
+                            : review.Content)</p>
                     <div class="review-meta">
-                        <span>Last edited: @review.LastEditDate</span>
+                        <span>Last edited: @review.LastEditDate.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</span>
                     </div>
                     <div class="review-actions">
                         <div class="action-item">
-                            @* <button class="like-btn ${review.liked ? 'liked' : ''}" onclick="toggleLike(this)"> *@
-                            @*     ${review.liked ? '♥' : '♡'} *@
-                            @* </button> *@
                             <span>@review.Likes likes</span>
                         </div>
                         <div class="action-item">
@@ -55,10 +61,11 @@
                     <div class="tags">
                         @foreach (var tag in review.Tags)
                         {
-                        <span class="tag">@tag</span>
+                            <span class="tag">@tag</span>
                         }
                     </div>
-                </div>
+                </a>
             }
+        </div>
     </div>
 </div>

@@ -1,0 +1,62 @@
+@page "/MyComments"
+@using System.Globalization
+@rendermode InteractiveServer
+
+<div class="container">
+    <div class="header">
+        <h1>💬 My Comments</h1>
+        <p>All your comments across the platform</p>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">@_myComments.Count()</div>
+                <div class="stat-label">Total Comments</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">@_myComments.Sum(c => c.Likes)</div>
+                <div class="stat-label">Total Likes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">0</div>
+                <div class="stat-label">Total Replies</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="comments-grid">
+        <!-- Sample comments -->
+        @foreach (var comment in _myComments)
+        {
+            <a class="comment-card" href="review/@comment.ReviewId">
+                <div class="comment-type">Comment</div>
+                <div class="review-context">
+                    <div class="review-title">@comment.ReviewTitle</div>
+                    <div class="review-author">
+                        <div class="author-icon">S</div>
+                        <span>Review by @comment.UserName</span>
+                    </div>
+                </div>
+                <div class="comment-content">
+                    <div class="comment-text">@(comment.Content.Length > 80
+                            ? comment.Content.Substring(0, 80) + "..."
+                            : comment.Content)</div>
+                </div>
+                <div class="comment-meta">
+                    <div class="edit-date">
+                        <span>📅</span>
+                        <span>Last edited: @comment.LastEditDate.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</span>
+                    </div>
+                </div>
+                <div class="comment-actions">
+                    <div class="action-item">
+                        <span>♥</span>
+                        <span class="likes-count">@comment.Likes likes</span>
+                    </div>
+                    <div class="action-item">
+                        <span>💬</span>
+                        <span class="replies-count">5 replies</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+</div>

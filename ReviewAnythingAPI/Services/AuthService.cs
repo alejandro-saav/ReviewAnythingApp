@@ -75,6 +75,7 @@ public class AuthService : IAuthService
                 IsActive = true,
                 PhoneNumber = userRegistrationDto.Phone,
                 ProfileImage = "",
+                EmailConfirmed = true,
             };
 
             var result = await _userManager.CreateAsync(user, userRegistrationDto.Password);
@@ -104,10 +105,10 @@ public class AuthService : IAuthService
                 }
             }
 
-            var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var encodedToken = Uri.EscapeDataString(verificationToken);
-
-            await _emailService.SendEmailConfirmationAsync(user, encodedToken);
+            // var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            // var encodedToken = Uri.EscapeDataString(verificationToken);
+            //
+            // await _emailService.SendEmailConfirmationAsync(user, encodedToken);
             await transaction.CommitAsync();
             return new AuthResponseDto
             {

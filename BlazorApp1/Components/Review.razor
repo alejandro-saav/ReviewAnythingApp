@@ -1,4 +1,5 @@
 @page "/review/{ReviewId:int}"
+@using System.Globalization
 @using BlazorApp1.Components.HelperComponents
 @rendermode InteractiveServer
 @if (CurrentReview == null && _notFound == false)
@@ -12,7 +13,7 @@ else if (CurrentReview != null)
             <h1 class="title">@CurrentReview.Title</h1>
             <div class="meta-info">
                 <div class="username">by: @CurrentReview.UserName</div>
-                <div class="last-edit">Last edited: @CurrentReview.LastEditDate</div>
+                <div class="last-edit">Last edited: @CurrentReview.LastEditDate.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</div>
             </div>
         </div>
 

@@ -225,4 +225,51 @@ public class ReviewService : IReviewService
             return [];
         }
     }
+
+    public async Task<IEnumerable<LikesReviewsModel>> GetLikesReviewsAsync()
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/reviews/liked-reviews");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();
+                return content;
+            }
+            
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error request unsuccessfull: {response.StatusCode} - error message:{errorContent}";
+            Console.WriteLine($"{LastErrorMessage}");
+            return [];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error On get likes reviews service:" + ex.Message);
+            return [];
+        }
+    }
+
+    public async Task<IEnumerable<MyCommentsPageModel>> GetMyCommentsPage()
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var response = await _httpClient.GetAsync($"api/comment/mycomments-page");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<MyCommentsPageModel>>();
+                return content;
+            }
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error request unsuccessfull on GetMyCommentsPage service: {response.StatusCode} - error message:{errorContent}";
+            Console.WriteLine($"{LastErrorMessage}");
+            return [];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Catch error on GetMyCommentsPage service, error:" + ex.Message);
+            return [];
+        }
+    }
 }

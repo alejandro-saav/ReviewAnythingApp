@@ -94,4 +94,13 @@ public class CommentController : ControllerBase
             _ => StatusCode(500, "Internal server error")
         };
     }
+
+    [Authorize]
+    [HttpGet("mycomments-page")]
+    public async Task<IActionResult> GetMyCommentsPage()
+    {
+        if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId)) return Unauthorized();
+        var comments = await _commentService.GetAllCommentsPageAsync(userId);
+        return Ok(comments);
+    }
 }

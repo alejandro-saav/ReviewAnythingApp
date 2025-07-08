@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
+using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories.Interfaces;
 
@@ -61,5 +62,28 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
             Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
         }).ToListAsync();
         return myReviews;
+    }
+
+    public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId)
+    {
+        var reviews = await _context.ReviewVotes.Where(rv => rv.UserId == userId).Select(rv => new LikesReviewsDto
+        {
+            ReviewId = rv.ReviewId,
+            Title = rv.Review.Title,
+            Content = rv.Review.Content,
+            LastEditDate = rv.Review.LastEditDate,
+            Rating = rv.Review.Rating,
+            Likes = rv.Review.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
+            NumberOfComments = rv.Review.ReviewComments.Count(),
+            Tags = rv.Review.ReviewTags.Select(rr => rr.Tag.TagName).ToList(),
+            User = new UserSummaryDto
+            {
+                UserId = rv.Review.UserId ?? 0,
+                UserName = rv.Review.Creator.UserName ?? "",
+                ProfileImage = rv.Review.Creator.ProfileImage ?? "",
+            },
+            CreatorFollowers = _context.Follows.Where(f => f.FollowingUserId == rv.Review.UserId).Count()
+        }).ToListAsync();
+        return reviews;
     }
 }
