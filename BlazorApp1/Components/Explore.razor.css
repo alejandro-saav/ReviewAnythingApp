@@ -2,6 +2,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 40px 20px;
+    overflow-wrap: break-word;
 }
 
 .page-header {
@@ -233,6 +234,46 @@
     border-color: var(--primary);
 }
 
+.review-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: var(--light);
+    border-radius: 12px;
+}
+
+.profile-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    transition: transform 0.3s ease;
+}
+
+.review-card:hover .profile-img {
+    transform: scale(1.1);
+}
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+.author-badge {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 500;
+}
+
 .review-header {
     display: flex;
     justify-content: space-between;
@@ -263,9 +304,13 @@
     margin-bottom: 15px;
 }
 
-.stars {
-    color: var(--secondary);
+.star {
+    color: var(--primary);
     font-size: 1.2rem;
+}
+
+.star.empty {
+    color: #ddd;
 }
 
 .rating-text {
@@ -286,9 +331,29 @@
 
 .review-tags {
     display: flex;
-    flex-wrap: wrap;
+    /*flex-wrap: wrap;*/
     gap: 6px;
     margin-bottom: 15px;
+    justify-content: space-between;
+    overflow-wrap: break-word;
+}
+
+.error-message {
+    margin-left: 4px;
+    background-color: rgba(244, 67, 54, 0.1);
+    border: 1px solid #f44336;
+    border-radius: 15px;
+    padding: 5px 10px;
+    margin-top: 15px;
+    color: red;
+    font-size: 14px;
+    text-align: center;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .review-tag {

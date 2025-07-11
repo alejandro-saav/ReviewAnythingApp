@@ -272,4 +272,46 @@ public class ReviewService : IReviewService
             return [];
         }
     }
+    
+    private static string BuildQueryString(ExploreQueryParams queryParams)
+    {
+        var parameters = new Dictionary<string, object?>
+        {
+            ["page"] = queryParams.Page,
+            ["sort"] = queryParams.Sort,
+            ["rating"] = queryParams.Rating,
+            ["category"] = queryParams.Category,
+            ["tag"] = string.Join(",", queryParams.Tags ?? [])
+        };
+
+        var filtered = parameters
+            .Where(p => p.Value is not null && !string.IsNullOrEmpty(p.Value.ToString()))
+            .ToDictionary(p => p.Key, p => p.Value!.ToString()!);
+
+        return QueryString.Create(filtered).ToUriComponent();
+    }
+
+    public async Task<IEnumerable<LikesReviewsModel>> GetExplorePageReviewsAsync(ExploreQueryParams queryParams)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            var queryString = BuildQueryString(queryParams); 
+            var response = await _httpClient.GetAsync($"api/reviews/explore{queryString}");
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();
+                return content;
+            }
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error request unsuccessfull on GetExplorePageReviewsAsync service: {response.StatusCode} - error message:{errorContent}";
+            Console.WriteLine($"{LastErrorMessage}");
+            return [];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Catch error on GetExplorePageReviewsAsync service, error:" + ex.Message);
+            return [];
+        }
+    }
 }

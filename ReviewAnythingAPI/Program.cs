@@ -72,6 +72,7 @@ builder.Services.AddOpenApi();
 // Seed services
 builder.Services.AddHttpClient(); 
 builder.Services.AddTransient<UserSeederService>();
+builder.Services.AddTransient<ReviewSeederService>();
 
 // Adding core identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -129,9 +130,30 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    var seeder = scope.ServiceProvider.GetRequiredService<UserSeederService>();
-    await seeder.SeedUsersAsync(50);
+    // SEED 50 USERS;
+    
+    // using var scope = app.Services.CreateScope();
+    // var seeder = scope.ServiceProvider.GetRequiredService<UserSeederService>();
+    // await seeder.SeedUsersAsync(50);
+    
+    // SEED 11371 REVIEWS
+    // using var scope = app.Services.CreateScope();
+    // var seeder = scope.ServiceProvider.GetRequiredService<ReviewSeederService>();
+    // var db = scope.ServiceProvider.GetRequiredService<ReviewAnythingDbContext>();
+    //
+    // var path = Path.Combine("SeedsDatabase", "reviews_sortv6.json");
+    // if (!File.Exists(path))
+    // {
+    //     Console.WriteLine("❌ File not found: " + path);
+    //     return;
+    // }
+    //
+    // var reviewJson = File.ReadAllText(path);
+    //
+    // var userIds = await db.Users.Select(u => u.Id).ToListAsync();
+    // var categoryIds = await db.Categories.Select(c => c.CategoryId).ToListAsync();
+    //
+    // await seeder.SeedReviewsAsync(reviewJson, userIds, categoryIds, 11371);
     app.MapOpenApi();
 }
 

@@ -144,9 +144,9 @@ p {
 }
 
 a {
-    color: var(--primary-color); /* Links use primary color */
+    /*color: var(--primary-color); !* Links use primary color *!*/
     text-decoration: none;
-    transition: color 0.2s ease-in-out;
+    /*transition: color 0.2s ease-in-out;*/
 }
 
 /*a:hover {*/

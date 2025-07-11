@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
 using ReviewAnythingAPI.Enums;
+using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories;
@@ -382,5 +383,11 @@ public class ReviewService : IReviewService
         if (user == null) throw new EntityNotFoundException("User not found");
         var  userReviews = await _reviewRepository.GetLikesReviewsAsync(userId);
         return userReviews;
+    }
+
+    public async Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto,  int pageSize)
+    {
+        var reviews = await _reviewRepository.GetExplorePageReviewsAsync(queryParamsDto, pageSize);
+        return reviews;
     }
 }
