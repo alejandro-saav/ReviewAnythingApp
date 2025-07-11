@@ -37,3 +37,10 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 
 - Lets make a button component so i can use it in different places 🌟
 - Lets make a comment component so to reduce code in the review component 🌟
+
+- Populate the reviews with data 🌟
+- Finish the explore page 
+    - first fetch last 9 reviews 🌟
+    - need to re done the page with claude, want to show user data. 🌟
+    - lets make the sorting functionality work 
+- Re style the necessary pages

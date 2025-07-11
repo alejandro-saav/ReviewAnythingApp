@@ -5,6 +5,7 @@ namespace ReviewAnythingAPI.DTOs.ReviewDTOs;
 public class LikesReviewsDto
 {
     public int ReviewId { get; set; }
+    public string Category { get; set; } = "";
     public string Title { get; set; } = "";
     public string Content { get; set; } = "";
     public int Likes { get; set; } 
@@ -14,4 +15,7 @@ public class LikesReviewsDto
     public int NumberOfComments { get; set; }
     public UserSummaryDto? User { get; set; }
     public int CreatorFollowers { get; set; }
+    public int Total { get; set; }
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
 }

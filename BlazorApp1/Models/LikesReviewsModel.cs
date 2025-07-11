@@ -3,6 +3,7 @@ namespace BlazorApp1.Models;
 public class LikesReviewsModel
 {
     public int ReviewId { get; set; }
+    public string Category { get; set; } = "";
     public string Title { get; set; } = "";
     public string Content { get; set; } = "";
     public int Likes { get; set; } 
@@ -12,4 +13,5 @@ public class LikesReviewsModel
     public int NumberOfComments { get; set; }
     public UserSummary? User { get; set; }
     public int CreatorFollowers { get; set; }
+    public int Total { get; set; }
 }

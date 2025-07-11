@@ -8,9 +8,9 @@ window.blazorHelpers = {
                 if (event.key === 'Enter') {
                     event.preventDefault();
                 }
-            });
+            },);
         }
-    }
+    },
 };
 
 // Resize textarea when it gets wider
@@ -22,7 +22,7 @@ window.autoResizeTextarea = function(id) {
     textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
-    });
+    },);
 
     // Store reference for future reset
     window._autoResizeTextareaElement = textarea;
@@ -35,3 +35,4 @@ window.resetTextareaHeight = function () {
         textarea.style.height = ''; // Resets to default height (usually one line)
     }
 };
+

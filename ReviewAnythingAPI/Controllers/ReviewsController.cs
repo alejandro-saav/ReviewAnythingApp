@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
 using ReviewAnythingAPI.Enums;
+using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Controllers;
@@ -108,6 +109,14 @@ public class ReviewsController : ControllerBase
     {
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
         var reviews = await _reviewService.GetLikesReviewsAsync(userId);
+        return Ok(reviews);
+    }
+
+    [HttpGet("explore")]
+    public async Task<IActionResult> GetExplorePageReviewsAsync([FromQuery] ExploreQueryParamsDto queryParamsDto)
+    {
+        int pageSize = 9;
+        var reviews = await _reviewService.GetExplorePageReviewsAsync(queryParamsDto, pageSize);
         return Ok(reviews);
     }
 }

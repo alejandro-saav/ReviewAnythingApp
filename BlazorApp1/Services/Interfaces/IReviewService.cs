@@ -20,4 +20,5 @@ public interface IReviewService
     Task<IEnumerable<LikesReviewsModel>> GetLikesReviewsAsync();
 
     Task<IEnumerable<MyCommentsPageModel>> GetMyCommentsPage();
+    Task<IEnumerable<LikesReviewsModel>> GetExplorePageReviewsAsync(ExploreQueryParams queryParams);
 }

@@ -1,5 +1,6 @@
 using ReviewAnythingAPI.DTOs.CommentDTOs;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
+using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.Repositories.Interfaces;
 
 namespace ReviewAnythingAPI.Services.Interfaces;
@@ -22,4 +23,5 @@ public interface IReviewService
     Task<ReviewPageDataDto> GetReviewPageDataAsync(int? userId, int reviewId);
     Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId);
     Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId);
+    Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto, int pageSize);
 }

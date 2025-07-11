@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
 using ReviewAnythingAPI.DTOs.UserDTOs;
+using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.Models;
 using ReviewAnythingAPI.Repositories.Interfaces;
 
@@ -83,6 +84,73 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
                 ProfileImage = rv.Review.Creator.ProfileImage ?? "",
             },
             CreatorFollowers = _context.Follows.Where(f => f.FollowingUserId == rv.Review.UserId).Count()
+        }).ToListAsync();
+        return reviews;
+    }
+
+    public async Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto, int pageSize)
+    {
+        var query = _context.Reviews.AsQueryable();
+        if (queryParamsDto.Sort == null || !SortOptions.All.Contains(queryParamsDto.Sort))
+        {
+            queryParamsDto.Sort = SortOptions.DateDesc;
+        }
+
+        if (queryParamsDto.Rating is not null)
+        {
+            query = query.Where(r => r.Rating == queryParamsDto.Rating);
+        }
+
+        if (!string.IsNullOrEmpty(queryParamsDto.Category))
+        {
+            query = query.Where(r => r.ReviewItem.ItemCategory.CategoryName == queryParamsDto.Category);
+        }
+
+        if (queryParamsDto.Tags.Any())
+        {
+                query = query.Where(r => queryParamsDto.Tags.All(t => r.ReviewTags.Select(rt => rt.Tag.TagName).Contains(t)));
+        }
+
+        switch (queryParamsDto.Sort?.ToLower())
+        {
+            case SortOptions.RatingAsc:
+                query = query.OrderBy(r => r.Rating);
+                break;
+            case SortOptions.RatingDesc:
+                query = query.OrderByDescending(r => r.Rating);
+                break;
+            case SortOptions.DateAsc:
+                query = query.OrderBy(r => r.CreationDate);
+                break;
+            case SortOptions.DateDesc:
+                query = query.OrderByDescending(r => r.CreationDate);
+                break;
+            default:
+                query = query.OrderByDescending(r => r.CreationDate);
+                break;
+        }
+        int total = await _context.Reviews.CountAsync();
+        var reviews = await query.Skip((queryParamsDto.Page - 1) * pageSize).Take(pageSize).Select(r => new LikesReviewsDto
+        {
+            ReviewId = r.ReviewId,
+            Category = r.ReviewItem.ItemCategory.CategoryName,
+            Title = r.Title,
+            Content = r.Content,
+            Likes = r.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
+            LastEditDate = r.LastEditDate,
+            Rating = r.Rating,
+            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            NumberOfComments = r.ReviewComments.Count(),
+            User = new  UserSummaryDto
+            {
+                UserId = r.UserId ?? 0,
+                UserName = r.Creator.UserName ?? "",
+                ProfileImage = r.Creator.ProfileImage ?? "",
+            },
+            CreatorFollowers = r.Creator.UserFollows.Count(),
+            PageNumber = queryParamsDto.Page,
+            PageSize = pageSize,
+            Total = total,
         }).ToListAsync();
         return reviews;
     }
