@@ -42,5 +42,8 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 - Finish the explore page 
     - first fetch last 9 reviews 🌟
     - need to re done the page with claude, want to show user data. 🌟
-    - lets make the sorting functionality work 
+    - lets make the sorting functionality work 🌟
+    - highlitght the sorting options when they are active 🌟
+    - unhighlight the sorting options 🌟
+    - make possible to remove written tags 🌟
 - Re style the necessary pages

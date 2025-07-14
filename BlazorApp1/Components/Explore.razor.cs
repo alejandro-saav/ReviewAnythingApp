@@ -19,6 +19,7 @@ public partial class Explore : ComponentBase
     private IEnumerable<Category> categories { get; set; } = [];
     public string ErrorTagMessage { get; set; } = "";
     private string NewTag { get; set; } = "";
+    private CancellationTokenSource _cts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -36,6 +37,7 @@ public partial class Explore : ComponentBase
             {
                 reviews = fetchReviews;
                 TotalReviews = reviews.Select(r => r.Total).FirstOrDefault();
+                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -56,7 +58,7 @@ public partial class Explore : ComponentBase
         }
     }
 
-    private async void HandleSortChange(ChangeEventArgs e)
+    private async Task HandleSortChange(ChangeEventArgs e)
     {
         var selectedValue = e.Value?.ToString();
         if (!string.IsNullOrEmpty(selectedValue))
@@ -67,21 +69,21 @@ public partial class Explore : ComponentBase
         }
     }
 
-    private async void HandleCategoryChange(string category)
+    private async Task HandleCategoryChange(string category)
     {
         QueryParams.Category = category;
         UpdateQueryInUrl();
         await FetchReviews();
     }
 
-    private async void HandleRatingFilter(int rating)
+    private async Task HandleRatingFilter(int? rating)
     {
         QueryParams.Rating = rating;
         UpdateQueryInUrl();
         await FetchReviews();
     }
 
-    private async void HandleTagFilter(KeyboardEventArgs e)
+    private async Task HandleTagFilter(KeyboardEventArgs e)
     {
         ErrorTagMessage = string.Empty;
         if (e.Key == "Enter" && !string.IsNullOrEmpty(NewTag))
@@ -99,6 +101,30 @@ public partial class Explore : ComponentBase
             NewTag = "";
         }
     }
+    
+    private async Task RemoveTag(string tag)
+    {
+        QueryParams.Tags.Remove(tag);
+        UpdateQueryInUrl();
+        await FetchReviews();
+    }
+
+    private async Task HandleSearchInput(ChangeEventArgs e)
+    {
+        QueryParams.Search = e.Value?.ToString() ?? "";
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(500, _cts.Token);
+            UpdateQueryInUrl();
+            await FetchReviews();
+        }
+        catch (TaskCanceledException ex)
+        {
+            Console.WriteLine("Catch in Handle Search Input" + ex);
+        }
+    }
 
     private void UpdateQueryInUrl()
     {
@@ -108,7 +134,8 @@ public partial class Explore : ComponentBase
             ["sort"] = QueryParams.Sort,
             ["rating"] = QueryParams.Rating,
             ["Category"] = QueryParams.Category,
-            ["tags"] = string.Join(",", QueryParams.Tags)
+            ["tags"] = string.Join(",", QueryParams.Tags),
+            ["search"] = QueryParams.Search,
         };
 
         var filtered = parameters.Where(p => p.Value is not null && !string.IsNullOrEmpty(p.Value.ToString()))
@@ -124,7 +151,7 @@ public partial class Explore : ComponentBase
         var query = QueryHelpers.ParseQuery(uri.Query);
         QueryParams.Page = query.TryGetValue("page", out var pageVal) && int.TryParse(pageVal, out var p) ? p : 1;
 
-        QueryParams.Tags = query.TryGetValue("tag", out var tagVal)
+        QueryParams.Tags = query.TryGetValue("tags", out var tagVal)
             ? tagVal.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries).ToList()
             : [];
 
@@ -133,10 +160,13 @@ public partial class Explore : ComponentBase
 
         QueryParams.Category = query.TryGetValue("category", out var catVal) ? catVal.ToString() : null;
         QueryParams.Sort = query.TryGetValue("sort", out var sortVal) ? sortVal.ToString() : null;
+        QueryParams.Search = query.TryGetValue("search", out var searchVal) ? searchVal.ToString() : null;
     }
 
     private void NavigatePage(int pageNumber)
     {
-        Navigation.NavigateTo($"/explore?page={pageNumber}", forceLoad: true);
+        QueryParams.Page = pageNumber;
+        var pageParams = ReviewService.BuildQueryString(QueryParams);
+        Navigation.NavigateTo($"/explore{pageParams}", forceLoad: true);
     }
 }

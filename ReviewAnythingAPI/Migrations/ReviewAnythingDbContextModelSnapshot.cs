@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 using ReviewAnythingAPI.Context;
 
 #nullable disable
@@ -511,6 +512,13 @@ namespace ReviewAnythingAPI.Migrations
                     b.Property<int>("Rating")
                         .HasColumnType("integer");
 
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "simple")
+                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Title", "Content" });
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -523,6 +531,10 @@ namespace ReviewAnythingAPI.Migrations
                     b.HasIndex("ItemId");
 
                     b.HasIndex("Rating");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
 
                     b.HasIndex("UserId");
 

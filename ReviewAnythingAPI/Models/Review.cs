@@ -1,3 +1,5 @@
+using NpgsqlTypes;
+
 namespace ReviewAnythingAPI.Models;
 
 public class Review
@@ -10,6 +12,8 @@ public class Review
     public int Rating { get; set; }
     public int? UserId { get; set; }
     public int ItemId { get; set; }
+    // Property for fast search functionality
+    public NpgsqlTsVector SearchVector { get; set; }
     
     // Navigation Properties
     public ApplicationUser? Creator { get; set; }
