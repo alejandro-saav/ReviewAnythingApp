@@ -1,0 +1,74 @@
+@page "/ExploreCategories"
+
+<div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+<div class="container">
+    <div class="header">
+        <h1>Categories</h1>
+        <p>Discover and review everything that matters to you. Choose a category to start exploring.</p>
+    </div>
+
+    <div class="categories-grid" id="categoriesGrid">
+        <a class="category-card" data-category="books" href="/explore?Category=Books">
+            <div class="category-icon">📚</div>
+            <h3>Books</h3>
+            <p>Novels, non-fiction, poetry, and everything literary. Share your thoughts on the latest reads.</p>
+        </a>
+
+        <a class="category-card" data-category="movies" href="/explore?Category=Movies">
+            <div class="category-icon">🎬</div>
+            <h3>Movies</h3>
+            <p>From blockbusters to indie films. Review the latest releases and timeless classics.</p>
+        </a>
+
+        <a class="category-card" data-category="music" href="/explore?category=Music">
+            <div class="category-icon">🎵</div>
+            <h3>Music</h3>
+            <p>Albums, singles, concerts, and artists. Share your musical discoveries and favorites.</p>
+        </a>
+
+        <a class="category-card" data-category="games" href="/explore?Category=Games">
+            <div class="category-icon">🎮</div>
+            <h3>Games</h3>
+            <p>Video games, board games, mobile games. Rate and review your gaming experiences.</p>
+        </a>
+
+        <a class="category-card" data-category="technology" href="/explore?Category=Technology">
+            <div class="category-icon">⚡</div>
+            <h3>Technology</h3>
+            <p>Gadgets, apps, software, and tech innovations. Help others make informed decisions.</p>
+        </a>
+
+        <a class="category-card" data-category="art" href="/explore?Category=Art">
+            <div class="category-icon">🎨</div>
+            <h3>Art</h3>
+            <p>Paintings, sculptures, digital art, and exhibitions. Express your artistic perspectives.</p>
+        </a>
+
+        <a class="category-card" data-category="science" href="/explore?Category=Science">
+            <div class="category-icon">🔬</div>
+            <h3>Science</h3>
+            <p>Research papers, documentaries, and scientific discoveries. Dive into the world of knowledge.</p>
+        </a>
+    </div>
+</div>
+
+<script>
+    // Parallax effect for floating shapes
+        document.addEventListener('mousemove', function(e) {
+            const shapes = document.querySelectorAll('.shape');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            shapes.forEach((shape, index) => {
+                const speed = (index + 1) * 0.5;
+                const xPos = (x - 0.5) * speed * 20;
+                const yPos = (y - 0.5) * speed * 20;
+                shape.style.transform = `translate(${xPos}px, ${yPos}px)`;
+            });
+        });
+    </script>

@@ -1,5 +1,4 @@
 @page "/"
-    <input type="file" id="fileInput" />
 <section class="hero" id="home">
     <div class="hero-container">
         <div class="hero-content">
@@ -7,8 +6,8 @@
             <p>Your voice matters. Share honest reviews about products, places, movies, books, and literally anything
                 else. Join a community that values authentic opinions.</p>
             <div class="cta-buttons">
-                <a href="#write" class="btn btn-primary">✍️ Write a Review</a>
-                <a href="#explore" class="btn btn-secondary">🔍 Explore Reviews</a>
+                <a href="/write" class="btn btn-primary">✍️ Write a Review</a>
+                <a href="/explore" class="btn btn-secondary">🔍 Explore Reviews</a>
             </div>
         </div>
         <div class="hero-visual">
@@ -151,7 +150,7 @@
         <h2>Ready to Share Your Voice?</h2>
         <p>Join thousands of reviewers helping others make better decisions. Your opinion matters and can help shape the
             experiences of others.</p>
-        <a href="#" class="btn btn-white">Start Writing Reviews</a>
+        <a href="/write" class="btn btn-white">Start Writing Reviews</a>
     </div>
 </section>
 
@@ -217,42 +216,4 @@
     if (statsSection) {
         statsObserver.observe(statsSection);
     }
-
-    document.getElementById('fileInput').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        console.log("file", file);
-        console.log("type file", typeof file);
-        const reader = new FileReader();
-
-        reader.onload = function (e) {
-            const text = e.target.result;
-            console.log("text", text);
-
-            if (!text || typeof text !== 'string') {
-                console.error('File is empty or unreadable');
-                return;
-            }
-
-            const lines = text
-                .split(/\r?\n/)               // split into lines
-                .filter(line => line.trim()); // remove empty lines
-
-            const objects = [];
-
-            for (let line of lines) {
-                try {
-                    const obj = JSON.parse(line);
-                    objects.push(obj);
-                } catch (err) {
-                    console.error('Skipping invalid line:', err.message);
-                }
-
-                if (objects.length >= 10) break;
-            }
-
-            console.log(objects);
-        };
-
-        reader.readAsText(file);
-    });
 </script>

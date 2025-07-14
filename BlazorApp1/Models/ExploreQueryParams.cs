@@ -7,4 +7,5 @@ public class ExploreQueryParams
     public string? Category { get; set; }
     public List<string> Tags { get; set; } = [];
     public string? Sort { get; set; }
+    public string? Search { get; set; }
 }

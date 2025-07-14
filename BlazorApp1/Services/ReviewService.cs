@@ -273,7 +273,7 @@ public class ReviewService : IReviewService
         }
     }
     
-    private static string BuildQueryString(ExploreQueryParams queryParams)
+    public string BuildQueryString(ExploreQueryParams queryParams)
     {
         var parameters = new Dictionary<string, object?>
         {
@@ -281,7 +281,8 @@ public class ReviewService : IReviewService
             ["sort"] = queryParams.Sort,
             ["rating"] = queryParams.Rating,
             ["category"] = queryParams.Category,
-            ["tag"] = string.Join(",", queryParams.Tags ?? [])
+            ["tags"] = string.Join(",", queryParams.Tags),
+            ["search"] = queryParams.Search,
         };
 
         var filtered = parameters

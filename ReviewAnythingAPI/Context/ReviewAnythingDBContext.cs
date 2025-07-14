@@ -59,6 +59,8 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
         modelBuilder.Entity<Review>().HasIndex(r => r.UserId);
         modelBuilder.Entity<Review>().HasIndex(r => r.ItemId);
         modelBuilder.Entity<Review>().HasIndex(r => r.Rating);
+        
+        modelBuilder.Entity<Review>().HasGeneratedTsVectorColumn(r => r.SearchVector, "simple", r => new { r.Title, r.Content}).HasIndex(r => r.SearchVector).HasMethod("GIN");
 
         // Tags Constraints
         modelBuilder.Entity<Tag>().HasIndex(t => t.TagName).IsUnique();
