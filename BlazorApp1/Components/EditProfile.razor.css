@@ -1,33 +1,35 @@
 .edit-profile-container {
     width: 100vw;
-    background-color: var(--bg-dark);
+    background-color: var(--background-containerv2);
     height: 100%;
+    padding: 20px;
 }
 
 .edit-profile-wrapper {
-    max-width: 600px;
+    max-width: 400px;
     margin: 0 auto;
     background: var(--card-dark);
     border-radius: 16px;
-    padding: 40px;
+    padding: 10px;
     border: 1px solid var(--border-dark);
 }
 
 .header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 .header h1 {
     color: var(--primary);
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
     margin-bottom: 8px;
 }
 
 .header p {
     color: var(--text-muted);
-    font-size: 1.1rem;
+    color: #eee;
+    font-size: 1rem;
 }
 
 .profile-image-section {
@@ -109,8 +111,8 @@
 }
 
 #previewImg {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
 }
 
@@ -135,7 +137,7 @@
 
 .form-input {
     width: 100%;
-    padding: 16px 20px;
+    padding: 8px 20px;
     border: 2px solid var(--border-dark);
     border-radius: 8px;
     font-size: 1rem;

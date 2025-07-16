@@ -369,19 +369,19 @@ public class ReviewService : IReviewService
         return result;
     }
 
-    public async Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId)
+    public async Task<IEnumerable<LikesReviewsDto>> GetMyReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null) throw new EntityNotFoundException("User not found");
-        var userReviews = await _reviewRepository.GetMyReviewsAsync(userId);
+        var userReviews = await _reviewRepository.GetMyReviewsAsync(userId, pageSize, queryParamsDto);
         return userReviews;
     }
 
-    public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId)
+    public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null) throw new EntityNotFoundException("User not found");
-        var  userReviews = await _reviewRepository.GetLikesReviewsAsync(userId);
+        var  userReviews = await _reviewRepository.GetLikesReviewsAsync(userId, pageSize, queryParamsDto);
         return userReviews;
     }
 

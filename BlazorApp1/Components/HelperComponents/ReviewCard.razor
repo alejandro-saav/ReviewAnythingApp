@@ -1,0 +1,54 @@
+@using BlazorApp1.Models
+<a class="review-card" data-category="books" data-rating="5" data-tags="fantasy,epic,bestseller"
+   href="/review/@review.ReviewId">
+    <div class="review-author">
+        @if (string.IsNullOrEmpty(review.User.ProfileImage))
+        {
+            <ProfileIcon/>
+        }
+        else
+        {
+            <img
+                src="@review.User.ProfileImage"
+                alt="Profile" class="profile-img">
+        }
+        <div class="author-info">
+            <div class="username">@review.User.UserName</div>
+            <div class="author-badge">Followers: @review.CreatorFollowers</div>
+        </div>
+    </div>
+    <div class="helper-container">
+        <div class="review-header">
+            <div>
+                <h3 class="review-title">@review.Title</h3>
+                <div class="review-category">@review.Category</div>
+            </div>
+        </div>
+        <div class="review-rating">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <span class="star @(i <= review.Rating ? "" : "empty")">★</span>
+            }
+            <span class="rating-text">@review.Rating/5 stars</span>
+        </div>
+        <div class="review-content">
+            @review.Content
+        </div>
+        <div class="review-tags">
+            <div class="tags-container">
+                @foreach (var tag in review.Tags)
+                {
+                    <span class="review-tag">@tag</span>
+                }
+            </div>
+            <div class="review-actions">
+                <button class="action-btn">👍 @review.Likes</button>
+                <button class="action-btn">💬 @review.NumberOfComments</button>
+            </div>
+        </div>
+    </div>
+</a>
+
+@code {
+    [Parameter] public LikesReviewsModel review { get; set; }
+}

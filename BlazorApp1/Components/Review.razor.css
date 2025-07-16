@@ -1,7 +1,7 @@
 .container {
-  max-width: 800px;
+  /*max-width: 800px;*/
   margin: 0 auto;
-  background: white;
+  /*background: white;*/
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -14,7 +14,7 @@
 }
 
 .header {
-  background: linear-gradient(135deg, var(--primary) 0%, #e54a1f 100%);
+  /*background: linear-gradient(135deg, var(--primary) 0%, #e54a1f 100%);*/
   padding: 1rem 2rem;
   color: white;
   position: relative;
@@ -41,6 +41,7 @@
   margin-bottom: 0.5rem;
   position: relative;
   z-index: 1;
+  color: var(--primary);
 }
 
 .meta-info {
@@ -125,18 +126,19 @@
 .rating-text {
   font-size: 1.8rem;
   font-weight: 600;
-  color: var(--dark);
+  /*color: var(--dark);*/
+  color: #eee;
   border-bottom: 1px solid var(--dark);
 }
 
 .review-content {
-  background: #fafafa;
+  /*background: #fafafa;*/
   padding: 2rem;
   border-radius: 15px;
   border-left: 5px solid var(--primary);
   margin-bottom: 2rem;
   font-size: 1.1rem;
-  color: var(--dark);
+  color: #eee;
   line-height: 1.8;
   position: relative;
   overflow-wrap: break-word;
@@ -160,7 +162,8 @@
 .tags-title {
   font-size: 1.2rem;
   font-weight: 600;
-  color: var(--dark);
+  /*color: var(--dark);*/
+  color: #eee;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -180,6 +183,7 @@
 .tag {
   background: linear-gradient(135deg, var(--accent) 0%, #b3d1a3 100%);
   color: var(--dark);
+  /*color: #eee;*/
   padding: 0.6rem 1.2rem;
   border-radius: 5px;
   font-size: 0.9rem;
@@ -272,7 +276,8 @@
 .votes-count {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--dark);
+  /*color: var(--dark);*/
+  color: #eee;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -289,7 +294,8 @@
 }
 
 .vote-btn {
-  background: var(--light);
+  /*background: var(--light);*/
+  background: none;
   border: 2px solid var(--accent);
   border-radius: 5px;
   padding: 0.5rem 1.2rem;
@@ -300,7 +306,8 @@
   gap: 0.5rem;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--dark);
+  /*color: var(--dark);*/
+  color: #eee;
 }
 
 .vote-btn:hover {
@@ -352,6 +359,7 @@
   width: 100%;
   align-items: flex-end;
   position: relative;
+  margin-bottom: 1rem;
 }
 
 .profile-svg {
@@ -363,20 +371,22 @@
   border: none;
   border-bottom: var(--input-border);
   margin-bottom: 8px; */
-  width: 70%;
+  width: 80%;
   padding: 6px 10px;
   /*border: 3px solid var(--primary-dark);*/
   border: none;
   border-bottom: var(--input-border);
   border-radius: 5px;
   font-size: 16px;
-  color: #000;
+  /*color: #000;*/
+  color: #eee;
   box-sizing: border-box;
   transition: all 0.3s ease;
   resize: none;
   overflow: hidden;
-  box-shadow: var(--lighter-shadow);
-  height: 2.5rem;
+  /*box-shadow: var(--lighter-shadow);*/
+  height: 3rem !important;
+  background-color: var(--dark);
 }
 
 .leave-comment-input:focus {
@@ -398,8 +408,9 @@
 .comments-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--dark);
-  margin-bottom: 2rem;
+  /*color: var(--dark);*/
+  color: #eee;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;

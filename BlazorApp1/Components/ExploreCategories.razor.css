@@ -2,6 +2,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    /*background: var(--background-containerv2);*/
 }
 
 .header {
@@ -23,8 +24,9 @@
 
 .header p {
     font-size: 1.2rem;
-    color: var(--dark);
-    opacity: 0.8;
+    /*color: var(--dark);*/
+    color: #eee;
+    /*opacity: 0.8;*/
     max-width: 600px;
     margin: 0 auto;
 }
