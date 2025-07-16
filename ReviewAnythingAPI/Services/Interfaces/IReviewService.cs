@@ -21,7 +21,7 @@ public interface IReviewService
     
     Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId);
     Task<ReviewPageDataDto> GetReviewPageDataAsync(int? userId, int reviewId);
-    Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId);
-    Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId);
+    Task<IEnumerable<LikesReviewsDto>> GetMyReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto);
+    Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto);
     Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto, int pageSize);
 }

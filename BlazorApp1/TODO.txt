@@ -46,4 +46,17 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
     - highlitght the sorting options when they are active 🌟
     - unhighlight the sorting options 🌟
     - make possible to remove written tags 🌟
+    - lets do the search functionality 🌟
+    - Update the query paramsDto in both applications to accept the search term 🌟
+    - Create the function in the code behind 🌟
+    - update the repository method for the search functionality 🌟
+    - lets edit the myreviews page so that i can use the review card
+    - change the repository method so that it return a likes reviewsDto
+    - change the service as well in the api
+    - change the model received in the service
+    - display the cards with the new component
+    - fix the rating average
+    - add pagination
+    - add search
+    - change style
 - Re style the necessary pages

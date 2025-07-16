@@ -202,15 +202,16 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<IEnumerable<MyReviewsModel>> GetMyReviewsAsync()
+    public async Task<IEnumerable<LikesReviewsModel>> GetMyReviewsAsync(ExploreQueryParams queryParams)
     {
         LastErrorMessage = null;
+        var queryString = BuildQueryString(queryParams);
         try
         {
-            var response = await _httpClient.GetAsync($"api/reviews/myreviews");
+            var response = await _httpClient.GetAsync($"api/reviews/myreviews{queryString}");
             if (response.IsSuccessStatusCode)
             {
-                var content = await response.Content.ReadFromJsonAsync<IEnumerable<MyReviewsModel>>();
+                var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();
                 return content;
             }
             var errorContent = await response.Content.ReadAsStringAsync();
@@ -226,12 +227,13 @@ public class ReviewService : IReviewService
         }
     }
 
-    public async Task<IEnumerable<LikesReviewsModel>> GetLikesReviewsAsync()
+    public async Task<IEnumerable<LikesReviewsModel>> GetLikesReviewsAsync(ExploreQueryParams queryParams)
     {
         LastErrorMessage = null;
+        var queryString = BuildQueryString(queryParams);
         try
         {
-            var response = await _httpClient.GetAsync($"api/reviews/liked-reviews");
+            var response = await _httpClient.GetAsync($"api/reviews/liked-reviews{queryString}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();

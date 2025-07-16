@@ -96,19 +96,21 @@ public class ReviewsController : ControllerBase
 
     [Authorize]
     [HttpGet("myreviews")]
-    public async Task<IActionResult> GetMyReviewsAsync()
+    public async Task<IActionResult> GetMyReviewsAsync([FromQuery] ExploreQueryParamsDto queryParamsDto)
     {
+        int pageSize = 9;
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
-        var reviews = await _reviewService.GetMyReviewsAsync(userId);
+        var reviews = await _reviewService.GetMyReviewsAsync(userId, pageSize, queryParamsDto);
         return Ok(reviews);
     }
 
     [Authorize]
     [HttpGet("liked-reviews")]
-    public async Task<IActionResult> GetLikedReviewsAsync()
+    public async Task<IActionResult> GetLikedReviewsAsync([FromQuery] ExploreQueryParamsDto queryParamsDto)
     {
+        int pageSize = 9;
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
-        var reviews = await _reviewService.GetLikesReviewsAsync(userId);
+        var reviews = await _reviewService.GetLikesReviewsAsync(userId, pageSize, queryParamsDto);
         return Ok(reviews);
     }
 

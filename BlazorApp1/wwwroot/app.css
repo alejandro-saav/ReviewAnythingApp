@@ -26,8 +26,10 @@ html {
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; /* Common system fonts */
     line-height: 1.6;
-    color: var(--text-color);
-    background-color: var(--secondary);
+    /*color: var(--text-color);*/
+    color: #eee;
+    /*background-color: var(--secondary);*/
+    background-color: var(--background-containerv2);
     -webkit-font-smoothing: antialiased; /* Improves font rendering on macOS/iOS */
     -moz-osx-font-smoothing: grayscale; /* Improves font rendering on macOS/iOS */
     min-height: 100vh; /* Ensure body takes full viewport height */
@@ -140,7 +142,7 @@ h5 { font-size: 1.25rem; }/* ~20px */
 h6 { font-size: 1rem; }   /* ~16px */
 
 p {
-    margin-bottom: var(--space-md);
+    /*margin-bottom: var(--space-md);*/
 }
 
 a {
@@ -285,6 +287,7 @@ button {
     
     --title-color: #FE5D26;
     --input-border: 2px solid #FE5D26;
+    --input-border-wider: 4px solid #FE5D26;
     --wrapper-border: 5px solid #FE5D26;
     --input-background-color: #FAEDCA;
     --light-shadow: 0 0 10px #FE5D26;
@@ -296,4 +299,7 @@ button {
     --text-light: #e0e0e0;
     --text-muted: #999;
     --border-dark: #404040;
+    
+    
+    --background-containerv2: rgba(34, 34, 34, 0.95);
 }

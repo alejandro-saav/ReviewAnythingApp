@@ -12,7 +12,9 @@ public interface IReviewRepository : IRepository<Review>
 
     public Task<Review> GetReviewByUserIdAndItemIdAsync(int userId, int itemId);
     public Task<ReviewDetailDto?> GetReviewDetailByIdAsync(int reviewId);
-    public Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId);
-    public Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId);
+    public Task<IEnumerable<LikesReviewsDto>> GetMyReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParams);
+    public Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParams);
     public Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto, int pageSize);
+
+    public IQueryable<Review> FilterReviews(ExploreQueryParamsDto queryParamsDto, int? userId = null, int? likedByUserId = null);
 }

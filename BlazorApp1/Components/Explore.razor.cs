@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using BlazorApp1.HelperClasses;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
@@ -23,7 +24,7 @@ public partial class Explore : ComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        ReadQuery();
+        QueryParams = PaginationHelper.ReadFromUri(Navigation.ToAbsoluteUri(Navigation.Uri));
         await FetchReviews();
         await FetchCategories();
     }
@@ -128,40 +129,10 @@ public partial class Explore : ComponentBase
 
     private void UpdateQueryInUrl()
     {
-        var parameters = new Dictionary<string, object?>
-        {
-            ["page"] = QueryParams.Page,
-            ["sort"] = QueryParams.Sort,
-            ["rating"] = QueryParams.Rating,
-            ["Category"] = QueryParams.Category,
-            ["tags"] = string.Join(",", QueryParams.Tags),
-            ["search"] = QueryParams.Search,
-        };
-
-        var filtered = parameters.Where(p => p.Value is not null && !string.IsNullOrEmpty(p.Value.ToString()))
-            .ToDictionary(p => p.Key, p => p.Value?.ToString());
-
-        var uri = Navigation.BaseUri + "explore" + QueryString.Create(filtered);
+        var uri = PaginationHelper.BuildUriFromParams("/explore", QueryParams);
         Navigation.NavigateTo(uri, forceLoad: false);
     }
-
-    private void ReadQuery()
-    {
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        var query = QueryHelpers.ParseQuery(uri.Query);
-        QueryParams.Page = query.TryGetValue("page", out var pageVal) && int.TryParse(pageVal, out var p) ? p : 1;
-
-        QueryParams.Tags = query.TryGetValue("tags", out var tagVal)
-            ? tagVal.ToString().Split(",", StringSplitOptions.RemoveEmptyEntries).ToList()
-            : [];
-
-        QueryParams.Rating =
-            query.TryGetValue("rating", out var rVal) && int.TryParse(rVal, out var rInt) ? rInt : null;
-
-        QueryParams.Category = query.TryGetValue("category", out var catVal) ? catVal.ToString() : null;
-        QueryParams.Sort = query.TryGetValue("sort", out var sortVal) ? sortVal.ToString() : null;
-        QueryParams.Search = query.TryGetValue("search", out var searchVal) ? searchVal.ToString() : null;
-    }
+    
 
     private void NavigatePage(int pageNumber)
     {

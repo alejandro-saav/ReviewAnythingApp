@@ -1,3 +1,4 @@
+using System.Numerics;
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
@@ -14,86 +15,19 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
     {
     }
 
-    public async Task<IEnumerable<Review>> GetAllReviewsByUserIdAsync(int userId)
-    {
-        return await _context.Reviews.Where(r => r.UserId == userId).ToListAsync();
-    }
-
-    public async Task<IEnumerable<Review>> GetAllReviewsByItemIdAsync(int itemId)
-    {
-        return await _context.Reviews.Where(r => r.ItemId == itemId).ToListAsync();
-    }
-
-    public async Task<Review> GetReviewByUserIdAndItemIdAsync(int userId, int itemId)
-    {
-        return await _context.Reviews.FirstOrDefaultAsync(r => r.UserId == userId && r.ItemId == itemId);
-    }
-
-    public async Task<ReviewDetailDto?> GetReviewDetailByIdAsync(int reviewId)
-    {
-        var review = await _context.Reviews.Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
-        {
-            ReviewId = r.ReviewId,
-            Title = r.Title,
-            Content = r.Content,
-            CreationDate = r.CreationDate,
-            LastEditDate = r.LastEditDate,
-            Rating = r.Rating,
-            ItemId = r.ItemId,
-            UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
-            UserId = r.UserId,
-            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
-            UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
-            DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
-            TotalVotes = r.ReviewVotes.Count()
-        }).FirstOrDefaultAsync();
-        return review;
-    }
-
-    public async Task<IEnumerable<MyReviewsDto>> GetMyReviewsAsync(int userId)
-    {
-        var myReviews = await _context.Reviews.Where(r => r.UserId == userId).Select(r => new MyReviewsDto
-        {
-            ReviewId = r.ReviewId,
-            Title = r.Title,
-            Content = r.Content,
-            LastEditDate = r.LastEditDate,
-            Rating = r.Rating,
-            Likes = r.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
-            NumberOfComments = r.ReviewComments.Count(),
-            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
-        }).ToListAsync();
-        return myReviews;
-    }
-
-    public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId)
-    {
-        var reviews = await _context.ReviewVotes.Where(rv => rv.UserId == userId).Select(rv => new LikesReviewsDto
-        {
-            ReviewId = rv.ReviewId,
-            Title = rv.Review.Title,
-            Content = rv.Review.Content,
-            LastEditDate = rv.Review.LastEditDate,
-            Rating = rv.Review.Rating,
-            Likes = rv.Review.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
-            NumberOfComments = rv.Review.ReviewComments.Count(),
-            Tags = rv.Review.ReviewTags.Select(rr => rr.Tag.TagName).ToList(),
-            User = new UserSummaryDto
-            {
-                UserId = rv.Review.UserId ?? 0,
-                UserName = rv.Review.Creator.UserName ?? "",
-                ProfileImage = rv.Review.Creator.ProfileImage ?? "",
-            },
-            CreatorFollowers = _context.Follows.Where(f => f.FollowingUserId == rv.Review.UserId).Count()
-        }).ToListAsync();
-        return reviews;
-    }
-
-    public async Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto,
-        int pageSize)
+    public IQueryable<Review> FilterReviews(ExploreQueryParamsDto queryParamsDto,  int? userId = null, int? likedByUserId = null)
     {
         var query = _context.Reviews.AsQueryable();
+        if (userId.HasValue)
+        {
+            query = query.Where(r => r.UserId == userId.Value);
+        }
 
+        if (likedByUserId.HasValue)
+        {
+            query = query.Where(r => r.ReviewVotes.Any(v => v.UserId == likedByUserId.Value && v.VoteType == 1));
+        }
+        
         if (!string.IsNullOrEmpty(queryParamsDto.Search))
         {
             query = query.Where(r =>
@@ -151,6 +85,108 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
                     break;
             }
         }
+
+        return query;
+    }
+    public async Task<IEnumerable<Review>> GetAllReviewsByUserIdAsync(int userId)
+    {
+        return await _context.Reviews.Where(r => r.UserId == userId).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Review>> GetAllReviewsByItemIdAsync(int itemId)
+    {
+        return await _context.Reviews.Where(r => r.ItemId == itemId).ToListAsync();
+    }
+
+    public async Task<Review> GetReviewByUserIdAndItemIdAsync(int userId, int itemId)
+    {
+        return await _context.Reviews.FirstOrDefaultAsync(r => r.UserId == userId && r.ItemId == itemId);
+    }
+
+    public async Task<ReviewDetailDto?> GetReviewDetailByIdAsync(int reviewId)
+    {
+        var review = await _context.Reviews.Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
+        {
+            ReviewId = r.ReviewId,
+            Title = r.Title,
+            Content = r.Content,
+            CreationDate = r.CreationDate,
+            LastEditDate = r.LastEditDate,
+            Rating = r.Rating,
+            ItemId = r.ItemId,
+            UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
+            UserId = r.UserId,
+            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
+            DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
+            TotalVotes = r.ReviewVotes.Count()
+        }).FirstOrDefaultAsync();
+        return review;
+    }
+
+    public async Task<IEnumerable<LikesReviewsDto>> GetMyReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
+    {
+        var query = FilterReviews(queryParamsDto: queryParamsDto, userId: userId);
+
+        int total = await query.CountAsync();
+        var myReviews = await query.Skip((queryParamsDto.Page - 1) * pageSize).Take(pageSize).Select(r => new LikesReviewsDto
+        {
+            ReviewId = r.ReviewId,
+            Category = r.ReviewItem.ItemCategory.CategoryName,
+            Title = r.Title,
+            Content = r.Content,
+            LastEditDate = r.LastEditDate,
+            Rating = r.Rating,
+            Likes = r.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
+            NumberOfComments = r.ReviewComments.Count(),
+            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            User = new UserSummaryDto
+            {
+                UserId = userId,
+                UserName = r.Creator!.UserName ?? "",
+                ProfileImage = r.Creator.ProfileImage,
+            },
+            CreatorFollowers = r.Creator.UserFollows.Count(),
+            PageNumber = queryParamsDto.Page,
+            PageSize = pageSize,
+            Total = total,
+        }).ToListAsync();
+        return myReviews;
+    }
+
+    public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
+    {
+        var query = FilterReviews(queryParamsDto,likedByUserId: userId);
+        int total = await query.CountAsync();
+        var reviews = await query.Skip((queryParamsDto.Page -1) * pageSize).Take(pageSize).Select(r => new LikesReviewsDto
+        {
+            ReviewId = r.ReviewId,
+            Title = r.Title,
+            Category = r.ReviewItem.ItemCategory.CategoryName,
+            Content = r.Content,
+            LastEditDate = r.LastEditDate,
+            Rating = r.Rating,
+            Likes = r.ReviewVotes.Where(r => r.VoteType == 1).Count(),
+            NumberOfComments = r.ReviewComments.Count(),
+            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            User = new UserSummaryDto
+            {
+                UserId = r.UserId ?? 0,
+                UserName = r.Creator.UserName ?? "",
+                ProfileImage = r.Creator.ProfileImage ?? "",
+            },
+            CreatorFollowers = r.Creator.UserFollows.Count(),
+            PageNumber = queryParamsDto.Page,
+            PageSize = pageSize,
+            Total = total,
+        }).ToListAsync();
+        return reviews;
+    }
+    
+    public async Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto,
+        int pageSize)
+    {
+        var query = FilterReviews(queryParamsDto);
 
         // int total = await _context.Reviews.CountAsync();
         int total = await query.CountAsync();
