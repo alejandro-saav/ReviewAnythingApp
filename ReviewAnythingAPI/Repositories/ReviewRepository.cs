@@ -114,8 +114,12 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
             LastEditDate = r.LastEditDate,
             Rating = r.Rating,
             ItemId = r.ItemId,
-            UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
-            UserId = r.UserId,
+            User = new UserSummaryDto
+            {
+                UserId = r.UserId ?? 0,
+                UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
+                ProfileImage = r.Creator != null ? r.Creator.ProfileImage ?? "" : "",
+            },
             Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
             UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
             DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
