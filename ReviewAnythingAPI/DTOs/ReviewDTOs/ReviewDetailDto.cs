@@ -1,3 +1,4 @@
+using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.HelperClasses.ValidationClasses;
 
 namespace ReviewAnythingAPI.DTOs.ReviewDTOs;
@@ -11,8 +12,7 @@ public class ReviewDetailDto
     public DateTime? LastEditDate { get; set; }
     public int Rating { get; set; }
 
-    public string UserName { get; set; } = "";
-    public int? UserId {get; set;}
+    public UserSummaryDto User { get; set; } = new();
     public int ItemId { get; set; }
     public List<string> Tags { get; set; } = new List<string>();
     public int UpVoteCount { get; set; }

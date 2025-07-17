@@ -36,3 +36,16 @@ window.resetTextareaHeight = function () {
     }
 };
 
+// window.googleAuth = {
+//     renderButton: function(dotNetHelper) {
+//         google.accounts.id.initialize({
+//             client_id: "",
+//             callback: function(response) {
+//                 dotNetHelper.invokeMethodAsync("GoogleSignInSucceeded", response.credential);
+//             }
+//         });
+//        
+//         google.accounts.id.renderButton(document.getElementById("googleButtonDiv"), { theme: "outline", size: "large"});
+//     }
+// }
+

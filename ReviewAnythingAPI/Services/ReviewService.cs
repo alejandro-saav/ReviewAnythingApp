@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
+using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.Enums;
 using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
@@ -262,7 +263,10 @@ public class ReviewService : IReviewService
                     LastEditDate = r.LastEditDate,
                     Rating = r.Rating,
                     ItemId = r.ItemId,
-                    UserId = userId,
+                    User = new UserSummaryDto
+                    {
+                        UserId = r.UserId ?? 0,
+                    },
                     Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
                     DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
                     UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
@@ -283,7 +287,10 @@ public class ReviewService : IReviewService
                     LastEditDate = r.LastEditDate,
                     Rating = r.Rating,
                     ItemId = r.ItemId,
-                    UserId = r.UserId,
+                    User = new UserSummaryDto
+                    {
+                        UserId = r.UserId ?? 0,
+                    },
                     Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
                     DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
                     UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),

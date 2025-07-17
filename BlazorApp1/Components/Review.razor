@@ -12,8 +12,30 @@ else if (CurrentReview != null)
         <div class="header">
             <h1 class="title">@CurrentReview.Title</h1>
             <div class="meta-info">
-                <div class="username">by: @CurrentReview.UserName</div>
-                <div class="last-edit">Last edited: @CurrentReview.LastEditDate.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</div>
+                @if (CurrentReview.User.UserId == 0)
+                {
+                    <div class="user-deleted">
+                        <ProfileIcon/>
+                        User Deleted
+                    </div>
+                }
+                else
+                {
+                    <a class="username" href="profile/@CurrentReview.User.UserId">
+                        @if (string.IsNullOrEmpty(CurrentReview.User.ProfileImage))
+                        {
+                            <ProfileIcon/>
+                        }
+                        else
+                        {
+                            <img src="@CurrentReview.User.ProfileImage" class="profile-picture-image"
+                                 alt="Profile image"/>
+                        }
+                        @(string.IsNullOrEmpty(CurrentReview.User.UserName) ? "User Deleted" : CurrentReview.User.UserName)
+                    </a>
+                }
+                <div class="last-edit">Last
+                    edited: @CurrentReview.LastEditDate.ToString("dd MMMM yyyy", CultureInfo.InvariantCulture)</div>
             </div>
         </div>
 
@@ -75,7 +97,8 @@ else if (CurrentReview != null)
                         @if (string.IsNullOrEmpty(UserProfileImage))
                         {
                             <div class="svg-container">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                                     fill="none"
                                      class="profile-svg">
                                     <!-- Circle background -->
                                     <circle cx="12" cy="12" r="11" stroke="#FE5D26" stroke-width="2" fill="none"/>
@@ -92,15 +115,16 @@ else if (CurrentReview != null)
                         }
                         @if (!IsLoggedIn)
                         {
-                            <textarea id="leave-comment-input" class="leave-comment-input" placeholder="Leave a comment..."
-                                  @onclick="OpenModal" readonly @onclick:stopPropagation>
+                            <textarea id="leave-comment-input" class="leave-comment-input"
+                                      placeholder="Leave a comment..."
+                                      @onclick="OpenModal" readonly @onclick:stopPropagation>
                                                         </textarea>
                         }
                         else
                         {
                             <textarea id="leave-comment-input" class="leave-comment-input"
-                                  placeholder="Leave a comment..."
-                                  @bind="createComment.Content" @bind:event="oninput"></textarea>
+                                      placeholder="Leave a comment..."
+                                      @bind="createComment.Content" @bind:event="oninput"></textarea>
                         }
 
                         <Button BtnType="submit"
@@ -122,15 +146,27 @@ else if (CurrentReview != null)
                         <div class="comment-header">
                             @if (string.IsNullOrWhiteSpace(comment.UserInformation.ProfileImage))
                             {
-                                <div class="profile-photo">AM</div>
+                                <div class="profile-photo">UD</div>
                             }
                             else
                             {
-                                <img src="@comment.UserInformation.ProfileImage" alt="profile-picture"
-                                     class="profile-picture-image"/>
+                                <a href="profile/@comment.UserInformation.UserId">
+                                    <img src="@comment.UserInformation.ProfileImage" alt="profile-picture"
+                                         class="profile-picture-image"/>
+                                </a>
                             }
                             <div class="user-info">
-                                <div class="username-comment">@comment.UserInformation.UserName</div>
+                                @if (comment.UserInformation.UserId == 0)
+                                {
+                                    <div class="user-comment-deleted">
+                                        User Deleted
+                                    </div>
+                                }
+                                else
+                                {
+                                    <a class="username-comment"
+                                       href="/profile/@comment.UserInformation.UserId">@comment.UserInformation.UserName</a>
+                                }
                                 <div class="user-stats">
                                     <span>@comment.UserInformation.ReviewCount reviews</span>
                                     <span>•</span>
@@ -160,11 +196,11 @@ else if (CurrentReview != null)
                                 <span class="likes-count">@comment.Likes likes</span>
                             </div>
                             <div class="comment-actions">
-                                <button class="comment-btn @(GetVoteClass(comment.CommentId, 1))"
+                                <button class="comment-btn like @(GetVoteClass(comment.CommentId, 1))"
                                         @onclick="() => PostCommentVote(1, comment.CommentId)"
                                         @onclick:stopPropagation>👍
                                 </button>
-                                <button class="comment-btn @(GetVoteClass(comment.CommentId, -1))"
+                                <button class="comment-btn dislike @(GetVoteClass(comment.CommentId, -1))"
                                         @onclick="() => PostCommentVote(-1, comment.CommentId)"
                                         @onclick:stopPropagation>👎
                                 </button>
