@@ -9,7 +9,7 @@ public class AuthService : IAuthService
     private readonly HttpClient _httpClient;
     private readonly NavigationManager _navigationManager;
     //private readonly ILocalStorageService _localStorage;
-    
+
     public string? LastErrorMessage { get; private set; }
 
     public AuthService(IHttpClientFactory httpClientFactory, NavigationManager navigationManager)
@@ -23,7 +23,7 @@ public class AuthService : IAuthService
         LastErrorMessage = null;
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("api/auth/Login",request);
+            var response = await _httpClient.PostAsJsonAsync("api/auth/Login", request);
             if (response.IsSuccessStatusCode)
             {
                 LoginResponse loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
@@ -49,13 +49,13 @@ public class AuthService : IAuthService
         try
         {
             using var content = new MultipartFormDataContent();
-            content.Add(new  StringContent(request.UserName), "UserName");
-            content.Add(new  StringContent(request.Email), "Email");
-            content.Add(new  StringContent(request.FirstName), "FirstName");
-            content.Add(new  StringContent(request.LastName ?? ""), "LastName");
-            content.Add(new  StringContent(request.Password), "Password");
-            content.Add(new  StringContent(request.Phone ?? ""), "Phone");
-            content.Add(new  StringContent(request.Bio ?? ""), "Bio");
+            content.Add(new StringContent(request.UserName), "UserName");
+            content.Add(new StringContent(request.Email), "Email");
+            content.Add(new StringContent(request.FirstName), "FirstName");
+            content.Add(new StringContent(request.LastName ?? ""), "LastName");
+            content.Add(new StringContent(request.Password), "Password");
+            content.Add(new StringContent(request.Phone ?? ""), "Phone");
+            content.Add(new StringContent(request.Bio ?? ""), "Bio");
 
             if (request.ProfileImage != null)
             {
@@ -64,6 +64,7 @@ public class AuthService : IAuthService
                 var streamContent = new StreamContent(fileStream);
                 content.Add(streamContent, "ProfileImage", request.ProfileImage.Name);
             }
+
             var response = await _httpClient.PostAsync("api/auth/Register", content);
             if (response.IsSuccessStatusCode)
             {
@@ -136,7 +137,9 @@ public class AuthService : IAuthService
         try
         {
             var encodedToken = Uri.EscapeDataString(token);
-            var response = await _httpClient.PostAsJsonAsync($"api/auth/reset-password?userId={userId}&token={encodedToken}", newPassword);
+            var response =
+                await _httpClient.PostAsJsonAsync($"api/auth/reset-password?userId={userId}&token={encodedToken}",
+                    newPassword);
             if (response.IsSuccessStatusCode)
             {
                 return true;
@@ -152,6 +155,31 @@ public class AuthService : IAuthService
         {
             LastErrorMessage = $"Network error during forgot-password: {ex.Message}";
             return false;
+        }
+    }
+
+    public async Task<LoginResponse> GoogleLoginAsync(string idToken)
+    {
+        LastErrorMessage = null;
+        try
+        {
+            GoogleSignInRequestDto request = new GoogleSignInRequestDto { IdToken = idToken };
+            var response = await _httpClient.PostAsJsonAsync("api/auth/google-signin", request);
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                return content;
+            }
+
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error response failed on GoogleLoginAsync: {response.StatusCode}. {errorContent}";
+            Console.WriteLine(LastErrorMessage);
+            return new LoginResponse { ErrorMessage = LastErrorMessage, Success = false };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error on GoogleLoginAsync, AuthService, error: {ex.Message}");
+            return new LoginResponse { ErrorMessage = ex.Message, Success = false };
         }
     }
 }

@@ -18,6 +18,7 @@ public class Login : PageModel
     public string? ErrorMessage { get; set; }
     
     private readonly IAuthService _authService;
+    private readonly GoogleOAuthService _googleOAuthService;
     
     [BindProperty]
     public LoginRequest LoginModel { get; set; } = new LoginRequest();
@@ -29,9 +30,58 @@ public class Login : PageModel
         _configuration = configuration;
     }
     
-    public void OnGet()
+    public async Task<IActionResult> OnGetAsync()
     {
         GoogleClientId = _configuration["Google:ClientId"] ?? throw new InvalidOperationException("Google ClientId not set");
+        var code = Request.Query["code"].FirstOrDefault();
+        var error = Request.Query["error"].FirstOrDefault();
+        if (!string.IsNullOrEmpty(error))
+        {
+            ErrorMessage = error;
+        }
+
+        if (string.IsNullOrEmpty(code))
+        {
+            ErrorMessage = "Code not found";
+        }
+
+        try
+        {
+            var googleTokenResponse = await _googleOAuthService.ExchangeCodeForTokenAsync(code);
+            if (string.IsNullOrEmpty(googleTokenResponse.IdToken))
+            {
+                ErrorMessage = "Token not found";
+            }
+
+            var loginResponse = await _authService.LoginAsync(LoginModel);
+            if (loginResponse == null || !loginResponse.Success)
+            {
+                ErrorMessage = "Invalid username or password";
+                return Page();
+            }
+
+            ;
+            var jwt = loginResponse.Token;
+            Response.Cookies.Append("jwt", jwt, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax
+            });
+            var principal = GetClaimsFromToken(jwt);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+            return Redirect("/");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            return Page();
+        }
+    }
+
+    public async Task OnPostGoogleLogin()
+    {
+        await _googleOAuthService.SignInAsync();
     }
 
     public ClaimsPrincipal GetClaimsFromToken(string jwtToken)

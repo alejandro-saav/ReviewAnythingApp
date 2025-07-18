@@ -21,19 +21,22 @@
 
                 <div class="form-group">
                     <label for="Email">Email</label>
-                    <input type="text" id="Email" name="Email" value="@Model.LoginModel.Email" class="form-input" placeholder="Email Address"/>
+                    <input type="text" id="Email" name="Email" value="@Model.LoginModel.Email" class="form-input"
+                           placeholder="Email Address"/>
                     @Html.ValidationMessage("Email", null, new { @class = "validation-error" })
                 </div>
 
                 <div class="form-group">
                     <label for="Password">Password</label>
-                    <input type="password" id="Password" name="Password" value="@Model.LoginModel.Password" class="form-input" placeholder="Password"/>
+                    <input type="password" id="Password" name="Password" value="@Model.LoginModel.Password"
+                           class="form-input" placeholder="Password"/>
                     @Html.ValidationMessage("Password", null, new { @class = "validation-error" })
                 </div>
 
                 <div class="form-options">
                     <label class="checkbox-container">
-                        <input type="checkbox" id="RememberMe" name="RememberMe" @(Model.LoginModel.RememberMe ? "checked" : "") />
+                        <input type="checkbox" id="RememberMe" name="RememberMe"
+                               @(Model.LoginModel.RememberMe ? "checked" : "")/>
                         <span class="checkmark"></span>
                         Remember me
                     </label>
@@ -57,32 +60,35 @@
             <div class="need-account"><span>Need an account? <a href="/signup">Sign up</a></span></div>
 
             <div class="divider">or</div>
-
-            @* <button class="gsi-material-button"> *@
-            @*     <div class="gsi-material-button-state"></div> *@
-            @*     <div class="gsi-material-button-content-wrapper"> *@
-            @*         <div class="gsi-material-button-icon"> *@
-            @*             <!-- SVG icon here --> *@
-            @*             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;"> *@
-            @*                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path> *@
-            @*                 <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path> *@
-            @*                 <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path> *@
-            @*                 <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path> *@
-            @*                 <path fill="none" d="M0 0h48v48H0z"></path> *@
-            @*             </svg> *@
-            @*         </div> *@
-            @*         <span class="gsi-material-button-contents">Sign in with Google</span> *@
-            @*     </div> *@
-            @* </button> *@
-            <div id="googleButtonDiv"></div>
-
-            <div id="authError" class="alert alert-danger mt-3" style="display:none;"></div>
+            <form method="post">
+                <button class="gsi-material-button" type="submit" asp-page-handler="GoogleLogin">
+                    <div class="gsi-material-button-state"></div>
+                    <div class="gsi-material-button-content-wrapper">
+                        <div class="gsi-material-button-icon">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"
+                                 xmlns:xlink="http://www.w3.org/1999/xlink" style="display: block;">
+                                <path fill="#EA4335"
+                                      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                                <path fill="#4285F4"
+                                      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                                <path fill="#FBBC05"
+                                      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                                <path fill="#34A853"
+                                      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                                <path fill="none" d="M0 0h48v48H0z"></path>
+                            </svg>
+                        </div>
+                        <span class="gsi-material-button-contents">Sign in with Google</span>
+                        <span style="display: none;">Sign in with Google</span>
+                    </div>
+                </button>
+            </form>
         </div>
     </div>
 </div>
 
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+@* <script src="https://accounts.google.com/gsi/client" async defer></script> *@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -100,63 +106,65 @@
             });
         }
     });
-
-    function handleCredentialResponse(response) {
-        const idToken = response.credential; // This is the Google ID Token (a JWT)
-        const errorDiv = document.getElementById('authError');
-        errorDiv.style.display = 'none'; // Hide any previous errors
+    //
+    // function handleCredentialResponse(response) {
+    //     const idToken = response.credential; // This is the Google ID Token (a JWT)
+    //     const errorDiv = document.getElementById('authError');
+    //     errorDiv.style.display = 'none'; // Hide any previous errors
+    //     console.log("Response:", response);
+    //     console.log("idTOken:", idToken);
 
         // Use the 'fetch' API to send the token to your backend
-        fetch('/api/auth/google-signin', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ idToken: idToken }) // Match the DTO your API expects
-        })
-            .then(apiResponse => {
-                if (!apiResponse.ok) {
-                    // If the server responds with an error status (4xx, 5xx)
-                    return apiResponse.json().then(errorData => {
-                        // Throw an error to be caught by the .catch block
-                        throw new Error(errorData.errorMessage || 'Login failed. Please try again.');
-                    });
-                }
-                return apiResponse.json(); // Parse the successful JSON response
-            })
-            .then(authData => {
-                // SUCCESS! Your API has returned its own JWT
-                if (authData.success && authData.token) {
-                    // Store your API's JWT. localStorage is common but be aware of XSS risks.
-                    // For many apps, this is an acceptable starting point.
-                    localStorage.setItem('authToken', authData.token);
-
-                    // Redirect the user to their dashboard or the homepage
-                    window.location.href = '/'; // Or '/dashboard', etc.
-                } else {
-                    // Handle logical failures returned by your API
-                    throw new Error(authData.errorMessage || 'An unknown authentication error occurred.');
-                }
-            })
-            .catch(error => {
-                // Display any errors to the user
-                console.error('Error during Google Sign-In:', error);
-                errorDiv.innerText = error.message;
-                errorDiv.style.display = 'block';
-            });
-    }
+        // fetch('/api/auth/google-signin', {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({ idToken: idToken }) // Match the DTO your API expects
+        // })
+        //     .then(apiResponse => {
+        //         if (!apiResponse.ok) {
+        //             // If the server responds with an error status (4xx, 5xx)
+        //             return apiResponse.json().then(errorData => {
+        //                 // Throw an error to be caught by the .catch block
+        //                 throw new Error(errorData.errorMessage || 'Login failed. Please try again.');
+        //             });
+        //         }
+        //         return apiResponse.json(); // Parse the successful JSON response
+        //     })
+        //     .then(authData => {
+        //         // SUCCESS! Your API has returned its own JWT
+        //         if (authData.success && authData.token) {
+        //             // Store your API's JWT. localStorage is common but be aware of XSS risks.
+        //             // For many apps, this is an acceptable starting point.
+        //             localStorage.setItem('authToken', authData.token);
+        //
+        //             // Redirect the user to their dashboard or the homepage
+        //             window.location.href = '/'; // Or '/dashboard', etc.
+        //         } else {
+        //             // Handle logical failures returned by your API
+        //             throw new Error(authData.errorMessage || 'An unknown authentication error occurred.');
+        //         }
+        //     })
+        //     .catch(error => {
+        //         // Display any errors to the user
+        //         console.error('Error during Google Sign-In:', error);
+        //         errorDiv.innerText = error.message;
+        //         errorDiv.style.display = 'block';
+        //     });
+    // }
 
     // This runs after the page (and the Google script) has loaded
-    window.onload = function () {
-        google.accounts.id.initialize({
-            // We use the GoogleClientId from our C# code-behind
-            client_id: "@Model.GoogleClientId",
-            callback: handleCredentialResponse // Register our function to handle the response
-        });
-
-        google.accounts.id.renderButton(
-            document.getElementById("googleButtonDiv"),
-            { size: "large", theme:"filled_black", locale: "en", text: "signin_with" } // Customize the button here
-        );
-    };
+    // window.onload = function () {
+    //     google.accounts.id.initialize({
+    //         // We use the GoogleClientId from our C# code-behind
+    //         client_id: "@Model.GoogleClientId",
+    //         callback: handleCredentialResponse // Register our function to handle the response
+    //     });
+    //
+    //     google.accounts.id.renderButton(
+    //         document.getElementById("googleButtonDiv"),
+    //         {size: "large", theme: "filled_black", locale: "en", text: "signin_with"} // Customize the button here
+    //     );
+    // };
 </script>
