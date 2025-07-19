@@ -14,7 +14,8 @@ public class BearerTokenHandler : DelegatingHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var token = _httpContextAccessor.HttpContext?.User?.FindFirst("jwt")?.Value;
+        // var token = _httpContextAccessor.HttpContext?.User?.FindFirst("jwt")?.Value;
+        var token = _httpContextAccessor.HttpContext?.Request?.Cookies["jwt"];
 
         if (!string.IsNullOrEmpty(token))
         {

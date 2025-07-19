@@ -60,8 +60,7 @@
             <div class="need-account"><span>Need an account? <a href="/signup">Sign up</a></span></div>
 
             <div class="divider">or</div>
-            <form method="post">
-                <button class="gsi-material-button" type="submit" asp-page-handler="GoogleLogin">
+                <a class="gsi-material-button" href="@Model.AuthUrl">
                     <div class="gsi-material-button-state"></div>
                     <div class="gsi-material-button-content-wrapper">
                         <div class="gsi-material-button-icon">
@@ -81,8 +80,7 @@
                         <span class="gsi-material-button-contents">Sign in with Google</span>
                         <span style="display: none;">Sign in with Google</span>
                     </div>
-                </button>
-            </form>
+                </a>
         </div>
     </div>
 </div>

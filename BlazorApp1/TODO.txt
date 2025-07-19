@@ -61,9 +61,18 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
     - change style 🌟
 - Re style the necessary pages 🌟
 
-- Need to get the profile image for the user who has written the review
-- update model so it takes a user summary in blazor and api
-- modify method in repository, service of api, modify blazor page to display profile image
+- Need to get the profile image for the user who has written the review 🌟
+- update model so it takes a user summary in blazor and api 🌟
+- modify method in repository, service of api, modify blazor page to display profile image 🌟
 
 
-- Need to check the page that calls the service method getallreviewsbyuser
+- Need to check the page that calls the service method getallreviewsbyuser 🌟
+
+
+- First display google button make the ref, insert the link
+- Update the onget method so it can read the code
+- make the request with the code to get the jwt from google
+- make the request to my api to get our own jwt
+- sign in user
+
+- need to check the update claims part

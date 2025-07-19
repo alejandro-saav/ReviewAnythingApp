@@ -238,6 +238,7 @@
 
 /* Google button styles */
 .gsi-material-button {
+    display: block;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;

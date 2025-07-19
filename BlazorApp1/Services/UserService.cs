@@ -75,6 +75,7 @@ public class UserService : IUserService
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Error fetching user summary, status code: {response.StatusCode} - error message:{errorContent}";
+                Console.WriteLine(LastErrorMessage);
                 return null;
             }
         }

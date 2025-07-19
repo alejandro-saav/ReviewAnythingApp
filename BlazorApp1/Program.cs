@@ -23,6 +23,7 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<GoogleOAuthService>();
 // httpClient
 string? blazorAppBaseUrl = builder.Configuration["BlazorAppBaseUrl"];
 builder.Services.AddHttpClient("BlazorAppApi", client =>
