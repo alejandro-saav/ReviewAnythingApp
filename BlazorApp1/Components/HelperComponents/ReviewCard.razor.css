@@ -11,7 +11,7 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     transition: all 0.3s ease;
     /*border: 2px solid transparent;*/
-    cursor: pointer;
+    /*cursor: pointer;*/
     padding-right: 1rem;
     overflow-wrap: break-word;
 }
@@ -39,8 +39,15 @@
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--primary);
-    transition: transform 0.3s ease;
+    /*border: 3px solid var(--primary);*/
+    box-shadow: 0 0 0 2px var(--primary);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.profile-img:hover {
+    border: none;
+    box-shadow: 0 0 0 2px #aaa;
 }
 
 /*.review-card:hover .profile-img {*/
@@ -57,6 +64,11 @@
     /*color: var(--dark);*/
     color: var(--primary);
     font-size: 1rem;
+    cursor: pointer;
+}
+
+.username:hover {
+    text-decoration: underline;
 }
 
 .author-badge {
@@ -81,6 +93,10 @@
     /*color: var(--dark);*/
     color: var(--primary);
     margin-bottom: 5px;
+}
+
+.review-title:hover {
+    text-decoration: underline;
 }
 
 .review-category {

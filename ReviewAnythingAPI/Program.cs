@@ -61,6 +61,9 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 // DbContext
 builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQL")));
+
+
+
 // // DbContext
 // builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
 //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -120,12 +123,13 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey =
             new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(secretKey ?? throw new InvalidOperationException("JWT secret not configured."))),
+        ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero // or small value if needed
     };
 });
 
+builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

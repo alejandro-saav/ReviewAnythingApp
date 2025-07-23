@@ -20,9 +20,9 @@ public class GoogleOAuthService
     public async Task<TokenResponse> ExchangeCodeForTokenAsync(string code)
     {
         var clientId = _configuration["Google:ClientId"];
-        var clientSecret = _configuration["ClientSecrets:Google"];
-        var redirectUri = "http://localhost:7032/login";
-        
+        var clientSecret = _configuration["Google:ClientSecret"];
+        var redirectUri = "http://localhost:5002/login";
+        Console.WriteLine("CLIENT SECRET: " + clientSecret);
         var tokenRequest = new Dictionary<string, string>
         {
             ["client_id"] = clientId,

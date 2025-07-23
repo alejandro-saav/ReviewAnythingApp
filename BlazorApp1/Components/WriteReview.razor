@@ -14,17 +14,17 @@
             <div class="categories">
                 @foreach (var category in Categories)
                 {
-                    <button class="category-btn @(SelectedCategory == category.CategoryName ? "active" : "")"
+                    <button type="button" class="category-btn @(SelectedCategory == category.CategoryName ? "active" : "")"
                         @onclick="() => SelectCategory(category)">
                         @category.CategoryName
                     </button>
                 }
-                <ValidationMessage For="@(() => ReviewModel.CategoryId)" />
             </div>
+                <ValidationMessage For="@(() => ReviewModel.CategoryId)" />
             <div class="form-group">
                 <label class="form-label" for="reviewTitle">Review Title</label>
                 <input type="text" id="reviewTitle" @bind="ReviewModel.Title" class="form-input review-title-input"
-                    placeholder="Enter your review title..." required>
+                    placeholder="Enter your review title...">
                 <ValidationMessage For="@(() => ReviewModel.Title)" />
             </div>
 
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <textarea id="reviewContent" class="form-input form-textarea"
-                    placeholder="Share your thoughts and experience..." required @bind="ReviewModel.Content">
+                    placeholder="Share your thoughts and experience..." @bind="ReviewModel.Content">
             </textarea>
                 <ValidationMessage For="@(() => ReviewModel.Content)" />
                 <div class="hellno">
@@ -55,7 +55,7 @@
                         @foreach (var tag in ReviewModel.Tags)
                         {
                             <li class="tag">
-                                @tag
+                                <span class="sp-tag">@tag</span> 
                                 <button class="remove-tag-btn" type="button" @onclick="() => RemoveTag(tag)">x</button>
                             </li>
                         }

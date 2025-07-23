@@ -1,0 +1,74 @@
+# This is a generated file. Not intended for manual editing.
+version: "3.8"
+services:
+  api:
+    build:
+      context: "/home/nexrox/RiderProjects/ReviewAnythingApp"
+      dockerfile: "ReviewAnythingAPI/Dockerfile"
+      target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
+    command: []
+    entrypoint:
+    - "/opt/JetBrains/RiderDebuggerTools/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/JetBrains/RiderDebuggerTools/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57000"
+    - "--backend-port=57200"
+    - "--roslyn-worker-port=57400"
+    - "--timeout=60"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
+      RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    image: "reviewanythingapi:dev"
+    ports:
+    - "127.0.0.1:57000:57000"
+    - "127.0.0.1:57200:57200"
+    - "127.0.0.1:57400:57400"
+    volumes:
+    - "/home/nexrox/RiderProjects/ReviewAnythingApp/ReviewAnythingAPI:/app:rw"
+    - "/home/nexrox/RiderProjects/ReviewAnythingApp:/src:rw"
+    - "/home/nexrox/.nuget/packages:/root/.nuget/packages"
+    - "/home/nexrox/.local/share/JetBrains/RiderRemoteDebugger/2025.1.3/Linux64:/opt/JetBrains/RiderDebuggerTools"
+    - "/home/nexrox/Documents/JetBrains.Rider-2025.1.3/bin/backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    - "/home/nexrox/.cache/JetBrains/Rider2025.1/log/DebuggerWorker/JetBrains.Debugger.Worker.2025_7_22_13_30_00:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    working_dir: "/app"
+  blazor:
+    build:
+      context: "/home/nexrox/RiderProjects/ReviewAnythingApp"
+      dockerfile: "BlazorApp1/Dockerfile"
+      target: "base"
+      args:
+        BUILD_CONFIGURATION: "Debug"
+    command: []
+    entrypoint:
+    - "/opt/JetBrains/RiderDebuggerTools/linux-x64/JetBrains.Debugger.Worker"
+    - "--runtimeconfig"
+    - "/opt/JetBrains/RiderDebuggerTools/JetBrains.Debugger.Worker.runtimeconfig.json"
+    - "--mode=server"
+    - "--frontend-port=57000"
+    - "--backend-port=57200"
+    - "--roslyn-worker-port=57401"
+    - "--timeout=60"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_STATICWEBASSETS: "/app/bin/Debug/net9.0/BlazorApp1.staticwebassets.runtime.CT.json"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      RIDER_DEBUGGER_LOG_DIR: "/var/opt/JetBrains/RiderDebuggerTools"
+      RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    image: "blazorapp1:dev"
+    ports:
+    - "127.0.0.1:57001:57000"
+    - "127.0.0.1:57201:57200"
+    - "127.0.0.1:57401:57401"
+    volumes:
+    - "/home/nexrox/RiderProjects/ReviewAnythingApp/BlazorApp1:/app:rw"
+    - "/home/nexrox/RiderProjects/ReviewAnythingApp:/src:rw"
+    - "/home/nexrox/.nuget/packages:/root/.nuget/packages"
+    - "/home/nexrox/.local/share/JetBrains/RiderRemoteDebugger/2025.1.3/Linux64:/opt/JetBrains/RiderDebuggerTools"
+    - "/home/nexrox/Documents/JetBrains.Rider-2025.1.3/bin/backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
+    - "/home/nexrox/.cache/JetBrains/Rider2025.1/log/DebuggerWorker/JetBrains.Debugger.Worker.2025_7_22_13_30_00:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    working_dir: "/app"

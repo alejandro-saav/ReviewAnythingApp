@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
       <UserSecretsId>e49cd42b-9089-4c8e-8cc8-e14b45930753</UserSecretsId>
+      <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
     <ItemGroup>
@@ -13,6 +14,9 @@
 
     <ItemGroup>
       <Content Remove="Components\Pages\Auth\Login.razor" />
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
       <None Include="Components\Pages\Auth\LoginBlazor.razor" />
     </ItemGroup>
 

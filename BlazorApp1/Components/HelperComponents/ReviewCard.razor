@@ -1,7 +1,7 @@
 @using BlazorApp1.Models
-<a class="review-card" data-category="books" data-rating="5" data-tags="fantasy,epic,bestseller"
-   href="/review/@review.ReviewId">
+<div class="review-card" data-category="books" data-rating="5" data-tags="fantasy,epic,bestseller">
     <div class="review-author">
+        <a href="/profile/@(review.User?.UserId ?? 0)">
         @if (string.IsNullOrEmpty(review.User.ProfileImage))
         {
             <ProfileIcon/>
@@ -12,15 +12,16 @@
                 src="@review.User.ProfileImage"
                 alt="Profile" class="profile-img">
         }
+        </a>
         <div class="author-info">
-            <div class="username">@review.User.UserName</div>
+            <a class="username" href="/profile/@review.User.UserId">@review.User.UserName</a>
             <div class="author-badge">Followers: @review.CreatorFollowers</div>
         </div>
     </div>
     <div class="helper-container">
         <div class="review-header">
             <div>
-                <h3 class="review-title">@review.Title</h3>
+                <a class="review-title" href="/review/@review.ReviewId">@review.Title</a>
                 <div class="review-category">@review.Category</div>
             </div>
         </div>
@@ -47,7 +48,7 @@
             </div>
         </div>
     </div>
-</a>
+</div>
 
 @code {
     [Parameter] public LikesReviewsModel review { get; set; }

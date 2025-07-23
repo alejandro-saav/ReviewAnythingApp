@@ -69,10 +69,17 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 - Need to check the page that calls the service method getallreviewsbyuser 🌟
 
 
-- First display google button make the ref, insert the link
-- Update the onget method so it can read the code
-- make the request with the code to get the jwt from google
-- make the request to my api to get our own jwt
-- sign in user
+- First display google button make the ref, insert the link 🌟
+- Update the onget method so it can read the code 🌟
+- make the request with the code to get the jwt from google 🌟
+- make the request to my api to get our own jwt 🌟
+- sign in user 🌟
 
 - need to check the update claims part
+- need to check the jwt settings part 🌟
+- restyle the pagination 🌟
+- restyle the mycomments page 🌟
+- fix write review page when selecting a category it submits the form. 🌟
+- fix tag font color 🌟
+
+- comment out options.RequireHttpsMetadata when deploying.

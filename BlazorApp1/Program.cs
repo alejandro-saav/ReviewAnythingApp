@@ -24,19 +24,13 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<GoogleOAuthService>();
-// httpClient
-string? blazorAppBaseUrl = builder.Configuration["BlazorAppBaseUrl"];
-builder.Services.AddHttpClient("BlazorAppApi", client =>
-{
-    client.BaseAddress = new Uri(blazorAppBaseUrl);
-});
 
 // Http bearer handler
 builder.Services.AddTransient<BearerTokenHandler>();
 
 builder.Services.AddHttpClient("ReviewAnythingAPI", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["YourApi:BaseUrl"] ?? "https://localhost:5026/");
+    client.BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"] ?? "http://api\"");
 }).AddHttpMessageHandler<BearerTokenHandler>();
 
 // HttpContextAccessor for accessing the auth token
@@ -58,7 +52,7 @@ builder.Services.AddAuthorizationCore();
 // for razor pages
 builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages"); ;
 
-
+builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

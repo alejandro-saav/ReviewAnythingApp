@@ -437,10 +437,11 @@
 }
 
 .page-btn {
-    padding: 10px 15px;
-    border: 2px solid var(--accent);
-    background: white;
+    padding: 10px;
+    border: 2px solid var(--primary);
+    background: var(--background-containerv2);
     border-radius: 8px;
+    color: #eee;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;

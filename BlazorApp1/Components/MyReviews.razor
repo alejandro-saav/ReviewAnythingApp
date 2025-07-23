@@ -114,7 +114,7 @@
                     <button class="page-btn @(pageNumber == QueryParams.Page ? "active" : "")"
                             @onclick="() => NavigatePage(pageNumber)">@pageNumber</button>
                 }
-                <a class="page-btn" @onclick="() => NavigatePage(QueryParams.Page +1)">Next →</a>
+                <button class="page-btn" @onclick="() => NavigatePage(QueryParams.Page +1)">Next →</button>
             </div>
     </div>
 </div>
