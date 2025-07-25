@@ -2,6 +2,7 @@
 @using System.Globalization
 @using BlazorApp1.Components.HelperComponents
 @rendermode InteractiveServer
+<PageTitle>Review: @ReviewId</PageTitle>
 @if (CurrentReview == null && _notFound == false)
 {
     <span>Loading...</span>
@@ -215,7 +216,7 @@ else if (CurrentReview != null)
 }
 else if (_notFound)
 {
-    <NotFound/>
+    <NotFoundPage/>
 }
 @if (showModal)
 {

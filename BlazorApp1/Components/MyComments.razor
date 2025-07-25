@@ -1,6 +1,10 @@
 @page "/MyComments"
 @using System.Globalization
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>My comments</PageTitle>
 
 <div class="mycomments-container">
     <div class="mycomments-wrapper">

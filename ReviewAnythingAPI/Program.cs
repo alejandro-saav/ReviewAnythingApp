@@ -113,7 +113,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options =>
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // In production set to true
+    // options.RequireHttpsMetadata = false; // In production set to true
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,
@@ -157,7 +157,7 @@ if (app.Environment.IsDevelopment())
     // var userIds = await db.Users.Select(u => u.Id).ToListAsync();
     // var categoryIds = await db.Categories.Select(c => c.CategoryId).ToListAsync();
     //
-    // await seeder.SeedReviewsAsync(reviewJson, userIds, categoryIds, 11371);
+    // await seeder.SeedReviewsAsync(reviewJson, userIds, categoryIds, 1000);
     app.MapOpenApi();
 }
 

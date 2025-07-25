@@ -3,6 +3,8 @@
 @using BlazorApp1.Components.HelperComponents
 @rendermode InteractiveServer
 
+<PageTitle>My Profile</PageTitle>
+
 @if (UserData == null && !_notFound)
 {
     <span>loading...</span>
@@ -99,7 +101,7 @@
 </div>
 } else if (_notFound)
 {
-    <NotFound />
+    <NotFoundPage />
 }
 @if (showModal)
 {

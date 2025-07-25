@@ -2,6 +2,9 @@
 @page "/edit-profile"
 @rendermode InteractiveServer
 @using BlazorApp1.Components.HelperComponents
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+<PageTitle>Edit Profile</PageTitle>
 
 <div class="edit-profile-container">
     <div class="edit-profile-wrapper">

@@ -2,7 +2,11 @@
 @using System.Globalization
 @using BlazorApp1.HelperClasses
 @using BlazorApp1.Components.HelperComponents
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>My reviews</PageTitle>
 
 <div class="myreviews-container">
     <div class="myreviews-wrapper">

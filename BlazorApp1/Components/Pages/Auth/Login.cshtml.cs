@@ -39,7 +39,7 @@ public class Login : PageModel
                          throw new InvalidOperationException("Google ClientId not set");
         var code = Request.Query["code"].FirstOrDefault();
         var error = Request.Query["error"].FirstOrDefault();
-        var redirectUri = "http://localhost:5002/login";
+        var redirectUri = _configuration["Google:RedirectUrl"];
         AuthUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
                                  $"client_id={GoogleClientId}&" +
                                  $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
@@ -133,20 +133,14 @@ public class Login : PageModel
                 SameSite = SameSiteMode.Lax
             });
 
-            // var claims = new List<Claim>
-            // {
-            //     new Claim(ClaimTypes.NameIdentifier, loginResponse.UserResponse!.UserId.ToString()),
-            //     new Claim(ClaimTypes.Name, loginResponse.UserResponse.UserName),
-            //     new Claim(ClaimTypes.Email, loginResponse.UserResponse.Email),
-            //     new Claim("profile_image", loginResponse.UserResponse.ProfileImage ?? ""),
-            //     new Claim("jwt", jwt)
-            // };
-            //
-            // var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            // var principal = new ClaimsPrincipal(identity);
             var principal = GetClaimsFromToken(jwt);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-            return Redirect("/");
+            var redirectUrl = Request.Query["ReturnUrl"].ToString();
+            if (string.IsNullOrEmpty(redirectUrl))
+            {
+                redirectUrl = "/";
+            }
+            return Redirect(redirectUrl);
         }
         catch (Exception ex)
         {
