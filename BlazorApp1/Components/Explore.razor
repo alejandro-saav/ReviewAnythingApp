@@ -1,7 +1,10 @@
 @page "/Explore"
 @using BlazorApp1.Components.HelperComponents
 @using BlazorApp1.HelperClasses
-@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Endpoints
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<title>Explore</title>
 
 <div class="explore-container">
     <div class="explore-wrapper">

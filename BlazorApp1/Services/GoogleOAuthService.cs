@@ -8,21 +8,18 @@ public class GoogleOAuthService
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
-    private readonly IJSRuntime _jsRuntime;
 
-    public GoogleOAuthService(HttpClient httpClient, IConfiguration configuration, IJSRuntime jsRuntime)
+    public GoogleOAuthService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
         _configuration = configuration;
-        _jsRuntime = jsRuntime;
     }
 
     public async Task<TokenResponse> ExchangeCodeForTokenAsync(string code)
     {
         var clientId = _configuration["Google:ClientId"];
         var clientSecret = _configuration["Google:ClientSecret"];
-        var redirectUri = "http://localhost:5002/login";
-        Console.WriteLine("CLIENT SECRET: " + clientSecret);
+        var redirectUri = _configuration["Google:RedirectUrl"];
         var tokenRequest = new Dictionary<string, string>
         {
             ["client_id"] = clientId,
@@ -44,22 +41,6 @@ public class GoogleOAuthService
         { 
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower 
         });
-    }
-    
-    public async Task<GoogleAuthResult> SignInAsync()
-    {
-        var clientId = _configuration["Google:ClientId"];
-        var redirectUri = "http://localhost:7032/login";
-        
-        var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
-                      $"client_id={clientId}&" +
-                      $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +
-                      $"response_type=code&" +
-                      $"scope=openid%20profile%20email&" +
-                      $"access_type=offline";
-
-        await _jsRuntime.InvokeVoidAsync("open", authUrl, "_self");
-        return new GoogleAuthResult { Success = false }; // Will redirect, so this won't be reached
     }
 
 }

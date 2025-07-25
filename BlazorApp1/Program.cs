@@ -44,7 +44,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.Cookie.Name = "auth_token";
-        options.Cookie.MaxAge = TimeSpan.FromMinutes(30);
+        options.Cookie.MaxAge = TimeSpan.FromMinutes(1440);
         options.LoginPath = "/login"; // Redirect here when not authenticated
     });
 builder.Services.AddCascadingAuthenticationState();
@@ -54,7 +54,8 @@ builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages"); ;
 
 builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
-
+// app.MapFallbackToPage("/NotFound");
+app.UseStatusCodePagesWithReExecute("/NotFoundPage", "?statusCode={0}"); 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

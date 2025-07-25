@@ -12,7 +12,7 @@ public class ReviewSeederService
         _reviewService = reviewService;
     }
 
-    public async Task SeedReviewsAsync(string jsonReviews, List<int> userIds, List<int> categoryIds, int maxCount = 11371)
+    public async Task SeedReviewsAsync(string jsonReviews, List<int> userIds, List<int> categoryIds, int maxCount = 1000)
     {
         var reviews = JsonSerializer.Deserialize<List<ExternalReview>>(jsonReviews);
         var faker = new Faker();

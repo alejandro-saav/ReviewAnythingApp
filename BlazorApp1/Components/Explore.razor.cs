@@ -25,8 +25,16 @@ public partial class Explore : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         QueryParams = PaginationHelper.ReadFromUri(Navigation.ToAbsoluteUri(Navigation.Uri));
-        await FetchReviews();
-        await FetchCategories();
+        // await FetchReviews();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await FetchCategories();
+            await FetchReviews();
+        }
     }
 
     private async Task FetchReviews()

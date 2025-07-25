@@ -2,7 +2,12 @@
 @using System.Globalization
 @using BlazorApp1.Components.HelperComponents
 @using BlazorApp1.HelperClasses
+@using Microsoft.AspNetCore.Authorization
 @rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Liked Reviews</PageTitle>
+
 <div class="likereviews-container">
 <div class="likereviews-wrapper">
     <div class="header">
