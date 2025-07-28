@@ -39,7 +39,7 @@ public class Login : PageModel
                          throw new InvalidOperationException("Google ClientId not set");
         var code = Request.Query["code"].FirstOrDefault();
         var error = Request.Query["error"].FirstOrDefault();
-        var redirectUri = _configuration["Google:RedirectUrl"];
+        var redirectUri = _configuration["Google:RedirectUrl"] ?? throw new InvalidOperationException("redirect url not set");
         AuthUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
                                  $"client_id={GoogleClientId}&" +
                                  $"redirect_uri={Uri.EscapeDataString(redirectUri)}&" +

@@ -1,7 +1,7 @@
 .signup-container {
   min-height: 100vh;
   /*background: linear-gradient(135deg, #f8d7da 0%, #f5c2c7 50%, #f1aeb5 100%);*/
-  background: var(--background-container);
+  /*background: var(--background-container);*/
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,6 +16,7 @@
   gap: 40px;
   max-width: 40%;
   width: 40%;
+  background: var(--background-containerv2);
 }
 
 .form-container {
@@ -32,9 +33,11 @@
 }
 
 .signup-panel {
-  background: rgba(255, 255, 255, 0.1);
+  /*background: rgba(255, 255, 255, 0.1);*/
+  background: var(--background-containerv2);
   backdrop-filter: blur(10px);
-  border: 5px solid var(--title-color);
+  /*border: 5px solid var(--title-color);*/
+  box-shadow: 0 0 4px var(--primary);
   border-radius: 5px;
   padding: 25px 25px;
   flex: 1;

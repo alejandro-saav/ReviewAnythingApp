@@ -4,20 +4,20 @@
     align-items: center;
     justify-content: center;
     /*background: linear-gradient(135deg, #fcf6bd 0%, #d0f4de 50%, #a9def9 100%);*/
-    background-color: var(--background-container);
+    /*background-color: var(--background-container);*/
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .confirmation-card {
     /*background: white;*/
+    background-color: var(--background-containerv2);
     border-radius: 20px;
     padding: 40px;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 4px var(--primary);
     max-width: 500px;
     width: 100%;
-    border: var(--wrapper-border);
     backdrop-filter: blur(10px);
 }
 
@@ -27,7 +27,7 @@
 
 .success-icon {
     display: inline-flex;
-    padding: 10px;
+    padding: 5px;
     /*background: linear-gradient(135deg, #d0f4de, #a9def9);*/
     background-color: var(--title-color);
     border-radius: 50%;
@@ -70,8 +70,8 @@
 }
 
 .message {
-    font-size: 1.2rem;
-    color: #222;
+    font-size: 1rem;
+    color: #eee;
     line-height: 1.6;
     margin-bottom: 10px;
 }
@@ -134,7 +134,7 @@
 
 .btn-tertiary {
     background: transparent;
-    color: #222;
+    color: #eee;
     border: var(--input-border);
     /*border: 2px solid #ccc;*/
 }
