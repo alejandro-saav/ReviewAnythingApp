@@ -16,7 +16,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=57402"
+    - "--roslyn-worker-port=57406"
     - "--timeout=60"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
@@ -25,16 +25,16 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "reviewanythingapi:dev"
     ports:
-    - "127.0.0.1:57002:57000"
-    - "127.0.0.1:57202:57200"
-    - "127.0.0.1:57402:57402"
+    - "127.0.0.1:57006:57000"
+    - "127.0.0.1:57206:57200"
+    - "127.0.0.1:57406:57406"
     volumes:
     - "/home/nexrox/RiderProjects/ReviewAnythingApp/ReviewAnythingAPI:/app:rw"
     - "/home/nexrox/RiderProjects/ReviewAnythingApp:/src:rw"
     - "/home/nexrox/.nuget/packages:/root/.nuget/packages"
     - "/home/nexrox/.local/share/JetBrains/RiderRemoteDebugger/2025.1.3/Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "/home/nexrox/Documents/JetBrains.Rider-2025.1.3/bin/backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
-    - "/home/nexrox/.cache/JetBrains/Rider2025.1/log/DebuggerWorker/JetBrains.Debugger.Worker.2025_7_23_15_25_09:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    - "/home/nexrox/.cache/JetBrains/Rider2025.1/log/DebuggerWorker/JetBrains.Debugger.Worker.2025_7_28_15_21_54:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"
   blazor:
     build:
@@ -51,7 +51,7 @@ services:
     - "--mode=server"
     - "--frontend-port=57000"
     - "--backend-port=57200"
-    - "--roslyn-worker-port=57403"
+    - "--roslyn-worker-port=57407"
     - "--timeout=60"
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
@@ -61,14 +61,14 @@ services:
       RESHARPER_LOG_CONF: "/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
     image: "blazorapp1:dev"
     ports:
-    - "127.0.0.1:57003:57000"
-    - "127.0.0.1:57203:57200"
-    - "127.0.0.1:57403:57403"
+    - "127.0.0.1:57007:57000"
+    - "127.0.0.1:57207:57200"
+    - "127.0.0.1:57407:57407"
     volumes:
     - "/home/nexrox/RiderProjects/ReviewAnythingApp/BlazorApp1:/app:rw"
     - "/home/nexrox/RiderProjects/ReviewAnythingApp:/src:rw"
     - "/home/nexrox/.nuget/packages:/root/.nuget/packages"
     - "/home/nexrox/.local/share/JetBrains/RiderRemoteDebugger/2025.1.3/Linux64:/opt/JetBrains/RiderDebuggerTools"
     - "/home/nexrox/Documents/JetBrains.Rider-2025.1.3/bin/backend-log.xml:/etc/opt/JetBrains/RiderDebuggerTools/backend-log.xml"
-    - "/home/nexrox/.cache/JetBrains/Rider2025.1/log/DebuggerWorker/JetBrains.Debugger.Worker.2025_7_23_15_25_09:/var/opt/JetBrains/RiderDebuggerTools:rw"
+    - "/home/nexrox/.cache/JetBrains/Rider2025.1/log/DebuggerWorker/JetBrains.Debugger.Worker.2025_7_28_15_21_54:/var/opt/JetBrains/RiderDebuggerTools:rw"
     working_dir: "/app"

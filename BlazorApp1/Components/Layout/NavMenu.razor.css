@@ -18,6 +18,10 @@
     padding: 0 20px;
 }
 
+.hamburger-icon {
+    display: none;
+}
+
 .logo {
     font-size: 28px;
     font-weight: bold;
@@ -102,4 +106,34 @@
 
 .nav-modal-list li:hover {
     background-color: #656c7633;
+}
+
+@media(max-width: 760px) {
+    .nav-container {
+        position: relative;
+    }
+    .nav-links {
+        width: 0;
+        height: 100vh;
+        overflow: hidden;
+        position: absolute;
+        flex-direction: column;
+        right: -10px;
+        top: 45px;
+        background-color: var(--background-containerv2);
+        transition: width 0.3s ease;
+    }
+    
+    .hamburger-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .nav-links.open {
+        width: auto;
+        height: 100vh;
+        padding: 1rem;
+        z-index: 100;
+    }
 }

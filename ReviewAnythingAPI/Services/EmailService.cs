@@ -36,10 +36,10 @@ public class EmailService
             <p>If you didn’t create this account, you can ignore this email.</p>
             <p style=""margin-top:30px;"">— The ReviewAnything Team</p>
         </div>";
-
+        var fromEmail = _configuration["Resend:From"];
         var message = new EmailMessage
         {
-            From = "onboarding@resend.dev",
+            From = fromEmail,
             Subject = "ReviewAnything Verification Email",
             HtmlBody = html
         };

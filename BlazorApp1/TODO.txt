@@ -85,13 +85,14 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 - check redirects are too slow 🌟 only for explore page
 - add authorization for user profile pages 🌟
 - add logo to page 🌟
-- comment out options.RequireHttpsMetadata when deploying.
+- comment out options.RequireHttpsMetadata when deploying. 🌟
 - add redirect to previous page when loading. 🌟
-- fix env variables for api front end urls.
+- fix env variables for api front end urls. 🌟
 - add env variables for google auth redirect 🌟
-- check urls in google cloud console
+- check urls in google cloud console 🌟
 - check wheter to set a custom name to a tab 🌟
 
-
-3g 14 seconds
-normal 0.7 to 1 second
+- Add responsive design.
+- need to restyle some pages in auth
+- re organize the folder structure
+- add the domain i bought
