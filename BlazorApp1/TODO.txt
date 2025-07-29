@@ -92,7 +92,17 @@ WHEN DOING A REQUEST IF OBJECT NAMES DO NOT MATCH IT WILL RETURN BAD REQUEST 400
 - check urls in google cloud console 🌟
 - check wheter to set a custom name to a tab 🌟
 
-- Add responsive design.
-- need to restyle some pages in auth
+- Add responsive design.🌟
+	- make the nav responsive -> show only the title and a button to show a list of the other options🌟
+	- when clickin the image profile had to restyle that on mobile
+- need to restyle some pages in auth 🌟
 - re organize the folder structure
 - add the domain i bought
+
+
+
+
+
+
+
+

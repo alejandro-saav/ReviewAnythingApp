@@ -67,7 +67,7 @@ if (!app.Environment.IsDevelopment())
 app.MapRazorPages();
 
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();
