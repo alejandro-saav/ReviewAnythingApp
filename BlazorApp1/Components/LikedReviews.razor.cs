@@ -39,7 +39,6 @@ public partial class LikedReviews : ComponentBase
             {
                 _likesReviews = reviews;
                 TotalReviews = reviews.Select(r => r.Total).FirstOrDefault();
-                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -49,6 +48,7 @@ public partial class LikedReviews : ComponentBase
         finally
         {
             IsLoading = false;
+            StateHasChanged();
         }
     }
     

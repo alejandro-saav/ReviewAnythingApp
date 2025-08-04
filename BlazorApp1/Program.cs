@@ -4,9 +4,17 @@ using BlazorApp1.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Forward thing to manage redirects to HTTPs required because of render
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -54,6 +62,9 @@ builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages"); ;
 
 builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
+
+app.UseForwardedHeaders();
+
 // app.MapFallbackToPage("/NotFound");
 app.UseStatusCodePagesWithReExecute("/NotFoundPage", "?statusCode={0}"); 
 // Configure the HTTP request pipeline.
