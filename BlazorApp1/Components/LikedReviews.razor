@@ -103,9 +103,18 @@
     </div>
     <div class="reviews-grid">
         <!-- Sample liked reviews -->
-        @foreach (var review in _likesReviews)
+        @if (IsLoading) {
+            for (int i = 1; i <= 9; i++)
+            {
+                <LoadingCard />
+            }
+        }
+        else
         {
-            <ReviewCard review="review"/>
+            @foreach (var review in _likesReviews)
+            {
+                <ReviewCard review="review"/>
+            }
         }
     </div>
             </div>

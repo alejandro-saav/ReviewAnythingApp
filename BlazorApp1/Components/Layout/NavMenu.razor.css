@@ -112,6 +112,28 @@
     .nav-container {
         position: relative;
     }
+    
+    .nav-modal {
+        position: relative;
+        background: none;
+        z-index: 0;
+    }
+    
+    .modal-overlay {
+        width: 0;
+        height: 0;
+    }
+    
+    .nav-modal-list li {
+        justify-content: center;
+        padding: 0;
+    }
+    .profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
     .nav-links {
         width: 0;
         height: 100vh;
@@ -128,6 +150,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
     }
     
     .nav-links.open {

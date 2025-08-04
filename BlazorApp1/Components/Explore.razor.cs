@@ -21,6 +21,7 @@ public partial class Explore : ComponentBase
     public string ErrorTagMessage { get; set; } = "";
     private string NewTag { get; set; } = "";
     private CancellationTokenSource _cts;
+    private bool IsLoading { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,6 +42,7 @@ public partial class Explore : ComponentBase
     {
         try
         {
+            IsLoading = true;
             var fetchReviews = await ReviewService.GetExplorePageReviewsAsync(QueryParams);
             if (fetchReviews.Any())
             {
@@ -52,6 +54,10 @@ public partial class Explore : ComponentBase
         catch (Exception ex)
         {
             Console.WriteLine("Error try oninitializedasync, :" + ex);
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 
