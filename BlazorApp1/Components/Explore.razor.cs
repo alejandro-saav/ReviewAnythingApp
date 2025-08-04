@@ -48,7 +48,6 @@ public partial class Explore : ComponentBase
             {
                 reviews = fetchReviews;
                 TotalReviews = reviews.Select(r => r.Total).FirstOrDefault();
-                StateHasChanged();
             }
         }
         catch (Exception ex)
@@ -58,6 +57,7 @@ public partial class Explore : ComponentBase
         finally
         {
             IsLoading = false;
+            StateHasChanged();
         }
     }
 

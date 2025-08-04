@@ -46,7 +46,7 @@
                 {
                     <a href="/login">Login</a>
                 }
-                @if (ShowModal)
+                @if (ShowModal && IsLoggedIn)
                 {
                     <div class="modal-overlay" @onclick="CloseModal"></div>
                     <div class="nav-modal" @onclick:stopPropagation>
