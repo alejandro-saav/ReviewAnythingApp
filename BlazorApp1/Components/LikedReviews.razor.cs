@@ -34,6 +34,7 @@ public partial class LikedReviews : ComponentBase
         try
         {
             IsLoading = true;
+            StateHasChanged();
             var reviews = await ReviewService.GetLikesReviewsAsync(QueryParams);
             if (reviews.Any())
             {

@@ -43,6 +43,7 @@ public partial class Explore : ComponentBase
         try
         {
             IsLoading = true;
+            StateHasChanged();
             var fetchReviews = await ReviewService.GetExplorePageReviewsAsync(QueryParams);
             if (fetchReviews.Any())
             {
