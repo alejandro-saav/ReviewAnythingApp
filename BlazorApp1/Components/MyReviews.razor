@@ -105,9 +105,18 @@
 
             <div class="reviews-grid" id="reviewsGrid">
                 <!-- Reviews will be populated by JavaScript -->
-                @foreach (var review in myReviews)
+                @if (IsLoading) {
+                    for (int i = 1; i <= 9; i++)
+                    {
+                        <LoadingCard />
+                    }
+                }
+                else
                 {
-                    <ReviewCard review="review"/>
+                    @foreach (var review in myReviews)
+                    {
+                        <ReviewCard review="review"/>
+                    }
                 }
             </div>
         </div>

@@ -19,6 +19,7 @@ public partial class MyReviews : ComponentBase
     private string NewTag { get; set; } = "";
     private CancellationTokenSource _cts;
     private int TotalReviews = 0;
+    private bool IsLoading { get; set; } = false;
     
 
     protected override async Task OnInitializedAsync()
@@ -32,6 +33,7 @@ public partial class MyReviews : ComponentBase
     {
         try
         {
+            IsLoading = true;
             var reviews = await ReviewService.GetMyReviewsAsync(QueryParams);
             if (reviews.Any())
             {
@@ -43,6 +45,10 @@ public partial class MyReviews : ComponentBase
         catch (Exception ex)
         {
             Console.WriteLine("Error on fetching reviews async: " + ex.Message);
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
     

@@ -97,9 +97,16 @@
 
         <div class="reviews-grid" id="reviewsContainer">
             <!-- Sample Review Cards -->
-            @foreach (var review in reviews)
-            {
-                <ReviewCard review="review"/>
+            @if (IsLoading) {
+                for (int i = 1; i <= 9; i++)
+                {
+                    <LoadingCard />
+                }
+            } else {
+                @foreach (var review in reviews)
+                {
+                    <ReviewCard review="review"/>
+                }
             }
         </div>
         </div>
