@@ -19,7 +19,7 @@ public partial class LikedReviews : ComponentBase
     private string NewTag { get; set; } = "";
     private CancellationTokenSource _cts;
     private int TotalReviews = 0;
-    private bool IsLoading { get; set; } = false;
+    private bool IsLoading { get; set; } = true;
     
 
     protected override async Task OnInitializedAsync()

@@ -21,7 +21,7 @@ public partial class Explore : ComponentBase
     public string ErrorTagMessage { get; set; } = "";
     private string NewTag { get; set; } = "";
     private CancellationTokenSource _cts;
-    private bool IsLoading { get; set; } = false;
+    private bool IsLoading { get; set; } = true;
 
     protected override async Task OnInitializedAsync()
     {
