@@ -36,9 +36,16 @@ builder.Services.AddScoped<GoogleOAuthService>();
 // Http bearer handler
 builder.Services.AddTransient<BearerTokenHandler>();
 
+var apiBaseUrl = builder.Configuration["Api:BaseUrl"];
+
+if (string.IsNullOrWhiteSpace(apiBaseUrl))
+{
+    throw new InvalidOperationException("Configuration error: Api:BaseUrl is missing or empty");
+}
+
 builder.Services.AddHttpClient("ReviewAnythingAPI", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"] ?? "http://api\"");
+    client.BaseAddress = new Uri(apiBaseUrl);
 }).AddHttpMessageHandler<BearerTokenHandler>();
 
 // HttpContextAccessor for accessing the auth token
@@ -60,7 +67,7 @@ builder.Services.AddAuthorizationCore();
 // for razor pages
 builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages"); ;
 
-builder.WebHost.UseUrls("http://*:80");
+// builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 
 app.UseForwardedHeaders();
@@ -78,7 +85,7 @@ if (!app.Environment.IsDevelopment())
 app.MapRazorPages();
 
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();

@@ -1,30 +1,38 @@
 version: '3.8'
 services:
-  db:
-    image: postgres:16
-    container_name: postgres-db
-    restart: always
-    env_file:
-      - database.env
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+  # db:
+  #   image: postgres:16
+  #   container_name: postgres-db
+  #   restart: always
+  #   env_file:
+  #     - database.env
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
   
   api:
+    image: reviewanything-api-dev
     build:
       context: .
       dockerfile: ReviewAnythingAPI/Dockerfile
-    depends_on:
-      - db
+      target: develop
+    # depends_on:
+    #   - db
     env_file:
       - ./ReviewAnythingAPI/config/development.env
     ports:
       - "5000:80"
+    volumes:
+      - ./ReviewAnythingAPI:/src/ReviewAnythingAPI
+      - ~/.nuget:/root/.nuget
+      - /src/ReviewAnythingAPI/bin
+      - /src/ReviewAnythingAPI/obj
+    command: dotnet watch run --urls=http://0.0.0.0:80
     
   blazor:
     build:

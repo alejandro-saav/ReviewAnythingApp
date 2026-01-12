@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.Marshalling;
 using BlazorApp1.Models;
 // using BlazorApp1.Services.Interfaces;
 using Category = BlazorApp1.Models.Category;
@@ -309,12 +310,12 @@ public class ReviewService : IReviewService
             var errorContent = await response.Content.ReadAsStringAsync();
             LastErrorMessage = $"Error request unsuccessfull on GetExplorePageReviewsAsync service: {response.StatusCode} - error message:{errorContent}";
             Console.WriteLine($"{LastErrorMessage}");
-            return [];
+            throw new Exception(LastErrorMessage);
         }
         catch (Exception ex)
         {
             Console.WriteLine("Catch error on GetExplorePageReviewsAsync service, error:" + ex.Message);
-            return [];
+            throw new Exception("Catch error on GetExplorePageReviewsAsync service, error:" + ex.Message);
         }
     }
 }

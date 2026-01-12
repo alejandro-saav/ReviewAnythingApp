@@ -13,7 +13,9 @@ using ReviewAnythingAPI.Repositories.Interfaces;
 using ReviewAnythingAPI.Services;
 using ReviewAnythingAPI.Services.Interfaces;
 
+
 var builder = WebApplication.CreateBuilder(args);
+// Register .env file
 
 // Configure Cloudinary settings
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
@@ -105,30 +107,30 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["Secret"];
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => 
-{
-    options.SaveToken = true;
-    // options.RequireHttpsMetadata = false; // In production set to true
-    options.TokenValidationParameters = new TokenValidationParameters()
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["ValidAudience"],
-        ValidIssuer = jwtSettings["ValidIssuer"],
-        IssuerSigningKey =
-            new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(secretKey ?? throw new InvalidOperationException("JWT secret not configured."))),
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero // or small value if needed
-    };
-});
+// builder.Services.AddAuthentication(options =>
+// {
+//     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+// }).AddJwtBearer(options => 
+// {
+//     options.SaveToken = true;
+//     // options.RequireHttpsMetadata = false; // In production set to true
+//     options.TokenValidationParameters = new TokenValidationParameters()
+//     {
+//         ValidateIssuer = true,
+//         ValidateAudience = true,
+//         ValidAudience = jwtSettings["ValidAudience"],
+//         ValidIssuer = jwtSettings["ValidIssuer"],
+//         IssuerSigningKey =
+//             new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(secretKey ?? throw new InvalidOperationException("JWT secret not configured."))),
+//         ValidateLifetime = true,
+//         ClockSkew = TimeSpan.Zero // or small value if needed
+//     };
+// });
 
-builder.WebHost.UseUrls("http://*:80");
+// builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

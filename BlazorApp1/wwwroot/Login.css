@@ -1,5 +1,5 @@
 .login-container {
-    min-height: 100vh;
+    min-height: 100dvh;
     /*background: linear-gradient(135deg, #f8d7da 0%, #f5c2c7 50%, #f1aeb5 100%);*/
     /*background-color: var(--background-container);*/
     background-color: var(--background-containerv2);
@@ -8,7 +8,8 @@
     align-items: center;
     padding: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 100vw;
+    /* width: 100vw; */
+    /* overflow: hidden; */
 }
 
 .login-wrapper {
