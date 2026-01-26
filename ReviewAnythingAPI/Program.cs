@@ -13,6 +13,7 @@ using ReviewAnythingAPI.Repositories.Interfaces;
 using ReviewAnythingAPI.Services;
 using ReviewAnythingAPI.Services.Interfaces;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Cloudinary settings
@@ -113,7 +114,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options => 
 {
     options.SaveToken = true;
-    // options.RequireHttpsMetadata = false; // In production set to true
+    options.RequireHttpsMetadata = true; // In production set to true
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,
@@ -128,6 +129,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// comment the below line for development
 builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 

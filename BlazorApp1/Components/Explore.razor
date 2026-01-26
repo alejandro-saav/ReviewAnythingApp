@@ -2,7 +2,9 @@
 @using BlazorApp1.Components.HelperComponents
 @using BlazorApp1.HelperClasses
 @using Microsoft.AspNetCore.Components.Endpoints
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@* @rendermode @(new InteractiveServerRenderMode(prerender: false)) *@
+@* @attribute [StreamRendering(false)] *@
+@rendermode InteractiveServer
 
 <title>Explore</title>
 
@@ -107,6 +109,10 @@
                 {
                     <ReviewCard review="review"/>
                 }
+            }
+
+            @if (!string.IsNullOrEmpty(ReviewsErrorMessage)) {
+                <div class="error-message">Something went wrong while loading the reviews, please try again.</div>
             }
         </div>
         </div>

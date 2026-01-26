@@ -1,0 +1,110 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.skeleton {
+     background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+     background-size: 200% 100%;
+     animation: loading 1.5s infinite;
+     border-radius: 4px;
+ }
+
+ .profile-header {
+    width: 100%;
+    display: flex;
+    gap: 30px;
+    margin-bottom: 10px;
+    padding: 5px;
+    align-items: flex-start;
+    justify-content: center;
+ }
+
+
+ @keyframes loading {
+     0% {
+         background-position: 200% 0;
+     }
+
+     100% {
+         background-position: -200% 0;
+     }
+ }
+
+ /* Profile Image */
+ .skeleton-profile-image {
+     width: 150px;
+     height: 150px;
+     border-radius: 50%;
+     border: 3px solid #444;
+     flex-shrink: 0;
+ }
+
+ /* Name */
+ .skeleton-name {
+     width: 300px;
+     height: 32px;
+     margin-bottom: 10px;
+ }
+
+ /* Username */
+ .skeleton-username {
+     width: 150px;
+     height: 20px;
+     margin-bottom: 15px;
+ }
+
+ /* Member Date */
+ .skeleton-member-date {
+     width: 200px;
+     height: 14px;
+     margin-bottom: 15px;
+ }
+
+ /* Bio */
+ .skeleton-bio {
+     width: 250px;
+     height: 16px;
+     margin-bottom: 25px;
+ }
+
+ /* Stats Numbers */
+ .skeleton-stat-number {
+     width: 30px;
+     height: 28px;
+     margin-bottom: 5px;
+ }
+
+ /* Stats Labels */
+ .skeleton-stat-label {
+     width: 70px;
+     height: 14px;
+ }
+
+ /* Follow Button */
+ .skeleton-follow-btn {
+     width: 90px;
+     height: 38px;
+     border-radius: 20px;
+ }
+
+ /* Section Headers */
+ .skeleton-section-header {
+     width: 140px;
+     height: 24px;
+ }
+
+ @media (max-width: 768px) {
+     .skeleton-profile-image {
+         margin: 0 auto 20px;
+     }
+
+     .skeleton-name,
+     .skeleton-username,
+     .skeleton-member-date,
+     .skeleton-bio {
+         margin-left: auto;
+         margin-right: auto;
+     }
+ }

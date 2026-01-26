@@ -2,6 +2,16 @@
     max-width: 900px;
     margin: 0 auto;
     padding: 40px 20px;
+    padding-top: 10px;
+}
+
+.title-header {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    color: var(--primary);
 }
 
 .profile-header {

@@ -23,6 +23,8 @@ public partial class Explore : ComponentBase
     private CancellationTokenSource _cts;
     private bool IsLoading { get; set; } = true;
 
+    private string ReviewsErrorMessage {get; set; } = "";
+
     protected override async Task OnInitializedAsync()
     {
         QueryParams = PaginationHelper.ReadFromUri(Navigation.ToAbsoluteUri(Navigation.Uri));
@@ -32,7 +34,7 @@ public partial class Explore : ComponentBase
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {
+        {  
             await FetchCategories();
             await FetchReviews();
         }
@@ -42,6 +44,7 @@ public partial class Explore : ComponentBase
     {
         try
         {
+            ReviewsErrorMessage = "";
             IsLoading = true;
             StateHasChanged();
             var fetchReviews = await ReviewService.GetExplorePageReviewsAsync(QueryParams);
@@ -53,7 +56,8 @@ public partial class Explore : ComponentBase
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Error try oninitializedasync, :" + ex);
+            ReviewsErrorMessage = "Something went wrong while fetching the reviews for the explore page. Error message: " + ex;
+            Console.WriteLine(ReviewsErrorMessage);
         }
         finally
         {

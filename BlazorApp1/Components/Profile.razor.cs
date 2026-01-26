@@ -2,11 +2,14 @@ using BlazorApp1.Models;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
+
 
 namespace BlazorApp1.Components;
 
 public partial class Profile : ComponentBase
 {
+    [Inject] IJSRuntime JS {get; set;}
     [Inject] private IUserService UserService { get; set; }
     [Parameter] public int UserId { get; set; }
 
@@ -17,6 +20,14 @@ public partial class Profile : ComponentBase
     private bool IsLoggedIn;
     private bool showModal { get; set; }
     private bool _notFound { get; set; } = false;
+
+protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
+    {
+        await JS.InvokeVoidAsync("window.scrollTo", 0, 0);
+    }
+}
 
 
     protected override async Task OnInitializedAsync()
@@ -32,8 +43,6 @@ public partial class Profile : ComponentBase
                 _notFound = true;
             }
             UserData = userPageDataRequest!;
-            Console.WriteLine($"HELLO: {UserData.UserSummary.CreationDate}");
-            Console.WriteLine($"Is user following: {userPageDataRequest?.IsCurrentUserFollowing}");
         }
         catch (Exception ex)
         {
