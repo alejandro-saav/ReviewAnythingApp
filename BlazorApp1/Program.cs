@@ -67,6 +67,7 @@ builder.Services.AddAuthorizationCore();
 // for razor pages
 builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages"); ;
 
+// Comment the below line for development
 builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 
@@ -85,7 +86,7 @@ if (!app.Environment.IsDevelopment())
 app.MapRazorPages();
 
 
-// app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();

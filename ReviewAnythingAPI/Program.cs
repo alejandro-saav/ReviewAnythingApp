@@ -129,6 +129,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// comment the below line for development
 builder.WebHost.UseUrls("http://*:80");
 var app = builder.Build();
 
