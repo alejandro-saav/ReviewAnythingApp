@@ -114,7 +114,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(options => 
 {
     options.SaveToken = true;
-    options.RequireHttpsMetadata = false; // In production set to true
+    options.RequireHttpsMetadata = true; // In production set to true
     options.TokenValidationParameters = new TokenValidationParameters()
     {
         ValidateIssuer = true,
