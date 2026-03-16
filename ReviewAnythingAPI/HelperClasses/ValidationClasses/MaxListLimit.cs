@@ -12,7 +12,7 @@ public class MaxListLimit : ValidationAttribute
         _maxListLimit = maxListLimit;
     }
 
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
     {
         if (value is ICollection collection)
         {
@@ -23,7 +23,7 @@ public class MaxListLimit : ValidationAttribute
             }
         }
 
-        return ValidationResult.Success;
+        return ValidationResult.Success!;
     }
     
 }

@@ -1,3 +1,4 @@
+using BlazorApp1.HelperClasses;
 using BlazorApp1.Models;
 
 namespace BlazorApp1.Services;
@@ -13,4 +14,6 @@ public interface IUserService
 
     Task<UserPageData?> GetUserPageDataAsync(int userId);
     Task<UserSummary?> UpdateUserSummaryAsync(UserSummaryModel model);
+    Task<bool> LogVisitAsync(ClientInfoService clientInfo);
+    Task<bool> WakeAPI();
 }

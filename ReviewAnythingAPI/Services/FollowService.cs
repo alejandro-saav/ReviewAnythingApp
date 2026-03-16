@@ -60,7 +60,7 @@ public class FollowService : IFollowService
             throw new EntityNotFoundException("User not found");
         }
 
-        await _followRepository.DeleteAsyncByEntity(entity);
+        _followRepository.DeleteAsyncByEntity(entity);
         await _dbContext.SaveChangesAsync();
         return true;
     }

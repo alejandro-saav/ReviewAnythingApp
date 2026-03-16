@@ -10,5 +10,5 @@ public class CommentVote
     
     // Navigation Properties
     public ApplicationUser? User { get; set; }
-    public Comment Comment { get; set; }
+    public Comment? Comment { get; set; }
 }

@@ -14,13 +14,13 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
 
     public async Task<IEnumerable<UserCommentDto>> GetUsersCommentInformationAsync(IReadOnlyList<int> userIds)
     {
-        var usersInfo = await _context.Users.Where(u => userIds.Contains(u.Id)).Select(u => new UserCommentDto
+        var usersInfo = await _context.Users.AsNoTracking().Where(u => userIds.Contains(u.Id)).Select(u => new UserCommentDto
         {
             UserId = u.Id,
-            UserName = u.UserName,
+            UserName = u.UserName ?? "",
             ProfileImage = u.ProfileImage,
-            ReviewCount = _context.Reviews.Where(r => r.UserId == u.Id).Count(),
-            FollowerCount = _context.Follows.Where(f => f.FollowingUserId == u.Id).Count()
+            ReviewCount = _context.Reviews.AsNoTracking().Where(r => r.UserId == u.Id).Count(),
+            FollowerCount = _context.Follows.AsNoTracking().Where(f => f.FollowingUserId == u.Id).Count()
         }).ToListAsync();
         return usersInfo;
     }
@@ -28,6 +28,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
     public async Task<UserPageDataDto> GetUserPageDataAsync(int targetUserId, int currentUserId)
     {
         var user = await _context.Users
+            .AsNoTracking()
             .Where(u => u.Id == targetUserId)
             .Select(u => new UserSummaryDto
             {
@@ -35,7 +36,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
                 UserName = u.UserName ?? "",
                 FirstName = u.FirstName ?? "",
                 LastName = u.LastName ?? "",
-                ProfileImage = u.ProfileImage,
+                ProfileImage = u.ProfileImage ?? "",
                 CreationDate = u.CreationDate,
                 Bio = u.Bio ?? "",
             })
@@ -54,7 +55,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
             .Select(f => new UserSummaryDto
             {
                 UserName = f.Follower!.UserName!,
-                ProfileImage = f.Follower.ProfileImage,
+                ProfileImage = f.Follower.ProfileImage ?? "",
             })
             .ToListAsync();
 
@@ -63,7 +64,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
             .Select(f => new UserSummaryDto
             {
                 UserName = f.Following!.UserName!,
-                ProfileImage = f.Following.ProfileImage,
+                ProfileImage = f.Following.ProfileImage ?? "",
             })
             .ToListAsync();
 
@@ -71,7 +72,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
 
         if (currentUserId > 0)
         {
-            var CurrentUserFollowTarget = await _context.Follows.FirstOrDefaultAsync(f => f.FollowerUserId == currentUserId && f.FollowingUserId == targetUserId);
+            var CurrentUserFollowTarget = await _context.Follows.AsNoTracking().FirstOrDefaultAsync(f => f.FollowerUserId == currentUserId && f.FollowingUserId == targetUserId);
             if (CurrentUserFollowTarget != null)
             {
                 IsUserFollowing = true;
@@ -80,7 +81,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
 
         return new UserPageDataDto
         {
-            UserSummary = user,
+            UserSummary = user!,
             TotalReviews = totalReviews,
             TotalComments = totalComments,
             Followers = followers,

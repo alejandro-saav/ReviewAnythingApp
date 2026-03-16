@@ -22,6 +22,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
     public DbSet<StatusReport> StatusReports { get; set; }
     public DbSet<Report> Reports { get; set; }
     public DbSet<ReviewTag> ReviewTags { get; set; }
+    public DbSet<RequestLog> RequestLogs {get;set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

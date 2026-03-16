@@ -7,7 +7,7 @@ public class UserUpdateSummaryDto
 {
     [Required]
     [StringLength(30)]
-    public string FirstName { get; set; }
+    public required string FirstName { get; set; }
     [StringLength(30)]
     public string? LastName { get; set; }
     [StringLength(500)]

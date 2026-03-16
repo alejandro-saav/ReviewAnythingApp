@@ -20,14 +20,15 @@ public class UpdateClaims : PageModel
     public async Task<IActionResult> OnGet(string? returnUrl)
     {
         var user = HttpContext.User;
-        if (!user.Identity.IsAuthenticated) return Redirect(returnUrl ?? "/");
+        if (user.Identity?.IsAuthenticated != true) return Redirect(returnUrl ?? "/");
         
-        var jwt = user.FindFirst("jwt")?.Value;
-        var email = user.FindFirst(ClaimTypes.Email)?.Value;
+        var jwt = user.FindFirst("jwt")?.Value ?? "";
+        var email = user.FindFirst(ClaimTypes.Email)?.Value ?? "";
 
         try
         {
             var userSummary = await _userService.GetUserSummaryAsync();
+            if (userSummary == null) return LocalRedirect(returnUrl ?? "/");
 
             var claims = new List<Claim>
             {

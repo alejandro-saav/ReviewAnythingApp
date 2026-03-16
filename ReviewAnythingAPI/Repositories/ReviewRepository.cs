@@ -17,7 +17,7 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
 
     public IQueryable<Review> FilterReviews(ExploreQueryParamsDto queryParamsDto,  int? userId = null, int? likedByUserId = null)
     {
-        var query = _context.Reviews.AsQueryable();
+        var query = _context.Reviews.AsNoTracking().AsQueryable();
         if (userId.HasValue)
         {
             query = query.Where(r => r.UserId == userId.Value);
@@ -52,7 +52,7 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
 
         if (!string.IsNullOrEmpty(queryParamsDto.Category))
         {
-            query = query.Where(r => r.ReviewItem.ItemCategory.CategoryName == queryParamsDto.Category);
+            query = query.Where(r => r.ReviewItem!.ItemCategory!.CategoryName == queryParamsDto.Category);
         }
 
         queryParamsDto.Tags = queryParamsDto.Tags.Any() ? queryParamsDto.Tags[0].Split(",").ToList() : [];
@@ -61,7 +61,7 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
         {
             query = query.Where(r =>
                 queryParamsDto.Tags.Select(t => t.ToLower())
-                    .All(t => r.ReviewTags.Select(rt => rt.Tag.TagName.ToLower()).Contains(t)));
+                    .All(t => r.ReviewTags.Select(rt => rt.Tag!.TagName.ToLower()).Contains(t)));
         }
 
         if (SortOptions.All.Contains(queryParamsDto.Sort))
@@ -90,22 +90,22 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
     }
     public async Task<IEnumerable<Review>> GetAllReviewsByUserIdAsync(int userId)
     {
-        return await _context.Reviews.Where(r => r.UserId == userId).ToListAsync();
+        return await _context.Reviews.AsNoTracking().Where(r => r.UserId == userId).ToListAsync();
     }
 
     public async Task<IEnumerable<Review>> GetAllReviewsByItemIdAsync(int itemId)
     {
-        return await _context.Reviews.Where(r => r.ItemId == itemId).ToListAsync();
+        return await _context.Reviews.AsNoTracking().Where(r => r.ItemId == itemId).ToListAsync();
     }
 
-    public async Task<Review> GetReviewByUserIdAndItemIdAsync(int userId, int itemId)
+    public async Task<Review?> GetReviewByUserIdAndItemIdAsync(int userId, int itemId)
     {
-        return await _context.Reviews.FirstOrDefaultAsync(r => r.UserId == userId && r.ItemId == itemId);
+        return await _context.Reviews.AsNoTracking().FirstOrDefaultAsync(r => r.UserId == userId && r.ItemId == itemId);
     }
 
     public async Task<ReviewDetailDto?> GetReviewDetailByIdAsync(int reviewId)
     {
-        var review = await _context.Reviews.Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
+        var review = await _context.Reviews.AsNoTracking().Where(r => r.ReviewId == reviewId).Select(r => new ReviewDetailDto
         {
             ReviewId = r.ReviewId,
             Title = r.Title,
@@ -120,7 +120,7 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
                 UserName = r.Creator != null ? r.Creator.UserName ?? "" : "",
                 ProfileImage = r.Creator != null ? r.Creator.ProfileImage ?? "" : "",
             },
-            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
             UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
             DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
             TotalVotes = r.ReviewVotes.Count()
@@ -136,19 +136,19 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
         var myReviews = await query.Skip((queryParamsDto.Page - 1) * pageSize).Take(pageSize).Select(r => new LikesReviewsDto
         {
             ReviewId = r.ReviewId,
-            Category = r.ReviewItem.ItemCategory.CategoryName,
+            Category = r.ReviewItem!.ItemCategory!.CategoryName,
             Title = r.Title,
             Content = r.Content,
             LastEditDate = r.LastEditDate,
             Rating = r.Rating,
             Likes = r.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
             NumberOfComments = r.ReviewComments.Count(),
-            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
             User = new UserSummaryDto
             {
                 UserId = userId,
                 UserName = r.Creator!.UserName ?? "",
-                ProfileImage = r.Creator.ProfileImage,
+                ProfileImage = r.Creator.ProfileImage ?? "",
             },
             CreatorFollowers = r.Creator.UserFollows.Count(),
             PageNumber = queryParamsDto.Page,
@@ -166,17 +166,17 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
         {
             ReviewId = r.ReviewId,
             Title = r.Title,
-            Category = r.ReviewItem.ItemCategory.CategoryName,
+            Category = r.ReviewItem!.ItemCategory!.CategoryName,
             Content = r.Content,
             LastEditDate = r.LastEditDate,
             Rating = r.Rating,
             Likes = r.ReviewVotes.Where(r => r.VoteType == 1).Count(),
             NumberOfComments = r.ReviewComments.Count(),
-            Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+            Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
             User = new UserSummaryDto
             {
                 UserId = r.UserId ?? 0,
-                UserName = r.Creator.UserName ?? "",
+                UserName = r.Creator!.UserName ?? "",
                 ProfileImage = r.Creator.ProfileImage ?? "",
             },
             CreatorFollowers = r.Creator.UserFollows.Count(),
@@ -192,24 +192,23 @@ public class ReviewRepository : Repository<Review>, IReviewRepository
     {
         var query = FilterReviews(queryParamsDto);
 
-        // int total = await _context.Reviews.CountAsync();
         int total = await query.CountAsync();
         var reviews = await query.Skip((queryParamsDto.Page - 1) * pageSize).Take(pageSize).Select(r =>
             new LikesReviewsDto
             {
                 ReviewId = r.ReviewId,
-                Category = r.ReviewItem.ItemCategory.CategoryName,
+                Category = r.ReviewItem!.ItemCategory!.CategoryName,
                 Title = r.Title,
                 Content = r.Content,
-                Likes = r.ReviewVotes.Where(rv => rv.VoteType == 1).Count(),
+                Likes = r.ReviewVotes.Count(rv => rv.VoteType == 1),
                 LastEditDate = r.LastEditDate,
                 Rating = r.Rating,
-                Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+                Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
                 NumberOfComments = r.ReviewComments.Count(),
                 User = new UserSummaryDto
                 {
                     UserId = r.UserId ?? 0,
-                    UserName = r.Creator.UserName ?? "",
+                    UserName = r.Creator!.UserName ?? "",
                     ProfileImage = r.Creator.ProfileImage ?? "",
                 },
                 CreatorFollowers = r.Creator.UserFollows.Count(),

@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using BlazorApp1.HelperClasses;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 
@@ -7,11 +8,13 @@ namespace BlazorApp1.Services;
 public class UserService : IUserService
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<UserService> _logger;
     public string? LastErrorMessage { get; private set; }
 
-    public UserService(IHttpClientFactory httpClientFactory)
+    public UserService(IHttpClientFactory httpClientFactory, ILogger<UserService> logger)
     {
         _httpClient = httpClientFactory.CreateClient("ReviewAnythingAPI");
+        _logger = logger;
     }
 
     public async Task<IEnumerable<UserCommentDto?>> GetUsersInformationAsync(IEnumerable<int> userIds)
@@ -22,19 +25,20 @@ public class UserService : IUserService
             var response = await _httpClient.PostAsJsonAsync("api/user", userIds);
             if (response.IsSuccessStatusCode)
             {
-                return response.Content.ReadFromJsonAsync<IEnumerable<UserCommentDto>>().Result;
+                var result = await response.Content.ReadFromJsonAsync<IEnumerable<UserCommentDto>>();
+                return result ?? Array.Empty<UserCommentDto>();
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
                 LastErrorMessage = $"Error creating review, status code: {response.StatusCode} - error message:{errorContent}";
-                return null;
+                return Array.Empty<UserCommentDto>();
             }
         }
         catch (Exception ex)
         {
             LastErrorMessage = ex.Message;
-            return null;
+            return Array.Empty<UserCommentDto>();
         }
     }
     // public async Task<IEnumerable<UserCommentDto?>> GetUsersInformationAsync(IEnumerable<int> userIds)
@@ -201,6 +205,36 @@ public class UserService : IUserService
         {
             Console.WriteLine($"Error in UpdateUserSummaryAsync service: {ex.Message}");
             return null;
+        }
+    }
+
+    public async Task<bool> LogVisitAsync(ClientInfoService clientInfo)
+    {
+        try
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/log", clientInfo);
+            if (response.IsSuccessStatusCode) return true;
+            var error = await response.Content.ReadAsStringAsync();
+            _logger.LogError("Insert log response unsuccessful. Error: {Error}", error);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Catch exception while insertin log visit. Error: {Error}", ex.Message);
+            return false;
+        }
+    }
+
+    public async Task<bool> WakeAPI()
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync("api/health", HttpCompletionOption.ResponseHeadersRead);
+            if (response.IsSuccessStatusCode) return true;
+            return false;
+        } catch (Exception)
+        {
+            return false;
         }
     }
 }

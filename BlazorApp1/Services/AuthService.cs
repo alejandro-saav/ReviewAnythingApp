@@ -26,8 +26,8 @@ public class AuthService : IAuthService
             var response = await _httpClient.PostAsJsonAsync("api/auth/Login", request);
             if (response.IsSuccessStatusCode)
             {
-                LoginResponse loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                return loginResponse;
+                var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+                return loginResponse ?? new LoginResponse { ErrorMessage = "Invalid response", Success = false };
             }
             else
             {
@@ -168,7 +168,7 @@ public class AuthService : IAuthService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                return content;
+                return content ?? new LoginResponse { ErrorMessage = "Invalid response", Success = false };
             }
 
             var errorContent = await response.Content.ReadAsStringAsync();

@@ -1,4 +1,5 @@
 using BlazorApp1.Components;
+using BlazorApp1.HelperClasses;
 using BlazorApp1.Models;
 using BlazorApp1.Services;
 using Blazored.LocalStorage;
@@ -32,6 +33,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<GoogleOAuthService>();
+builder.Services.AddScoped<ClientInfoService>();
+// builder.Services.AddTransient<ForwardedHeaders>();
 
 // Http bearer handler
 builder.Services.AddTransient<BearerTokenHandler>();
@@ -65,11 +68,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 // for razor pages
-builder.Services.AddRazorPages().WithRazorPagesRoot("/Components/Pages"); ;
+builder.Services.AddRazorPages().WithRazorPagesRoot("/Components"); ;
 
 // Comment the below line for development
-builder.WebHost.UseUrls("http://*:80");
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://*:80");
+}
 var app = builder.Build();
+
+// Add custom middleware
+app.UseMiddleware<CaptureClientInfoMiddleware>();
 
 app.UseForwardedHeaders();
 

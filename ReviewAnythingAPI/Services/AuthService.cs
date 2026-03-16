@@ -1,3 +1,4 @@
+using System.CodeDom;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -38,7 +39,7 @@ public class AuthService : IAuthService
         _emailService = emailService;
     }
 
-    public async Task<AuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto)
+    public async Task<SuccessAuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto)
     {
         // Start transaction
         await using var transaction = await _context.Database.BeginTransactionAsync();
@@ -48,21 +49,13 @@ public class AuthService : IAuthService
             var existingUserByUsername = await _userManager.FindByNameAsync(userRegistrationDto.UserName);
             if (existingUserByUsername != null)
             {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    ErrorMessage = "Username already exists!"
-                };
+                throw new InvalidOperationException($"Username already exists. Username: {userRegistrationDto.UserName}");
             }
 
             var existingUserByEmail = await _userManager.FindByEmailAsync(userRegistrationDto.Email);
             if (existingUserByEmail != null)
             {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    ErrorMessage = "Email already exists!"
-                };
+                throw new InvalidOperationException("A user for the given email already exists.");
             }
 
             var user = new ApplicationUser
@@ -83,13 +76,7 @@ public class AuthService : IAuthService
 
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    ErrorMessage = "User registration failed!",
-                    Errors = errors
-                };
+                throw new ArgumentException($"User registration failed: {result.Errors.First().Description}");
             }
             // Cloudinary upload image
             if (userRegistrationDto.ProfileImage != null || userRegistrationDto.ProfileImage?.Length > 0)
@@ -102,16 +89,16 @@ public class AuthService : IAuthService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error trying to upload profile image to cloudinary: {ex.Message}");
+                    throw new Exception($"Something went wrong while trying to upload image to cloudinary. Error: {ex.Message}");
                 }
             }
 
             var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = Uri.EscapeDataString(verificationToken);
-            
+
             await _emailService.SendEmailConfirmationAsync(user, encodedToken);
             await transaction.CommitAsync();
-            return new AuthResponseDto
+            return new SuccessAuthResponseDto
             {
                 Success = true,
                 Message =
@@ -122,22 +109,22 @@ public class AuthService : IAuthService
                     UserName = user.UserName,
                     Email = user.Email,
                     FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Bio = user.Bio,
+                    LastName = user.LastName ?? "",
+                    Bio = user.Bio ?? "",
                     ProfileImage = user.ProfileImage,
                     CreationDate = user.CreationDate,
-                    Phone = user.PhoneNumber
+                    Phone = user.PhoneNumber ?? ""
                 },
             };
         }
         catch (Exception ex)
         {
             await transaction.RollbackAsync();
-           throw new TransactionFailedException("An error occured while trying to create a new user", ex);
+            throw new TransactionFailedException("An error occured while trying to create a new user", ex);
         }
     }
 
-    public async Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token)
+    public async Task<SuccessAuthResponseDto> ConfirmEmailAsync(string userId, string token)
     {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
@@ -152,88 +139,71 @@ public class AuthService : IAuthService
 
         var newJwtToken = await GenerateJwtToken(user);
 
-        return new AuthResponseDto
+        return new SuccessAuthResponseDto
         {
             Success = true,
             Token = newJwtToken,
             UserResponse = new UserResponseDto
             {
                 UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Bio = user.Bio,
-                ProfileImage = user.ProfileImage,
+                UserName = user.UserName!,
+                Email = user.Email!,
+                FirstName = user.FirstName!,
+                LastName = user.LastName ?? "",
+                Bio = user.Bio ?? "",
+                ProfileImage = user.ProfileImage ?? "",
                 CreationDate = user.CreationDate,
-                Phone = user.PhoneNumber
+                Phone = user.PhoneNumber ?? ""
             },
         };
     }
 
-    public async Task<AuthResponseDto> LoginUserAsync(UserLoginRequestDto userLoginDto)
+    public async Task<SuccessAuthResponseDto> LoginUserAsync(UserLoginRequestDto userLoginDto)
     {
         // Find user
         var user = await _userManager.FindByEmailAsync(userLoginDto.Email);
-        if (user == null || !user.IsActive)
+        if (user is null || !user.IsActive)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "Invalid email or password!"
-            };
+            throw new InvalidOperationException("User not found or user is not currently active.");
         }
-        
+
         if (!user.EmailConfirmed)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "Email not confirmed. Please check your inbox."
-                // You could add a flag here like RequiresEmailConfirmation = true
-            };
+            throw new InvalidOperationException("Email not confirmed. Pleas check your inbox.");
         }
-        
+
         // Check if account is locked out
         if (await _userManager.IsLockedOutAsync(user))
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "Account is locked out!"
-            };
+            throw new InvalidOperationException("Account is locked out.");
         }
-        
+
         // Verify password
         var passwordValid = await _userManager.CheckPasswordAsync(user, userLoginDto.Password);
         if (!passwordValid)
         {
             await _userManager.AccessFailedAsync(user);
-            return new AuthResponseDto
-            {
-                Success = false,
-                ErrorMessage = "Invalid email or password!"
-            };
+            throw new InvalidOperationException("Invalid email or password.");
         }
         // if login success reset access failed count
         await _userManager.ResetAccessFailedCountAsync(user);
         // Generate Token
         var token = await GenerateJwtToken(user);
-        return new AuthResponseDto
+        return new SuccessAuthResponseDto
         {
             Success = true,
             Token = token,
             UserResponse = new UserResponseDto
             {
                 UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Bio = user.Bio,
-                ProfileImage = user.ProfileImage,
+                UserName = user.UserName ?? "",
+                Email = user.Email!,
+                FirstName = user.FirstName!,
+                LastName = user.LastName ?? "",
+                Bio = user.Bio ?? "",
+                ProfileImage = user.ProfileImage ?? "",
                 CreationDate = user.CreationDate,
-                Phone = user.PhoneNumber
+                Phone = user.PhoneNumber ?? ""
             },
         };
     }
@@ -246,16 +216,16 @@ public class AuthService : IAuthService
 
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()), 
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()), new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()), new Claim(JwtRegisteredClaimNames.Email, user.Email!),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName ?? ""),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
             new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             new Claim("profile_image", user.ProfileImage ?? string.Empty)
         };
-        
+
         var customUserClaims = await _userManager.GetClaimsAsync(user);
         claims.AddRange(customUserClaims);
 
@@ -276,7 +246,7 @@ public class AuthService : IAuthService
         return tokenHandler.WriteToken(token);
     }
 
-    public async Task<AuthResponseDto> GoogleSignInAsync(string idTokenString)
+    public async Task<SuccessAuthResponseDto> GoogleSignInAsync(string idTokenString)
     {
         var googleClientId = _configuration["Google:ClientId"];
         GoogleJsonWebSignature.Payload payload;
@@ -284,14 +254,14 @@ public class AuthService : IAuthService
         {
             payload = await GoogleJsonWebSignature.ValidateAsync(idTokenString, new GoogleJsonWebSignature.ValidationSettings
             {
-                Audience = new[] { googleClientId},
+                Audience = new[] { googleClientId },
             });
         }
-        catch (InvalidJwtException)
+        catch (InvalidJwtException ex)
         {
-            return new AuthResponseDto { Success = false, ErrorMessage = "Invalid Google Token" };
+            throw new InvalidOperationException($"Invalid google token. Error: {ex.Message}");
         }
-        
+
         // Token is valid, extract user information
         var userEmail = payload.Email;
         var googleUserId = payload.Subject;
@@ -301,9 +271,9 @@ public class AuthService : IAuthService
         var emailVerified = payload.EmailVerified;
         if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(googleUserId))
         {
-            return new AuthResponseDto { Success = false, ErrorMessage = "Required information not provided by Google." };
+            throw new InvalidOperationException($"Required information not found in the token.");
         }
-        
+
         // Use ASP.NET Core Identity's external login mechanism
         var loginInfo = new UserLoginInfo("Google", googleUserId, "Google");
 
@@ -328,60 +298,56 @@ public class AuthService : IAuthService
                 var createUserResult = await _userManager.CreateAsync(user);
                 if (!createUserResult.Succeeded)
                 {
-                    return new AuthResponseDto { Success = false, ErrorMessage = "Could not create local user account.", Errors = createUserResult.Errors.Select(e => e.Description).ToList() };
+                    throw new Exception($"Could not creat local user account. Error: {createUserResult.Errors.First().Description}");
                 }
             }
 
             var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
             if (!addLoginResult.Succeeded)
             {
-                return new AuthResponseDto { Success = false, ErrorMessage = "Could not link google account to local user.", Errors = addLoginResult.Errors.Select(e => e.Description).ToList() };
+                throw new Exception($"Could not link google account to local user. Error: {addLoginResult.Errors.First().Description}");
             }
         }
         var localToken = await GenerateJwtToken(user);
-        return new AuthResponseDto
+        return new SuccessAuthResponseDto
         {
             Success = true,
             Token = localToken,
             UserResponse = new UserResponseDto
             {
                 UserId = user.Id,
-                UserName = user.UserName,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Bio = user.Bio,
-                ProfileImage = user.ProfileImage,
+                UserName = user.UserName ?? "",
+                Email = user.Email!,
+                FirstName = user.FirstName!,
+                LastName = user.LastName ?? "",
+                Bio = user.Bio ?? "",
+                ProfileImage = user.ProfileImage ?? "",
                 CreationDate = user.CreationDate,
-                Phone = user.PhoneNumber
+                Phone = user.PhoneNumber ?? ""
             }
         };
     }
 
     public string GenerateRandomUsername()
     {
-        return "user_" + Guid.NewGuid().ToString("N").Substring(0,8);
+        return "user_" + Guid.NewGuid().ToString("N").Substring(0, 8);
     }
 
-    public async Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto request)
+    public async Task<SuccessAuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+        if (user is null || !await _userManager.IsEmailConfirmedAsync(user))
         {
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = "If your email address is registered and confirmed, you will receive a password reset link.",
-            };
+            throw new InvalidOperationException("The user for the given email does not exists or email is not yet confirmed.");
         }
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var encodedToken = Uri.EscapeDataString(token);
         string callBackUrl = $"{_configuration["FrontEndUrls:ResetPassword"]}?userId={user.Id}&token={encodedToken}";
-        
+
         // Send Email
         var message = new EmailMessage();
         message.From = "onboarding@resend.dev";
-        message.To.Add(user.Email);
+        message.To.Add(user.Email!);
         message.Subject = "ReviewAnything Password Reset";
         message.HtmlBody = $@"
     <div style=""font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.6;color:#333;background:#f9f9f9;padding:20px;border-radius:8px;"">
@@ -407,41 +373,56 @@ public class AuthService : IAuthService
         <p style=""margin-top:30px;"">— The ReviewAnything Team</p>
     </div>";
         await _resend.EmailSendAsync(message);
-        return new AuthResponseDto
+        return new SuccessAuthResponseDto
         {
             Success = true,
             Message =
                 "Reset password success you will receive a password reset link to the email address registered to your account.",
+            UserResponse = new UserResponseDto
+            {
+                UserId = user.Id,
+                UserName = user.UserName ?? "",
+                Email = user.Email!,
+                FirstName = user.FirstName!,
+                LastName = user.LastName ?? "",
+                Bio = user.Bio ?? "",
+                ProfileImage = user.ProfileImage ?? "",
+                CreationDate = user.CreationDate,
+                Phone = user.PhoneNumber ?? ""
+            }
         };
     }
 
-    public async Task<AuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto request)
+    public async Task<SuccessAuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto request)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
+        if (user is null)
         {
-            return new AuthResponseDto
-            {
-                Success = false,
-                Message = "Password reset failed, invalid request."
-            };
+            throw new InvalidOperationException("Password reset failed, user does not exist.");
         }
 
-        // string decodedToken = Uri.UnescapeDataString(token);
         var result = await _userManager.ResetPasswordAsync(user, token, request.Password);
         if (result.Succeeded)
         {
-            return new AuthResponseDto
-            {
-                Success = true,
-                Message = "Password has been reset successfully."
-            };
+            throw new Exception($"Something went wrong while reseting the user's password. Error: {result.Errors.First().Description}");
         }
 
-        return new AuthResponseDto
+        return new SuccessAuthResponseDto
         {
-            Success = false,
-            Message = "Password reset failed, invalid request."
+            Success = true,
+            Message = "Password has been reset successfully.",
+             UserResponse = new UserResponseDto
+            {
+                UserId = user.Id,
+                UserName = user.UserName ?? "",
+                Email = user.Email!,
+                FirstName = user.FirstName!,
+                LastName = user.LastName ?? "",
+                Bio = user.Bio ?? "",
+                ProfileImage = user.ProfileImage ?? "",
+                CreationDate = user.CreationDate,
+                Phone = user.PhoneNumber ?? ""
+            }
         };
     }
 }

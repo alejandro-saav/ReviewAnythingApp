@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure Cloudinary settings
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
-// Register Cloudinary as a singleton (recommended)
+// Register Cloudinary as a singleton
 builder.Services.AddSingleton(sp =>
 {
     var config = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<CloudinarySettings>>().Value;
@@ -33,7 +33,7 @@ builder.Services.AddOptions();
 builder.Services.AddHttpClient<ResendClient>();
 builder.Services.Configure<ResendClientOptions>(options =>
 {
-    options.ApiToken = builder.Configuration["Resend:ApiKey"];
+    options.ApiToken = builder.Configuration["Resend:ApiKey"] ?? "";
 });
 builder.Services.AddTransient<IResend, ResendClient>();
 
@@ -44,6 +44,7 @@ builder.Services.AddScoped<IItemService, ItemService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IFollowService, FollowService>();
+builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<CloudinaryService>();
 // Add repositories to the container
@@ -63,15 +64,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresSQL")));
 
-
-
-// // DbContext
-// builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 // Seed services
 builder.Services.AddHttpClient(); 
@@ -129,12 +122,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// comment the below line for development
-builder.WebHost.UseUrls("http://*:80");
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://*:80");
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
     // SEED 50 USERS;
     
@@ -173,3 +168,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+///// TODO
+/// Add new table for new visits. Add the model.
+/// Add new visit to table on middleware
+/// Stop tracking the issues folder delete it from git.

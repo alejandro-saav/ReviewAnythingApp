@@ -54,7 +54,7 @@ public class CommentService : ICommentService
     public async Task<CommentResponseDto> CreateCommentAsync(CommentCreateRequestDto commentCreateRequestDto, int userId, string userName)
     {
         var reviewExists = await _reviewRepository.GetByIdAsync(commentCreateRequestDto.ReviewId);
-        if (reviewExists == null)
+        if (reviewExists is null)
         {
             throw new EntityNotFoundException($"review not found for the given reviewId {commentCreateRequestDto.ReviewId}");
         }
@@ -73,8 +73,8 @@ public class CommentService : ICommentService
 
     public async Task<CommentResponseDto> UpdateCommentAsync(CommentCreateRequestDto commentCreateRequestDto, int commentId, int userId, string userName)
     {
-        Comment comment = await _commentRepository.GetByIdAsync(commentId);
-        if (comment == null)
+        Comment? comment = await _commentRepository.GetByIdAsync(commentId);
+        if (comment is null)
         {
             throw new EntityNotFoundException($"comment not found for the given commentId {commentId}");
         }
@@ -97,8 +97,8 @@ public class CommentService : ICommentService
 
     public async Task<CommentResponseDto> GetCommentByIdAsync(int commentId)
     {
-        Comment comment = await _commentRepository.GetByIdAsync(commentId);
-        if (comment == null)
+        Comment? comment = await _commentRepository.GetByIdAsync(commentId);
+        if (comment is null)
         {
             throw new EntityNotFoundException($"comment not found for commentId {commentId}");
         }
@@ -127,7 +127,7 @@ public class CommentService : ICommentService
             throw new ArgumentException("commentId must be greater than 0", nameof(commentId));
         }
         var comment = await _commentRepository.GetByIdAsync(commentId);
-        if (comment == null)
+        if (comment is null)
         {
             throw new KeyNotFoundException($"comment not found for the given commentId {commentId}");
         }
@@ -150,7 +150,7 @@ public class CommentService : ICommentService
             CommentId = commentVoteRequestDto.CommentId,
             UserVote = commentVoteRequestDto.VoteType,
         };
-        if (existingCommentVote == null)
+        if (existingCommentVote is null)
         {
             CommentVote newCommentVote = new CommentVote
             {
@@ -165,7 +165,7 @@ public class CommentService : ICommentService
         }
         else if (existingCommentVote.VoteType == commentVoteRequestDto.VoteType)
         {
-            await _commentVoteRepository.DeleteAsyncByEntity(existingCommentVote);
+            _commentVoteRepository.DeleteAsyncByEntity(existingCommentVote);
             response.ActionType = ActionType.Deleted;
         }
         else
@@ -181,7 +181,7 @@ public class CommentService : ICommentService
     public async Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null) throw new EntityNotFoundException("User not found");
+        if (user is null) throw new EntityNotFoundException("User not found");
         var comments = await _commentRepository.GetAllCommentsPageAsync(userId);
         return comments;
     }

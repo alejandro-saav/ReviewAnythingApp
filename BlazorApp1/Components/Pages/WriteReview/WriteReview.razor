@@ -1,0 +1,84 @@
+@page "/write"
+@using Microsoft.AspNetCore.Authorization
+@rendermode InteractiveServer
+@attribute [Authorize]
+
+<PageTitle>Write Review</PageTitle>
+
+<div class="write-review-container">
+
+    <div class="write-review-wrapper">
+        <h1 class="page-title">Write a Review</h1>
+
+
+        <EditForm Model="@ReviewModel" OnValidSubmit="CreateNewReview" FormName="CreateReview">
+            <DataAnnotationsValidator />
+            <div class="categories">
+                @foreach (var category in Categories)
+                {
+                    <button type="button" class="category-btn @(SelectedCategory == category.CategoryName ? "active" : "")"
+                        @onclick="() => SelectCategory(category)">
+                        @category.CategoryName
+                    </button>
+                }
+            </div>
+                <ValidationMessage For="@(() => ReviewModel.CategoryId)" />
+            <div class="form-group">
+                <label class="form-label" for="reviewTitle">Review Title</label>
+                <input type="text" id="reviewTitle" @bind="ReviewModel.Title" class="form-input review-title-input"
+                    placeholder="Enter your review title...">
+                <ValidationMessage For="@(() => ReviewModel.Title)" />
+            </div>
+
+            <div class="form-group">
+                <div class="rating-container">
+                    <label class="form-label" for="reviewContent">Review Content</label>
+                    <div class="@(AnimateRatingError ? "animate-error" : "")">
+                        <span>rating:</span>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            int starValue = i;
+                            <span
+                                class="star @(starValue <= (HoverRating > 0 ? HoverRating : ReviewModel.Rating) ? "selected" : "")"
+                                @onclick="@(() => SetRating(starValue))" @onmouseover="@(() => SetHoverRating(starValue))"
+                                @onmouseout="@(() => ClearHover())">
+                                ★
+                            </span>
+                        }
+                    </div>
+                </div>
+                <textarea id="reviewContent" class="form-input form-textarea"
+                    placeholder="Share your thoughts and experience..." @bind="ReviewModel.Content">
+            </textarea>
+                <ValidationMessage For="@(() => ReviewModel.Content)" />
+                <div class="hellno">
+                    <label for="tag-input">Tags:</label>
+                    <ul>
+                        @foreach (var tag in ReviewModel.Tags)
+                        {
+                            <li class="tag">
+                                <span class="sp-tag">@tag</span> 
+                                <button class="remove-tag-btn" type="button" @onclick="() => RemoveTag(tag)">x</button>
+                            </li>
+                        }
+                        @if (!string.IsNullOrEmpty(ErrorTagMessage))
+                        {
+                            <span class="error-message">@ErrorTagMessage</span>
+                        }
+                    </ul>
+                </div>
+                <input id="tag-input" class="form-input"
+                    placeholder="Add 5 tags max. (no special characters allow, just letters and numbers)"
+                    @onkeydown="HandleKeyDown" @bind="NewTag" @bind:event="oninput" type="text" autocomplete="off" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <p class="error-message">@ErrorMessage</p>
+            }
+            <button type="submit" class="submit-btn">Create Review</button>
+        </EditForm>
+    </div>
+
+
+</div>

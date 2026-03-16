@@ -12,39 +12,39 @@ public class ItemRepository : Repository<Item>, IItemRepository
 
     public async Task<IEnumerable<ItemSummaryDto>> GetItemsByCategoryIdAsync(int categoryId)
     {
-        return await _context.Items.Where(item => item.CategoryId == categoryId).Select(item => new ItemSummaryDto
+        return await _context.Items.AsNoTracking().Where(item => item.CategoryId == categoryId).Select(item => new ItemSummaryDto
         {
             ItemId = item.ItemId,
             ItemName = item.ItemName,
             TotalReviews = item.ItemReviews.Count(),
             AvgRating = item.ItemReviews.Any() ? (int)Math.Round(item.ItemReviews.Average(r => r.Rating)) : 0,
-            CreatedBy = item.Creator.UserName,
+            CreatedBy = item.Creator != null ? item.Creator.UserName : "",
             CreationDate = item.CreationDate,
         }).ToListAsync();
     }
 
-    public async Task<ItemSummaryDto> GetItemByItemNameAsync(string itemName)
+    public async Task<ItemSummaryDto?> GetItemByItemNameAsync(string itemName)
     {
-        return await _context.Items.Where(i => i.ItemName == itemName).Select(item => new ItemSummaryDto
+        return await _context.Items.AsNoTracking().Where(i => i.ItemName == itemName).Select(item => new ItemSummaryDto
         {
             ItemId = item.ItemId,
             ItemName = item.ItemName,
             TotalReviews = item.ItemReviews.Count(),
             AvgRating = item.ItemReviews.Any() ? (int)Math.Round(item.ItemReviews.Average(r => r.Rating)) : 0,
-            CreatedBy = item.Creator.UserName,
+            CreatedBy = item.Creator != null ? item.Creator.UserName : "",
             CreationDate = item.CreationDate,
         }).FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<ItemSummaryDto>> GetItemsByUserIdAsync(int userId)
     {
-        return await _context.Items.Where(i => i.CreatedByUserId == userId).Select(item => new ItemSummaryDto
+        return await _context.Items.AsNoTracking().Where(i => i.CreatedByUserId == userId).Select(item => new ItemSummaryDto
         {
             ItemId = item.ItemId,
             ItemName = item.ItemName,
             TotalReviews = item.ItemReviews.Count(),
             AvgRating = item.ItemReviews.Any() ? (int)Math.Round(item.ItemReviews.Average(r => r.Rating)) : 0,
-            CreatedBy = item.Creator.UserName,
+            CreatedBy = item.Creator != null ? item.Creator.UserName : "",
             CreationDate = item.CreationDate,
         }).ToListAsync();
     }

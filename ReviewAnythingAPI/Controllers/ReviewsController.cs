@@ -28,6 +28,9 @@ public class ReviewsController : ControllerBase
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
 
             var createdReview = await _reviewService.CreateReviewAsync(reviewCreateRequestDto, userId);
+
+            _logger.LogInformation("Review successfully created. User id: {UserId}, review id: {ReviewId}, at {Time}", userId, createdReview.ReviewId, DateTime.UtcNow);
+
             return CreatedAtAction(nameof(GetReviewById), new { reviewId = createdReview.ReviewId }, createdReview);
     }
 
@@ -38,6 +41,9 @@ public class ReviewsController : ControllerBase
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
             var updatedReview = await _reviewService.UpdateReviewAsync(reviewUpdateRequestDto, userId, reviewId);
+
+            _logger.LogInformation("Successfully review update. User id_ {UserId}, review id {ReviewId}, at: {Time}", userId, reviewId, DateTime.UtcNow);
+
             return Ok(updatedReview);
     }
 
@@ -46,6 +52,9 @@ public class ReviewsController : ControllerBase
     {
             var reviews = await _reviewService.GetAllReviewsByUserIdAsync(userId);
             if (reviews == null || !reviews.Any()) return NotFound(new { message = $"No reviews found for user {userId}"});
+
+            _logger.LogInformation("Retrieved user reviews. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+
             return Ok(reviews);
     }
 
@@ -53,6 +62,9 @@ public class ReviewsController : ControllerBase
     public async Task<IActionResult> GetItemReviewsByItemId([FromRoute] int itemId)
     {
             var reviews = await _reviewService.GetAllReviewsByItemIdAsync(itemId);
+
+            _logger.LogInformation("Retrieved reviews by item id. Item id: {itemId}, reviews count_ {ReviewsCount}, at {Time}", itemId, reviews.Count(), DateTime.UtcNow);
+
             return Ok(reviews);
     }
 
@@ -61,6 +73,9 @@ public class ReviewsController : ControllerBase
     {
             var review = await _reviewService.GetReviewByIdAsync(reviewId);
             if (review == null) return NotFound(new { message = $"Review {reviewId} was not found" });
+
+            _logger.LogInformation("Retrieved review by id. Review id: {ReviewId}, at: {Time}", reviewId, DateTime.UtcNow);
+
             return Ok(review);
     }
 
@@ -71,6 +86,7 @@ public class ReviewsController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
         var reviewVote = await _reviewService.ReviewVoteAsync(reviewVoteRequestDto, userId);
+
         return reviewVote.ActionType switch
         {
             ActionType.Created => CreatedAtAction(nameof(PostReviewVotes), new { reviewVoteRequestDto.ReviewId },
@@ -87,10 +103,16 @@ public class ReviewsController : ControllerBase
         int? userId = null;
         if (User.Identity?.IsAuthenticated == true)
         {
-            userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int id)) {
+                userId = id;
+            }
         }
         
         var data = await _reviewService.GetReviewPageDataAsync(userId, reviewId);
+
+        _logger.LogInformation("Retrieved review page data. Review id: {ReviewId}, at: {Time}", reviewId, DateTime.UtcNow);
+
         return Ok(data);
     }
 
@@ -101,6 +123,9 @@ public class ReviewsController : ControllerBase
         int pageSize = 9;
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
         var reviews = await _reviewService.GetMyReviewsAsync(userId, pageSize, queryParamsDto);
+
+        _logger.LogInformation("Retrieved reviews made by authenticated user. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+
         return Ok(reviews);
     }
 
@@ -111,6 +136,9 @@ public class ReviewsController : ControllerBase
         int pageSize = 9;
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int userId)) return Unauthorized();
         var reviews = await _reviewService.GetLikesReviewsAsync(userId, pageSize, queryParamsDto);
+
+        _logger.LogInformation("Retrieved liked reviews by authenticated user. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+
         return Ok(reviews);
     }
 
@@ -119,6 +147,9 @@ public class ReviewsController : ControllerBase
     {
         int pageSize = 9;
         var reviews = await _reviewService.GetExplorePageReviewsAsync(queryParamsDto, pageSize);
+
+        _logger.LogInformation("Retrieved explore page information. At: {Time}", DateTime.UtcNow);
+
         return Ok(reviews);
     }
 }

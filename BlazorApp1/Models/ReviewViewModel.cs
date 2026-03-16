@@ -6,11 +6,11 @@ public class ReviewViewModel
 {
     [Required]
     [MaxLength(100)]
-    public string Title { get; set; }
+    public string Title { get; set; } = "";
     
     [Required]
     [MaxLength(10000)]
-    public string Content { get; set; }
+    public string Content { get; set; } = "";
     
     // [Required(ErrorMessage = "Please select a star rating.")]
     public int Rating { get; set; }

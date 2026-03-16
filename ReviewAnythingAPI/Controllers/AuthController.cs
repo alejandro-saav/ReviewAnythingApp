@@ -9,21 +9,22 @@ namespace ReviewAnythingAPI.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
+        _logger = logger;
     }
 
     [HttpPost("Register")]
     public async Task<IActionResult> Register([FromForm] UserRegistrationRequestDto userRegistrationDto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        
-        var result = await _authService.RegisterUserAsync(userRegistrationDto);
-        
-        if (!result.Success) return BadRequest(result.Errors);
 
+        var result = await _authService.RegisterUserAsync(userRegistrationDto);
+
+        _logger.LogInformation("New user registered. User id: {UserId}, username: {UserName}, at: {Time}", result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
         return Ok(result);
     }
 
@@ -33,8 +34,9 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var result = await _authService.LoginUserAsync(userLoginDto);
-        
-        if (!result.Success) return BadRequest(result.ErrorMessage);
+
+        _logger.LogInformation("New login. User id: {UserId}, username: {UserName}, at: {Time}", result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
+
         return Ok(result);
     }
 
@@ -43,11 +45,9 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var authResponse = await _authService.GoogleSignInAsync(googleSignInDto.IdToken);
-        if (authResponse.Success)
-        {
-            return Ok(authResponse);
-        }
-        return BadRequest(new { authResponse.ErrorMessage, authResponse.Errors });
+
+        _logger.LogInformation("New google sign in. User id: {UserId}, username: {UserName}, at: {Time}", authResponse.UserResponse.UserId, authResponse.UserResponse.UserName, DateTime.UtcNow);
+        return Ok(authResponse);
     }
 
     [HttpGet("confirm-email")]
@@ -55,6 +55,8 @@ public class AuthController : ControllerBase
     {
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token)) return BadRequest("userId or token is empty");
         var result = await _authService.ConfirmEmailAsync(userId, token);
+
+        _logger.LogInformation("Email successfully confirmed. User id: {UserId}, username: {UserName}, at: {Time}", result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
         return Ok(result);
     }
 
@@ -63,7 +65,14 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var result = await _authService.ForgotPasswordAsync(forgotPasswordDto);
-        return Ok(result);
+
+        _logger.LogInformation("Email for password reset successfully sent. User id: {UserId}, username: {UserName}, at: {Time}",result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
+
+        return Ok(new GenericResponseDto
+        {
+            Success = result.Success,
+            Message = result.Message
+        });
     }
 
     [HttpPost("reset-password")]
@@ -71,7 +80,13 @@ public class AuthController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var result = await _authService.ResetPasswordAsync(userId, token, resetPasswordRequestDto);
-        if (result.Success) return Ok(result);
-        return BadRequest(result);
+
+        _logger.LogInformation("Password successfully reset. User id: {UserId}, username: {UserName}, at: {Time}", result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
+
+        return Ok(new GenericResponseDto
+        {
+            Success = result.Success,
+            Message = result.Message
+        });
     }
 }
