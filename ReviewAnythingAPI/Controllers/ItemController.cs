@@ -7,21 +7,21 @@ namespace ReviewAnythingAPI.Controllers;
 public class ItemController : ControllerBase
 {
     private readonly IItemService _itemService;
+    private readonly ILogger<ItemController> _logger;
 
     public ItemController(ILogger<ItemController> logger, IItemService itemService)
     {
+        _logger = logger;
         _itemService = itemService;
     }
 
     [HttpGet("categories/{categoryId}")]
     public async Task<IActionResult> GetItemsByCategoryIdAsync(int categoryId)
     {
-            if (categoryId < 1 || categoryId > 6)
-            {
-                return BadRequest("Category ID must be between 1 and 6");
-            }
-
             var result = await _itemService.GetItemsByCategoryIdAsync(categoryId);
+
+            _logger.LogInformation("Successfully retrieved items by category id. Category id: {CategoryId}, at: {Time}", categoryId, DateTime.UtcNow);
+
             return Ok(result);
     }
 
@@ -29,6 +29,9 @@ public class ItemController : ControllerBase
     public async Task<IActionResult> GetItemsByUserIdAsync(int userId)
     {
             var result = await _itemService.GetItemsByUserIdAsync(userId);
+
+            _logger.LogInformation("Successfully retrieved items by user id. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+
             return Ok(result);
     }
 
@@ -38,6 +41,9 @@ public class ItemController : ControllerBase
             if (string.IsNullOrWhiteSpace(itemName)) return BadRequest("Item name cannot be empty");
             var result = await _itemService.GetItemByNameAsync(itemName);
             if (result == null) return NotFound($"Item with name '{itemName}' not found");
+
+            _logger.LogInformation("Successfully retrieved item by name. Item name: {ItemName}, at {Time}", itemName, DateTime.UtcNow);
+
             return Ok(result);
     }
 

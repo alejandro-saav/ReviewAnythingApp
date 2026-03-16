@@ -1,3 +1,4 @@
+**/appsettings.Development.json
 bin/
 obj/
 packages/
@@ -34,3 +35,6 @@ Thumbs.db
 docker-compose.override.yml
 
 .idea/
+BlazorApp1/CHANGES_LOG.md
+BlazorApp1/TODO.txt
+ReviewAnythingAPI/Issues

@@ -29,7 +29,7 @@ public class ReviewSeederService
 
         int created = 0;
 
-        foreach (var r in reviews)
+        foreach (var r in reviews!)
         {
             if (created >= maxCount) break;
             if (string.IsNullOrWhiteSpace(r.review_text)) continue;
@@ -72,6 +72,6 @@ public class ReviewSeederService
 
 public class ExternalReview
 {
-    public string review_text { get; set; }
+    public required string review_text { get; set; }
     public int rating { get; set; }
 }

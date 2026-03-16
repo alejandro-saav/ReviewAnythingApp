@@ -9,5 +9,5 @@ public class ReviewVote
     
     // Navigation Properties
     public ApplicationUser? User { get; set; }
-    public Review Review { get; set; }
+    public Review? Review { get; set; }
 }

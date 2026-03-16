@@ -67,14 +67,7 @@ public class UserSeederService
 
             var result = await _authService.RegisterUserAsync(userDto);
 
-            if (result.Success)
-            {
-                Console.WriteLine($"✅ Created: {username}");
-            }
-            else
-            {
-                Console.WriteLine($"❌ Failed: {username} - {result.ErrorMessage}");
-            }
+            Console.WriteLine($"✅ Created: {username}");
 
             await Task.Delay(200); // evita saturar
         }

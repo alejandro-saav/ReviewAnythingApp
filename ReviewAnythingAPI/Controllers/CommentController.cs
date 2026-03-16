@@ -13,10 +13,12 @@ namespace ReviewAnythingAPI.Controllers;
 public class CommentController : ControllerBase
 {
     private readonly ICommentService _commentService;
+    private readonly ILogger<CommentController> _logger;
 
-    public CommentController(ICommentService commentService)
+    public CommentController(ICommentService commentService, ILogger<CommentController> logger)
     {
         _commentService = commentService;
+        _logger = logger;
     }
 
 
@@ -24,6 +26,9 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetAllCommentsByUser([FromRoute] int userId)
     {
         var comments = await _commentService.GetAllCommentsByUserAsync(userId);
+
+        _logger.LogInformation("Successfully retrieved all comments by user. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+
         return Ok(comments);
     }
 
@@ -31,6 +36,9 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetAllCommentsByReview([FromRoute] int reviewId)
     {
         var comments = await _commentService.GetAllCommentsByReviewAsync(reviewId);
+
+        _logger.LogInformation("Successfully retrieve all comments by review id. Review id: {ReviewId}, at {Time}", reviewId, DateTime.UtcNow);
+
         return Ok(comments);
     }
 
@@ -44,6 +52,9 @@ public class CommentController : ControllerBase
         if (userName == null) return Unauthorized();
 
         var createdComment = await _commentService.CreateCommentAsync(comment, userId, userName);
+
+        _logger.LogInformation("Comment created successfully. User id: {UserId}, username: {UserName}, comment id: {CommentId}, at: {Time} ", userId, userName, createdComment.CommentId, DateTime.UtcNow);
+
         return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.CommentId }, createdComment);
     }
 
@@ -51,6 +62,9 @@ public class CommentController : ControllerBase
     public async Task<IActionResult> GetCommentById([FromRoute] int commentId)
     {
         var comment = await _commentService.GetCommentByIdAsync(commentId);
+
+        _logger.LogInformation("Successfully retrieve comment. Comment id: {CommentId}, at: {Time}", commentId, DateTime.UtcNow);
+
         return Ok(comment);
     }
 
@@ -65,6 +79,9 @@ public class CommentController : ControllerBase
         if (userName == null) return Unauthorized();
 
         var updatedComment = await _commentService.UpdateCommentAsync(comment, commentId, userId, userName);
+
+        _logger.LogInformation("Succefully updated comment. User id: {UserId}, username: {UserName}, comment id {CommentId}, at {Time}", userId, userName, updatedComment.CommentId, DateTime.UtcNow);
+
         return Ok(updatedComment);
     }
 
@@ -76,6 +93,9 @@ public class CommentController : ControllerBase
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId)) return Unauthorized();
         await _commentService.DeleteCommentByIdAsync(commentId, userId);
+
+        _logger.LogInformation("Successfully delete comment. Comment id: {CommentId}, user id: {UserId}, at {Time}", commentId, userId, DateTime.UtcNow);
+
         return NoContent();
     }
 
@@ -86,6 +106,7 @@ public class CommentController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId)) return Unauthorized();
         var response = await _commentService.CommentVoteAsync(vote, userId);
+
         return response.ActionType switch
         {
             ActionType.Created => CreatedAtAction(nameof(PostCommentVotes), new { vote.CommentId }, vote),
@@ -101,6 +122,9 @@ public class CommentController : ControllerBase
     {
         if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId)) return Unauthorized();
         var comments = await _commentService.GetAllCommentsPageAsync(userId);
+
+        _logger.LogInformation("Successfully retrieve all comments made by the authenticated user. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+
         return Ok(comments);
     }
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
@@ -6,6 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
       <UserSecretsId>e49cd42b-9089-4c8e-8cc8-e14b45930753</UserSecretsId>
       <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+      <!-- RZ10012: Blazor component resolution; framework components (PageTitle, EditForm, etc.) are in scope via _Imports -->
+      <NoWarn>$(NoWarn);RZ10012</NoWarn>
   </PropertyGroup>
 
     <ItemGroup>

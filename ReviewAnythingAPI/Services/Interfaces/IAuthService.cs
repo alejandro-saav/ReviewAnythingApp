@@ -6,13 +6,13 @@ namespace ReviewAnythingAPI.Services.Interfaces;
 
 public interface IAuthService
 {
-    Task<AuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto);
+    Task<SuccessAuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto);
     
-    Task<AuthResponseDto> LoginUserAsync(UserLoginRequestDto userLoginDto);
+    Task<SuccessAuthResponseDto> LoginUserAsync(UserLoginRequestDto userLoginDto);
 
     Task<string> GenerateJwtToken(ApplicationUser user);
-    Task<AuthResponseDto> GoogleSignInAsync(string idToken);
-    Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token);
-    Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto forgotPasswordRequestDto);
-    Task<AuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto resetPasswordRequestDto);
+    Task<SuccessAuthResponseDto> GoogleSignInAsync(string idToken);
+    Task<SuccessAuthResponseDto> ConfirmEmailAsync(string userId, string token);
+    Task<SuccessAuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto forgotPasswordRequestDto);
+    Task<SuccessAuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto resetPasswordRequestDto);
 }

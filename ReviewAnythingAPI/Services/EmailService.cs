@@ -37,6 +37,10 @@ public class EmailService
             <p style=""margin-top:30px;"">— The ReviewAnything Team</p>
         </div>";
         var fromEmail = _configuration["Resend:From"];
+        if (string.IsNullOrWhiteSpace(fromEmail))
+        {
+            throw new Exception("Email configuration for resend is null or empty.");
+        }
         var message = new EmailMessage
         {
             From = fromEmail,

@@ -7,11 +7,11 @@ public class ReviewCreateRequestDto
 {
     [Required]
     [MaxLength(100)]
-    public string Title { get; set; }
+    public required string Title { get; set; }
     
     [Required]
     [MaxLength(10000)]
-    public string Content { get; set; }
+    public required string Content { get; set; }
     
     [Required]
     [Range(1, 5)]
@@ -23,6 +23,6 @@ public class ReviewCreateRequestDto
     public List<string> Tags { get; set; } = new List<string>();
     
     [Required]
-    [Range(1, 6)]
+    [Range(1, 7)]
     public int CategoryId { get; set; }
 }

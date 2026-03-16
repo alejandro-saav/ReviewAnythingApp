@@ -17,9 +17,9 @@ public class GoogleOAuthService
 
     public async Task<TokenResponse> ExchangeCodeForTokenAsync(string code)
     {
-        var clientId = _configuration["Google:ClientId"];
-        var clientSecret = _configuration["Google:ClientSecret"];
-        var redirectUri = _configuration["Google:RedirectUrl"];
+        var clientId = _configuration["Google:ClientId"] ?? "";
+        var clientSecret = _configuration["Google:ClientSecret"] ?? "";
+        var redirectUri = _configuration["Google:RedirectUrl"] ?? "";
         var tokenRequest = new Dictionary<string, string>
         {
             ["client_id"] = clientId,
@@ -40,7 +40,6 @@ public class GoogleOAuthService
         return JsonSerializer.Deserialize<TokenResponse>(responseContent, new JsonSerializerOptions 
         { 
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower 
-        });
+        }) ?? throw new InvalidOperationException("Failed to deserialize token response.");
     }
-
 }

@@ -33,7 +33,7 @@ public class ReviewService : IReviewService
                 return [];
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             LastErrorMessage = "Something went wrong";
             return [];
@@ -43,25 +43,17 @@ public class ReviewService : IReviewService
     public async Task<ReviewModel> CreateReviewAsync(ReviewViewModel review)
     {
         LastErrorMessage = null;
-        try
+        var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
+        if (response.IsSuccessStatusCode)
         {
-            var response = await _httpClient.PostAsJsonAsync("api/reviews", review);
-            if (response.IsSuccessStatusCode)
-            {
-                var newReview = await response.Content.ReadFromJsonAsync<ReviewModel>();
-                return newReview;
-            }
-            else
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                LastErrorMessage = $"Error creating review, status code: {response.StatusCode} - error message:{errorContent}";
-                return new ReviewModel();
-            }
+            var newReview = await response.Content.ReadFromJsonAsync<ReviewModel>();
+            return newReview!;
         }
-        catch (Exception ex)
+        else
         {
-            LastErrorMessage = "Something went wrong";
-            return new ReviewModel();
+            var errorContent = await response.Content.ReadAsStringAsync();
+            LastErrorMessage = $"Error creating review, status code: {response.StatusCode} - error message:{errorContent}";
+            throw new Exception(LastErrorMessage);
         }
     }
 
@@ -100,7 +92,7 @@ public class ReviewService : IReviewService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<Comment>>();
-                return content;
+                return content ?? [];
             }
             else
             {
@@ -109,7 +101,7 @@ public class ReviewService : IReviewService
                 return [];
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             LastErrorMessage = "Something went wrong";
             return [];
@@ -182,7 +174,7 @@ public class ReviewService : IReviewService
             return null;
         }
     }
-    
+
     public async Task<bool> CommentVoteAsync(CommentVoteRequest commentVote)
     {
         LastErrorMessage = null;
@@ -213,7 +205,7 @@ public class ReviewService : IReviewService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();
-                return content;
+                return content ?? [];
             }
             var errorContent = await response.Content.ReadAsStringAsync();
             LastErrorMessage = $"Error request unsuccessfull: {response.StatusCode} - error message:{errorContent}";
@@ -238,9 +230,9 @@ public class ReviewService : IReviewService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();
-                return content;
+                return content ?? [];
             }
-            
+
             var errorContent = await response.Content.ReadAsStringAsync();
             LastErrorMessage = $"Error request unsuccessfull: {response.StatusCode} - error message:{errorContent}";
             Console.WriteLine($"{LastErrorMessage}");
@@ -262,7 +254,7 @@ public class ReviewService : IReviewService
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<MyCommentsPageModel>>();
-                return content;
+                return content ?? [];
             }
             var errorContent = await response.Content.ReadAsStringAsync();
             LastErrorMessage = $"Error request unsuccessfull on GetMyCommentsPage service: {response.StatusCode} - error message:{errorContent}";
@@ -275,7 +267,7 @@ public class ReviewService : IReviewService
             return [];
         }
     }
-    
+
     public string BuildQueryString(ExploreQueryParams queryParams)
     {
         var parameters = new Dictionary<string, object?>
@@ -290,7 +282,8 @@ public class ReviewService : IReviewService
 
         var filtered = parameters
             .Where(p => p.Value is not null && !string.IsNullOrEmpty(p.Value.ToString()))
-            .ToDictionary(p => p.Key, p => p.Value!.ToString()!);
+            .Select(p => new KeyValuePair<string, string?>(p.Key, p.Value!.ToString()))
+            .ToList();
 
         return QueryString.Create(filtered).ToUriComponent();
     }
@@ -300,12 +293,12 @@ public class ReviewService : IReviewService
         LastErrorMessage = null;
         try
         {
-            var queryString = BuildQueryString(queryParams); 
+            var queryString = BuildQueryString(queryParams);
             var response = await _httpClient.GetAsync($"api/reviews/explore{queryString}");
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadFromJsonAsync<IEnumerable<LikesReviewsModel>>();
-                return content;
+                return content ?? [];
             }
             var errorContent = await response.Content.ReadAsStringAsync();
             LastErrorMessage = $"Error request unsuccessfull on GetExplorePageReviewsAsync service: {response.StatusCode} - error message:{errorContent}";

@@ -11,11 +11,11 @@ public class ReviewVoteRepository : Repository<ReviewVote>, IReviewVoteRepositor
     
     public async Task<int> GetVotesByReviewIdAsync(int reviewId)
     {
-        return await _context.ReviewVotes.Where(rv => rv.ReviewId == reviewId).SumAsync(rv => rv.VoteType);
+        return await _context.ReviewVotes.AsNoTracking().Where(rv => rv.ReviewId == reviewId).SumAsync(rv => rv.VoteType);
     }
 
     public async Task<ReviewVote?> GetByUserAndReviewIdAsync(int? userId, int reviewId)
     {
-        return await _context.ReviewVotes.FirstOrDefaultAsync(rv => rv.UserId == userId && rv.ReviewId == reviewId);
+        return await _context.ReviewVotes.AsNoTracking().FirstOrDefaultAsync(rv => rv.UserId == userId && rv.ReviewId == reviewId);
     }
 }

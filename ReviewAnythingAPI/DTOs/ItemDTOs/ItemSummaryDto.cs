@@ -8,7 +8,7 @@ public class ItemSummaryDto
     [Required]
     public int ItemId { get; set; }
     [Required]
-    public string ItemName { get; set; }
+    public required string ItemName { get; set; }
     public int TotalReviews { get; set; }
     public string? CreatedBy { get; set; }
     public int AvgRating { get; set; }

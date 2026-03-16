@@ -11,12 +11,12 @@ public class ReviewTagRepository : Repository<ReviewTag>, IReviewTagRepository
     
     public async Task<IEnumerable<Tag>> GetTagsByReviewIdAsync(int reviewId)
     {
-        return await _context.ReviewTags.Where(rt => rt.ReviewId == reviewId).Select(rt => rt.Tag).ToListAsync();
+        return await _context.ReviewTags.AsNoTracking().Where(rt => rt.ReviewId == reviewId).Select(rt => rt.Tag!).ToListAsync();
     }
 
     public async Task<IEnumerable<Review>> GetAllReviewsByTagAsync(int tagId)
     {
-        return await _context.ReviewTags.Where(rt => rt.TagId == tagId).Select(rt => rt.TagReview).ToListAsync();
+        return await _context.ReviewTags.AsNoTracking().Where(rt => rt.TagId == tagId).Select(rt => rt.TagReview!).ToListAsync();
     }
 
     public async Task<IEnumerable<ReviewTag>> AddRangeAsync(IEnumerable<ReviewTag> reviewTags)

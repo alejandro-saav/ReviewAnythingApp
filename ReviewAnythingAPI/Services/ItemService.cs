@@ -18,21 +18,25 @@ public class ItemService : IItemService
 
     public async Task<IEnumerable<ItemSummaryDto>> GetItemsByCategoryIdAsync(int categoryId)
     {
-            var items = await _itemRepository.GetItemsByCategoryIdAsync(categoryId);
-            return items;
-        
+        if (categoryId < 1 || categoryId > 6)
+        {
+            throw new ArgumentException("Category ID must be between 1 and 6");
+        }
+        var items = await _itemRepository.GetItemsByCategoryIdAsync(categoryId);
+        return items;
+
     }
 
     public async Task<IEnumerable<ItemSummaryDto>> GetItemsByUserIdAsync(int userId)
     {
-            var items = await _itemRepository.GetItemsByUserIdAsync(userId);
-            return items;
+        var items = await _itemRepository.GetItemsByUserIdAsync(userId);
+        return items;
     }
 
     public async Task<ItemSummaryDto?> GetItemByNameAsync(string itemName)
     {
-            var item = await _itemRepository.GetItemByItemNameAsync(itemName);
-            return item;
+        var item = await _itemRepository.GetItemByItemNameAsync(itemName);
+        return item;
     }
 
     public async Task<IEnumerable<Category>> GetAllCategoriesAsync()

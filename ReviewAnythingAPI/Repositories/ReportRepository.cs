@@ -11,16 +11,16 @@ public class ReportRepository : Repository<Report>, IReportRepository
 
     public async Task<IEnumerable<Report>> GetAllReportsByUserIdAsync(int userId)
     {
-        return await _context.Reports.Where(r => r.ReporterUserId == userId).ToListAsync();
+        return await _context.Reports.AsNoTracking().Where(r => r.ReporterUserId == userId).ToListAsync();
     }
 
     public async Task<IEnumerable<Report>> GetAllReportsByTargetIdAsync(int targetId)
     {
-        return await _context.Reports.Where(r => r.TargetId == targetId).ToListAsync();
+        return await _context.Reports.AsNoTracking().Where(r => r.TargetId == targetId).ToListAsync();
     }
 
     public async Task<IEnumerable<Report>> GetAllReportsByStatusIdAsync(int statusId)
     {
-        return await _context.Reports.Where(r => r.StatusReportId == statusId).ToListAsync();
+        return await _context.Reports.AsNoTracking().Where(r => r.StatusReportId == statusId).ToListAsync();
     }
 }

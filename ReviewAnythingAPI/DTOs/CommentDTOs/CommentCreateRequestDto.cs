@@ -8,5 +8,5 @@ public class CommentCreateRequestDto
     public int ReviewId { get; set; }
     [Required]
     [MaxLength(1000)]
-    public string Content { get; set; }
+    public required string Content { get; set; }
 }

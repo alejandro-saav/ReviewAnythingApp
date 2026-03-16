@@ -13,14 +13,14 @@ public class ApplicationUser : IdentityUser<int>
     public bool IsActive { get; set; }
     
     // Navigation Properties
-    public ICollection<Item> UserItems { get; set; }
-    public ICollection<Review> UserReviews { get; set; }
-    public ICollection<Comment> UserComments { get; set; }
-    public ICollection<Follow> UserFollows { get; set; }
-    public ICollection<Follow> UserFollowings { get; set; }
-    public ICollection<ReviewVote> UserReviewVotes { get; set; }
-    public ICollection<CommentVote> UserCommentVotes { get; set; }
-    public ICollection<Report> UserReports { get; set; }
+    public ICollection<Item> UserItems { get; set; } = new List<Item>();
+    public ICollection<Review> UserReviews { get; set; } = new List<Review>();
+    public ICollection<Comment> UserComments { get; set; } = new List<Comment>();
+    public ICollection<Follow> UserFollows { get; set; } = new List<Follow>();
+    public ICollection<Follow> UserFollowings { get; set; } = new List<Follow>();
+    public ICollection<ReviewVote> UserReviewVotes { get; set; } = new List<ReviewVote>();
+    public ICollection<CommentVote> UserCommentVotes { get; set; } = new List<CommentVote>();
+    public ICollection<Report> UserReports { get; set; } = new List<Report>();
 }
 
 

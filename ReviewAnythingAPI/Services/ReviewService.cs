@@ -51,7 +51,7 @@ public class ReviewService : IReviewService
         {
             // using transaction to ensure data consistency
             int itemId;
-            if (reviewCreateRequestDto.ItemId == null)
+            if (reviewCreateRequestDto.ItemId is null)
             {
                 var itemToInsert = new Item
                 {
@@ -67,7 +67,7 @@ public class ReviewService : IReviewService
             else
             {
                 var itemExists = await _itemRepository.GetByIdAsync(reviewCreateRequestDto.ItemId.Value);
-                if (itemExists == null)
+                if (itemExists is null)
                 {
                     throw new EntityNotFoundException($"Item with ID {reviewCreateRequestDto.ItemId.Value} not found");
                 }
@@ -77,7 +77,7 @@ public class ReviewService : IReviewService
 
             // Check if the user already reviewed this item to prevent duplicates
             var existingReview = await _reviewRepository.GetReviewByUserIdAndItemIdAsync(userId, itemId);
-            if (existingReview != null)
+            if (existingReview is not null)
             {
                 throw new InvalidOperationException("You have already reviewed this item");
             }
@@ -109,7 +109,7 @@ public class ReviewService : IReviewService
             {
                 var existingTag = await _tagRepository.GetTagByNameAsync(tag);
                 int tagId;
-                if (existingTag == null)
+                if (existingTag is null)
                 {
                     // Create new tag
                     var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
@@ -158,7 +158,7 @@ public class ReviewService : IReviewService
         {
             // Roll back the transaction if any operation fails
             await transaction.RollbackAsync();
-            throw new TransactionFailedException("Review create transaction failed", ex);
+            throw new TransactionFailedException($"Review create transaction failed {ex.Message}");
         }
     }
 
@@ -172,7 +172,7 @@ public class ReviewService : IReviewService
             {
                 // review exists
                 var reviewExists = await _reviewRepository.GetByIdAsync(reviewId);
-                if (reviewExists == null)
+                if (reviewExists is null)
                 {
                     throw new EntityNotFoundException($"Review with ID {reviewId} not found");
                 }
@@ -203,7 +203,7 @@ public class ReviewService : IReviewService
                 {
                     var existingTag = await _tagRepository.GetTagByNameAsync(tag);
                     int tagId;
-                    if (existingTag == null)
+                    if (existingTag is null)
                     {
                         var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
                         tagId = newTag.TagId;
@@ -247,7 +247,7 @@ public class ReviewService : IReviewService
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw new TransactionFailedException("Review update transaction failed", ex);
+                throw new TransactionFailedException($"Review update transaction failed {ex.Message}");
             }
     }
     
@@ -267,7 +267,7 @@ public class ReviewService : IReviewService
                     {
                         UserId = r.UserId ?? 0,
                     },
-                    Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+                    Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
                     DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
                     UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
                     TotalVotes = r.ReviewVotes.Count(),
@@ -291,7 +291,7 @@ public class ReviewService : IReviewService
                     {
                         UserId = r.UserId ?? 0,
                     },
-                    Tags = r.ReviewTags.Select(rt => rt.Tag.TagName).ToList(),
+                    Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
                     DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
                     UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
                     TotalVotes = r.ReviewVotes.Count(),
@@ -302,7 +302,7 @@ public class ReviewService : IReviewService
     public async Task<bool> DeleteReviewAsync(int reviewId, int userId)
     {
         var review = await _reviewRepository.GetByIdAsync(reviewId);
-        if (review == null) return false;
+        if (review is null) return false;
         var isUserOwner = userId == review.UserId;
         if (!isUserOwner) return false;
         await _reviewRepository.DeleteAsyncById(reviewId);
@@ -313,7 +313,7 @@ public class ReviewService : IReviewService
     public async Task<ReviewDetailDto?> GetReviewByIdAsync(int reviewId)
     {
         var review = await _reviewRepository.GetReviewDetailByIdAsync(reviewId);
-        if (review == null) throw new EntityNotFoundException("Review for the given id not found");
+        if (review is null) throw new EntityNotFoundException("Review for the given id not found");
         return review;
     }
 
@@ -325,7 +325,7 @@ public class ReviewService : IReviewService
             ReviewId = reviewVoteRequestDto.ReviewId,
             UserVote = reviewVoteRequestDto.VoteType
         };
-        if (existingVote == null)
+        if (existingVote is null)
         {
             ReviewVote newReviewVote = new ReviewVote
             {
@@ -338,7 +338,7 @@ public class ReviewService : IReviewService
             response.ActionType = ActionType.Created;
         } else if (existingVote.VoteType == reviewVoteRequestDto.VoteType)
         {
-            await _reviewVoteRepository.DeleteAsyncByEntity(existingVote);
+            _reviewVoteRepository.DeleteAsyncByEntity(existingVote);
             response.ActionType = ActionType.Deleted;
         }
         else
@@ -356,12 +356,12 @@ public class ReviewService : IReviewService
     {
         var result = new ReviewPageDataDto();
         var review = await _reviewRepository.GetReviewDetailByIdAsync(reviewId);
-        if (review == null) throw new EntityNotFoundException("Review for the given id not found");
+        if (review is null) throw new EntityNotFoundException("Review for the given id not found");
         var comments = await _commentRepository.GetAllCommentsByReviewIdAsync(reviewId);
-        if (userId != null)
+        if (userId is not null)
         {
             var userVote = await _reviewVoteRepository.GetByUserAndReviewIdAsync(userId, reviewId);
-            if (userVote != null)
+            if (userVote is not null)
             {
                 result.UserReviewVote = userVote.VoteType;
             }
@@ -379,7 +379,7 @@ public class ReviewService : IReviewService
     public async Task<IEnumerable<LikesReviewsDto>> GetMyReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null) throw new EntityNotFoundException("User not found");
+        if (user is null) throw new EntityNotFoundException("User not found");
         var userReviews = await _reviewRepository.GetMyReviewsAsync(userId, pageSize, queryParamsDto);
         return userReviews;
     }
@@ -387,7 +387,7 @@ public class ReviewService : IReviewService
     public async Task<IEnumerable<LikesReviewsDto>> GetLikesReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null) throw new EntityNotFoundException("User not found");
+        if (user is null) throw new EntityNotFoundException("User not found");
         var  userReviews = await _reviewRepository.GetLikesReviewsAsync(userId, pageSize, queryParamsDto);
         return userReviews;
     }

@@ -15,7 +15,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByReviewIdAsync(int reviewId)
     {
-        return await _context.Comments.Where(c => c.ReviewId == reviewId).Select(c => new CommentResponseDto
+        return await _context.Comments.AsNoTracking().Where(c => c.ReviewId == reviewId).Select(c => new CommentResponseDto
         {
             CommentId = c.CommentId,
             Content = c.Content,
@@ -25,7 +25,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
             UserInformation = new UserCommentDto
             {
                 UserId = c.UserId ?? 0,
-                UserName = c.User.UserName,
+                UserName = c.User!.UserName ?? "",
                 ProfileImage = c.User.ProfileImage,
                 ReviewCount = _context.Reviews.Where(r => r.UserId == c.UserId).Count(),
                 FollowerCount = _context.Follows.Where(f => f.FollowingUserId == c.UserId).Count(),
@@ -35,7 +35,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
 
     public async Task<IEnumerable<CommentResponseDto>> GetAllCommentsByUserIdAsync(int userId)
     {
-        return await _context.Comments.Where(c => c.UserId == userId).Select(c => new CommentResponseDto
+        return await _context.Comments.AsNoTracking().Where(c => c.UserId == userId).Select(c => new CommentResponseDto
         {
             CommentId = c.CommentId,
             Content = c.Content,
@@ -45,7 +45,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
             UserInformation = new UserCommentDto
             {
                 UserId = userId,
-                UserName = c.User.UserName,
+                UserName = c.User!.UserName ?? "",
                 ProfileImage = c.User.ProfileImage,
                 ReviewCount = _context.Reviews.Where(r => r.UserId == c.UserId).Count(),
                 FollowerCount = _context.Follows.Where(f => f.FollowingUserId == c.UserId).Count(),
@@ -57,7 +57,8 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
     {
         _context.Add(comment);
         await _context.SaveChangesAsync();
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == comment.UserId);
+        // var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == comment.UserId);
+        var user = await _context.Users.FindAsync(comment.UserId);
         return new CommentResponseDto
         {
             CommentId = comment.CommentId,
@@ -66,28 +67,28 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
             LastEditDate = comment.LastEditDate,
             UserInformation = new UserCommentDto
             {
-                UserId = user.Id,
-                UserName = user.UserName,
+                UserId = user!.Id,
+                UserName = user.UserName ?? "",
                 ProfileImage = user.ProfileImage,
-                ReviewCount = _context.Reviews.Where(r => r.UserId == user.Id).Count(),
-                FollowerCount = _context.Follows.Where(f => f.FollowingUserId == user.Id).Count(),
+                ReviewCount = _context.Reviews.AsNoTracking().Where(r => r.UserId == user.Id).Count(),
+                FollowerCount = _context.Follows.AsNoTracking().Where(f => f.FollowingUserId == user.Id).Count(),
             },
-            Likes = _context.CommentVotes.Where(cm => cm.CommentId == comment.CommentId && cm.VoteType == 1).Count(),
+            Likes = _context.CommentVotes.AsNoTracking().Where(cm => cm.CommentId == comment.CommentId && cm.VoteType == 1).Count(),
         };
     }
 
     public async Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId)
     {
-        var comments = await _context.Comments.Where(c => c.UserId == userId).Select(c => new MyCommentsPageDto
+        var comments = await _context.Comments.AsNoTracking().Where(c => c.UserId == userId).Select(c => new MyCommentsPageDto
         {
             CommentId = c.CommentId,
             Content = c.Content,
             LastEditDate = c.LastEditDate,
             ReviewId = c.ReviewId,
-            Likes = _context.CommentVotes.Where(cv => cv.CommentId == c.CommentId && cv.VoteType == 1).Count(),
-            ReviewTitle = c.Review.Title,
-            UserName = c.User.UserName,
-            ProfileImage = c.User.ProfileImage,
+            Likes = _context.CommentVotes.AsNoTracking().Where(cv => cv.CommentId == c.CommentId && cv.VoteType == 1).Count(),
+            ReviewTitle = c.Review != null ? c.Review.Title : "",
+            UserName = c.User != null ? c.User.UserName : "",
+            ProfileImage = c.User != null ? c.User.ProfileImage : "",
         }).ToListAsync();
         return comments;
     }

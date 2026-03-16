@@ -9,5 +9,5 @@ public class ResetPasswordRequestDto
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).+$", 
         ErrorMessage = "The password must contain uppercase and lowercase letters, numbers, and a special character.")]
     [DataType(DataType.Password)]
-    public string Password { get; set; }
+    public string Password { get; set; } = "";
 }
