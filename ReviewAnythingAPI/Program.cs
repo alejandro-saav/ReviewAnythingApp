@@ -168,9 +168,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
-///// TODO
-/// Add new table for new visits. Add the model.
-/// Add new visit to table on middleware
-/// Stop tracking the issues folder delete it from git.
