@@ -1,13 +1,9 @@
-using System.CodeDom;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
+using System.Text.Json;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Resend;
 using ReviewAnythingAPI.Context;
@@ -15,7 +11,6 @@ using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.DTOs.UserDTOs;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
 using ReviewAnythingAPI.Models;
-using ReviewAnythingAPI.Repositories.Interfaces;
 using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Services;
@@ -28,8 +23,10 @@ public class AuthService : IAuthService
     private readonly ReviewAnythingDbContext _context;
     private readonly CloudinaryService _cloudinaryService;
     private readonly EmailService _emailService;
+    private readonly IHttpClientFactory _httpClient;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IResend resend, ReviewAnythingDbContext context, CloudinaryService cloudinaryService, EmailService emailService)
+    public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IResend resend, ReviewAnythingDbContext context, CloudinaryService cloudinaryService, EmailService emailService, IHttpClientFactory httpClient, ILogger<AuthService> logger)
     {
         _userManager = userManager;
         _configuration = configuration;
@@ -37,6 +34,8 @@ public class AuthService : IAuthService
         _context = context;
         _cloudinaryService = cloudinaryService;
         _emailService = emailService;
+        _httpClient = httpClient;
+        _logger = logger;
     }
 
     public async Task<SuccessAuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto)
@@ -249,10 +248,38 @@ public class AuthService : IAuthService
     public async Task<SuccessAuthResponseDto> GoogleSignInAsync(string idTokenString)
     {
         var googleClientId = _configuration["Google:ClientId"];
+        var googleClientSecret = _configuration["Google:ClientSecret"];
+        var googleRedirectUrl = _configuration["Google:RedirectUrl"];
+
+        if (string.IsNullOrWhiteSpace(googleClientId)) throw new Exception("Google client id is null or white space");
+
+        if (string.IsNullOrWhiteSpace(googleClientSecret)) throw new Exception("Google secret is null or white space");
+
+        if (string.IsNullOrWhiteSpace(googleRedirectUrl)) throw new Exception("Google redirect url is null or white space");
+
+        var tokenRequest = new Dictionary<string, string>
+        {
+            ["client_id"] = googleClientId,
+            ["client_secret"] = googleClientSecret,
+            ["code"] = idTokenString,
+            ["grant_type"] = "authorization_code",
+            ["redirect_uri"] = googleRedirectUrl
+        };
+        var content = new FormUrlEncodedContent(tokenRequest);
+        var client = _httpClient.CreateClient();
+        var response = await client.PostAsync("https://oauth2.googleapis.com/token", content);
+
+        if (!response.IsSuccessStatusCode) throw new Exception("Something went wrong when trying to get the JWT from google");
+
+        var stringBody = await response.Content.ReadAsStringAsync();
+
+        var googleJWT = JsonSerializer.Deserialize<GoogleJWT>(stringBody, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+
+        if (googleJWT is null || string.IsNullOrWhiteSpace(googleJWT.AccessToken)) throw new Exception("Google JWT not found!");
         GoogleJsonWebSignature.Payload payload;
         try
         {
-            payload = await GoogleJsonWebSignature.ValidateAsync(idTokenString, new GoogleJsonWebSignature.ValidationSettings
+            payload = await GoogleJsonWebSignature.ValidateAsync(googleJWT.IdToken, new GoogleJsonWebSignature.ValidationSettings
             {
                 Audience = new[] { googleClientId },
             });
@@ -281,31 +308,27 @@ public class AuthService : IAuthService
 
         if (user == null)
         {
-            user = await _userManager.FindByEmailAsync(userEmail);
-            if (user == null)
+            user = new ApplicationUser
             {
-                user = new ApplicationUser
-                {
-                    UserName = GenerateRandomUsername(),
-                    Email = userEmail,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    ProfileImage = profilePicture,
-                    EmailConfirmed = emailVerified,
-                    CreationDate = DateTime.UtcNow,
-                    IsActive = true
-                };
-                var createUserResult = await _userManager.CreateAsync(user);
-                if (!createUserResult.Succeeded)
-                {
-                    throw new Exception($"Could not creat local user account. Error: {createUserResult.Errors.First().Description}");
-                }
+                UserName = GenerateRandomUsername(),
+                Email = userEmail,
+                FirstName = firstName,
+                LastName = lastName,
+                ProfileImage = profilePicture,
+                EmailConfirmed = emailVerified,
+                CreationDate = DateTime.UtcNow,
+                IsActive = true
+            };
+            var createUserResult = await _userManager.CreateAsync(user);
+            if (!createUserResult.Succeeded)
+            {
+                throw new Exception($"Could not creat google user account. Error: {createUserResult.Errors.First().Description}");
             }
 
             var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
             if (!addLoginResult.Succeeded)
             {
-                throw new Exception($"Could not link google account to local user. Error: {addLoginResult.Errors.First().Description}");
+                throw new Exception($"Could not link google account to local users. Error: {addLoginResult.Errors.First().Description}");
             }
         }
         var localToken = await GenerateJwtToken(user);
@@ -411,7 +434,7 @@ public class AuthService : IAuthService
         {
             Success = true,
             Message = "Password has been reset successfully.",
-             UserResponse = new UserResponseDto
+            UserResponse = new UserResponseDto
             {
                 UserId = user.Id,
                 UserName = user.UserName ?? "",
@@ -424,5 +447,26 @@ public class AuthService : IAuthService
                 Phone = user.PhoneNumber ?? ""
             }
         };
+    }
+
+    public async Task<bool> DeleteAccountAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            throw new EntityNotFoundException($"User not found for the given userId: {userId}");
+        }
+
+        var userDeletionSuccess = await _userManager.DeleteAsync(user);
+        if (!userDeletionSuccess.Succeeded)
+        {
+            _logger.LogInformation("Error while deleting the user, for the given userId: {0}", userId);
+            foreach (IdentityError error in userDeletionSuccess.Errors)
+            {
+                _logger.LogError(error.Description);
+            }
+            throw new Exception($"Error while deleting the user, userId: {userId}");
+        }
+        return true;
     }
 }

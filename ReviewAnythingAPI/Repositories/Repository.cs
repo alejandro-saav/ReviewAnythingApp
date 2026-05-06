@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.Repositories.Interfaces;
@@ -51,5 +53,10 @@ public class Repository<T> : IRepository<T> where T : class
     public void DeleteAsyncByEntity(T entity)
     {
         _dbSet.Remove(entity);
+    }
+
+    public async Task<bool> SaveAsync()
+    {
+        return await _context.SaveChangesAsync() > 0;
     }
 }

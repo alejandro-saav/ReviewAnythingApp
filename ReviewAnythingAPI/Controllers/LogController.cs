@@ -20,14 +20,20 @@ public class LogController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> InsertNewLogVisitAsync([FromBody] LogInsertRequestDto logRequest)
+    public async Task<IActionResult> InsertNewLogVisitAsync()
     {
-        if (!ModelState.IsValid) throw new ArgumentException("Invalid or missing required fields.");
-        var response = await _logService.InsertNewVisitLogAsync(logRequest);
+        LogInsertRequestDto newLogDto = new LogInsertRequestDto
+        {
+            UserAgent = Request.Headers["User-Agent"].FirstOrDefault() ?? "Unknown",
+            AcceptLanguage = Request.Headers["Accept-Language"].FirstOrDefault() ?? "Unknown",
+            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+            CreatedAt = DateTime.UtcNow,
+        };
+        var response = await _logService.InsertNewVisitLogAsync(newLogDto);
 
         _logger.LogInformation("New visit log has been inserted. Log ID: {LogId}, at: {Time}", response.Id, DateTime.UtcNow.AddHours(-5));
 
-        return Ok(response);
+        return Ok();
     }
 
     [HttpGet("{logId:int}")]

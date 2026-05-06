@@ -22,7 +22,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
     public DbSet<StatusReport> StatusReports { get; set; }
     public DbSet<Report> Reports { get; set; }
     public DbSet<ReviewTag> ReviewTags { get; set; }
-    public DbSet<RequestLog> RequestLogs {get;set;}
+    public DbSet<RequestLog> RequestLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,8 +60,8 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
         modelBuilder.Entity<Review>().HasIndex(r => r.UserId);
         modelBuilder.Entity<Review>().HasIndex(r => r.ItemId);
         modelBuilder.Entity<Review>().HasIndex(r => r.Rating);
-        
-        modelBuilder.Entity<Review>().HasGeneratedTsVectorColumn(r => r.SearchVector, "simple", r => new { r.Title, r.Content}).HasIndex(r => r.SearchVector).HasMethod("GIN");
+
+        modelBuilder.Entity<Review>().HasGeneratedTsVectorColumn(r => r.SearchVector, "simple", r => new { r.Title, r.Content }).HasIndex(r => r.SearchVector).HasMethod("GIN");
 
         // Tags Constraints
         modelBuilder.Entity<Tag>().HasIndex(t => t.TagName).IsUnique();
@@ -86,7 +86,7 @@ public class ReviewAnythingDbContext : IdentityDbContext<ApplicationUser, Applic
 
         modelBuilder.Entity<Follow>().HasOne(f => f.Follower).WithMany(u => u.UserFollows).HasForeignKey(f => f.FollowerUserId).OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Follow>().HasOne(f => f.Following).WithMany(u => u.UserFollowings).HasForeignKey(f => f.FollowingUserId).OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<Follow>().HasOne(f => f.Following).WithMany(u => u.UserFollowings).HasForeignKey(f => f.FollowingUserId).OnDelete(DeleteBehavior.Cascade);
 
         // ReviewVotes Constraints
         modelBuilder.Entity<ReviewVote>().HasKey(rv => new { rv.UserId, rv.ReviewId });

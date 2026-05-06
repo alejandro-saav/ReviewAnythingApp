@@ -7,6 +7,7 @@ using ReviewAnythingAPI.HelperClasses;
 using ReviewAnythingAPI.Services.Interfaces;
 
 namespace ReviewAnythingAPI.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ReviewsController : ControllerBase
@@ -24,59 +25,66 @@ public class ReviewsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateReviewAsync([FromBody] ReviewCreateRequestDto reviewCreateRequestDto)
     {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
 
-            var createdReview = await _reviewService.CreateReviewAsync(reviewCreateRequestDto, userId);
+        var createdReview = await _reviewService.CreateReviewAsync(reviewCreateRequestDto, userId);
 
-            _logger.LogInformation("Review successfully created. User id: {UserId}, review id: {ReviewId}, at {Time}", userId, createdReview.ReviewId, DateTime.UtcNow);
+        _logger.LogInformation("Review successfully created. User id: {UserId}, review id: {ReviewId}, at {Time}", userId, createdReview.ReviewId, DateTime.UtcNow);
 
-            return CreatedAtAction(nameof(GetReviewById), new { reviewId = createdReview.ReviewId }, createdReview);
+        return CreatedAtAction(nameof(GetReviewById), new { reviewId = createdReview.ReviewId }, createdReview);
     }
 
     [Authorize]
     [HttpPut("{reviewId}")]
     public async Task<IActionResult> UpdateReviewAsync([FromBody] ReviewUpdateRequestDto reviewUpdateRequestDto, [FromRoute] int reviewId)
     {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
-            var updatedReview = await _reviewService.UpdateReviewAsync(reviewUpdateRequestDto, userId, reviewId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId)) return Unauthorized();
+        var updatedReview = await _reviewService.UpdateReviewAsync(reviewUpdateRequestDto, userId, reviewId);
 
-            _logger.LogInformation("Successfully review update. User id_ {UserId}, review id {ReviewId}, at: {Time}", userId, reviewId, DateTime.UtcNow);
+        _logger.LogInformation("Successfully review update. User id_ {UserId}, review id {ReviewId}, at: {Time}", userId, reviewId, DateTime.UtcNow);
 
-            return Ok(updatedReview);
+        return Ok(updatedReview);
     }
 
     [HttpGet("users/{userId}")]
     public async Task<IActionResult> GetUserReviews([FromRoute] int userId)
     {
-            var reviews = await _reviewService.GetAllReviewsByUserIdAsync(userId);
-            if (reviews == null || !reviews.Any()) return NotFound(new { message = $"No reviews found for user {userId}"});
+        var reviews = await _reviewService.GetAllReviewsByUserIdAsync(userId);
+        if (reviews == null || !reviews.Any()) return NotFound(new { message = $"No reviews found for user {userId}" });
 
-            _logger.LogInformation("Retrieved user reviews. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
+        _logger.LogInformation("Retrieved user reviews. User id: {UserId}, at: {Time}", userId, DateTime.UtcNow);
 
-            return Ok(reviews);
+        return Ok(reviews);
     }
 
     [HttpGet("item/{itemId}")]
     public async Task<IActionResult> GetItemReviewsByItemId([FromRoute] int itemId)
     {
-            var reviews = await _reviewService.GetAllReviewsByItemIdAsync(itemId);
+        var reviews = await _reviewService.GetAllReviewsByItemIdAsync(itemId);
 
-            _logger.LogInformation("Retrieved reviews by item id. Item id: {itemId}, reviews count_ {ReviewsCount}, at {Time}", itemId, reviews.Count(), DateTime.UtcNow);
+        _logger.LogInformation("Retrieved reviews by item id. Item id: {itemId}, reviews count_ {ReviewsCount}, at {Time}", itemId, reviews.Count(), DateTime.UtcNow);
 
-            return Ok(reviews);
+        return Ok(reviews);
     }
 
     [HttpGet("{reviewId}")]
     public async Task<IActionResult> GetReviewById([FromRoute] int reviewId)
     {
-            var review = await _reviewService.GetReviewByIdAsync(reviewId);
-            if (review == null) return NotFound(new { message = $"Review {reviewId} was not found" });
+        var review = await _reviewService.GetReviewByIdAsync(reviewId);
+        if (review == null) return NotFound(new { message = $"Review {reviewId} was not found" });
 
-            _logger.LogInformation("Retrieved review by id. Review id: {ReviewId}, at: {Time}", reviewId, DateTime.UtcNow);
+        _logger.LogInformation("Retrieved review by id. Review id: {ReviewId}, at: {Time}", reviewId, DateTime.UtcNow);
 
-            return Ok(review);
+        return Ok(review);
+    }
+
+    [HttpGet("latest")]
+    public async Task<IActionResult> GetLatestReviewsIds([FromQuery] int amount)
+    {
+        var reviewsIds = await _reviewService.GetLatestReviewsIdsAsync(amount > 0 ? amount : 250);
+        return Ok(reviewsIds);
     }
 
     [Authorize]
@@ -104,11 +112,12 @@ public class ReviewsController : ControllerBase
         if (User.Identity?.IsAuthenticated == true)
         {
             string? userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (int.TryParse(userIdClaim, out int id)) {
+            if (int.TryParse(userIdClaim, out int id))
+            {
                 userId = id;
             }
         }
-        
+
         var data = await _reviewService.GetReviewPageDataAsync(userId, reviewId);
 
         _logger.LogInformation("Retrieved review page data. Review id: {ReviewId}, at: {Time}", reviewId, DateTime.UtcNow);

@@ -54,6 +54,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
             .Where(f => f.FollowingUserId == targetUserId)
             .Select(f => new UserSummaryDto
             {
+                UserId = f.FollowerUserId ?? 0,
                 UserName = f.Follower!.UserName!,
                 ProfileImage = f.Follower.ProfileImage ?? "",
             })
@@ -63,6 +64,7 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
             .Where(f => f.FollowerUserId == targetUserId)
             .Select(f => new UserSummaryDto
             {
+                UserId = f.FollowingUserId ?? 0,
                 UserName = f.Following!.UserName!,
                 ProfileImage = f.Following.ProfileImage ?? "",
             })
@@ -97,5 +99,12 @@ public class UserRepository : Repository<ApplicationUser>, IUserRepository
         user.Bio = summary.Bio;
         await _context.SaveChangesAsync();
         return summary;
+    }
+
+    public async Task<IEnumerable<int>> GetLatestUserIdsAsync(int amount)
+    {
+        amount = amount == 0 ? 250 : amount;
+        Console.WriteLine(amount);
+        return await _context.Users.AsNoTracking().OrderByDescending(u => u.Id).Take(amount).Select(u => u.Id).ToListAsync();
     }
 }

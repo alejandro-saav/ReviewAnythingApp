@@ -1,3 +1,7 @@
+using System.Net;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.Services.Interfaces;
@@ -37,6 +41,26 @@ public class AuthController : ControllerBase
 
         _logger.LogInformation("New login. User id: {UserId}, username: {UserName}, at: {Time}", result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
 
+        var reactHeader = Request.Headers["X-Client-Type"].FirstOrDefault();
+        if (reactHeader is not null)
+        {
+            Response.Cookies.Append("accessToken", result.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                MaxAge = TimeSpan.FromDays(7)
+            });
+            var webResponse = new ReactLoginResponseDto
+            {
+                ProfileImage = result.UserResponse.ProfileImage,
+                FirstName = result.UserResponse.FirstName,
+                LastName = result.UserResponse.LastName,
+                Bio = result.UserResponse.Bio
+            };
+            return Ok(webResponse);
+        }
+
         return Ok(result);
     }
 
@@ -47,6 +71,26 @@ public class AuthController : ControllerBase
         var authResponse = await _authService.GoogleSignInAsync(googleSignInDto.IdToken);
 
         _logger.LogInformation("New google sign in. User id: {UserId}, username: {UserName}, at: {Time}", authResponse.UserResponse.UserId, authResponse.UserResponse.UserName, DateTime.UtcNow);
+
+        var reactHeader = Request.Headers["X-Client-Type"].FirstOrDefault();
+        if (reactHeader is not null)
+        {
+            Response.Cookies.Append("accessToken", authResponse.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                MaxAge = TimeSpan.FromDays(7)
+            });
+            var webResponse = new ReactLoginResponseDto
+            {
+                ProfileImage = authResponse.UserResponse.ProfileImage,
+                FirstName = authResponse.UserResponse.FirstName,
+                LastName = authResponse.UserResponse.LastName,
+                Bio = authResponse.UserResponse.Bio
+            };
+            return Ok(webResponse);
+        }
         return Ok(authResponse);
     }
 
@@ -66,7 +110,7 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
         var result = await _authService.ForgotPasswordAsync(forgotPasswordDto);
 
-        _logger.LogInformation("Email for password reset successfully sent. User id: {UserId}, username: {UserName}, at: {Time}",result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
+        _logger.LogInformation("Email for password reset successfully sent. User id: {UserId}, username: {UserName}, at: {Time}", result.UserResponse.UserId, result.UserResponse.UserName, DateTime.UtcNow);
 
         return Ok(new GenericResponseDto
         {
@@ -88,5 +132,30 @@ public class AuthController : ControllerBase
             Success = result.Success,
             Message = result.Message
         });
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> LogoutBrowser()
+    {
+        Response.Cookies.Delete("accessToken", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Lax
+        });
+
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpDelete("delete-account")]
+    public async Task<IActionResult> DeleteAccount()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdClaim is null || !int.TryParse(userIdClaim, out int userId)) throw new UnauthorizedAccessException("UserId claim not found or unable to convert the userId to int");
+        var deleteAccount = await _authService.DeleteAccountAsync(userIdClaim);
+
+        _logger.LogInformation("Account successfully deleted for userId: {0}", userIdClaim);
+        return NoContent();
     }
 }

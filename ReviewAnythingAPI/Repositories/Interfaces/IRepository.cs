@@ -8,4 +8,5 @@ public interface IRepository<T> where T : class
     T UpdateAsync(T entity);
     Task<bool> DeleteAsyncById(int id);
     void DeleteAsyncByEntity(T entity);
+    Task<bool> SaveAsync();
 }

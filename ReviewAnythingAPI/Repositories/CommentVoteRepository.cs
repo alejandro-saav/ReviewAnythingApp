@@ -8,7 +8,7 @@ namespace ReviewAnythingAPI.Repositories;
 
 public class CommentVoteRepository : Repository<CommentVote>, ICommentVoteRepository
 {
-    public CommentVoteRepository(ReviewAnythingDbContext context) : base(context) {}
+    public CommentVoteRepository(ReviewAnythingDbContext context) : base(context) { }
 
     public async Task<IEnumerable<int>> GetVotesByCommentIdAsync(int commentId)
     {
@@ -17,7 +17,7 @@ public class CommentVoteRepository : Repository<CommentVote>, ICommentVoteReposi
 
     public async Task<CommentVote?> GetByUserAndCommentIdAsync(int userId, int commentId)
     {
-        return await _context.CommentVotes.AsNoTracking().FirstOrDefaultAsync(c => c.UserId == userId && c.CommentId == commentId);
+        return await _context.CommentVotes.FirstOrDefaultAsync(c => c.UserId == userId && c.CommentId == commentId);
     }
 
     public async Task<IEnumerable<CommentVoteResponseDto>> GetVotesByReviewIdAndUserIdAsync(int reviewId, int userId)

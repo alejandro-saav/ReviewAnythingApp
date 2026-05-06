@@ -1,9 +1,11 @@
+using System.Data;
 using System.Text;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using Resend;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.HelperClasses;
@@ -15,6 +17,18 @@ using ReviewAnythingAPI.Services.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// CORS Services
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("GenericPolicy", policy =>
+    {
+        policy.WithOrigins("https://reviewanything.site")
+        .WithMethods("GET", "POST", "PUT", "DELETE", "HEAD", "PATCH")
+        .WithHeaders("Content-Type", "Authorization", "X-Client-Type")
+        .AllowCredentials();
+    });
+});
 
 // Configure Cloudinary settings
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
@@ -67,7 +81,7 @@ builder.Services.AddDbContext<ReviewAnythingDbContext>(options =>
 builder.Services.AddControllers();
 
 // Seed services
-builder.Services.AddHttpClient(); 
+builder.Services.AddHttpClient();
 builder.Services.AddTransient<UserSeederService>();
 builder.Services.AddTransient<ReviewSeederService>();
 
@@ -104,7 +118,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => 
+}).AddJwtBearer(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = true; // In production set to true
@@ -120,23 +134,49 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero // or small value if needed
     };
+
+    // Check if react header is present if so set auth to cookie else use bearer
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var cookieToken = context.Request.Cookies["accessToken"];
+            if (!string.IsNullOrWhiteSpace(cookieToken))
+            {
+                context.Token = cookieToken;
+            }
+
+            return Task.CompletedTask;
+        }
+    };
 });
 
 if (!builder.Environment.IsDevelopment())
 {
     builder.WebHost.UseUrls("http://*:80");
 }
+
+// builder.WebHost.ConfigureKestrel(options =>
+// {
+//     options.ListenAnyIP(5000); // Listen on port 5000
+// });
 var app = builder.Build();
+
+// Set ip from X-Forwared-For header
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     // SEED 50 USERS;
-    
+
     // using var scope = app.Services.CreateScope();
     // var seeder = scope.ServiceProvider.GetRequiredService<UserSeederService>();
     // await seeder.SeedUsersAsync(50);
-    
+
     // SEED 11371 REVIEWS
     // using var scope = app.Services.CreateScope();
     // var seeder = scope.ServiceProvider.GetRequiredService<ReviewSeederService>();
@@ -161,7 +201,7 @@ if (!app.Environment.IsDevelopment())
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
-
+app.UseCors("GenericPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
