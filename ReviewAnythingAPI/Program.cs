@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("GenericPolicy", policy =>
     {
-        policy.WithOrigins("https://reviewanything.site", "http://localhost:7032")
+        policy.WithOrigins("https://reviewanything.site")
         .WithMethods("GET", "POST", "PUT", "DELETE", "HEAD", "PATCH")
         .WithHeaders("Content-Type", "Authorization", "X-Client-Type")
         .AllowCredentials();
