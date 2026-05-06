@@ -59,7 +59,7 @@ public class UserService : IUserService
     public async Task<UserPageDataDto> GetUserPageDataAsync(int targetUserId, int currentUserId)
     {
         var user = await _userRepository.GetByIdAsync(targetUserId);
-        if(user is null) throw new EntityNotFoundException("User not found");
+        if (user is null) throw new EntityNotFoundException("User not found");
         var userPageDate = await _userRepository.GetUserPageDataAsync(targetUserId, currentUserId);
         return userPageDate;
     }
@@ -68,12 +68,11 @@ public class UserService : IUserService
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user is null) throw new EntityNotFoundException("User not found");
-        var summary = new UserSummaryDto
-        {
-            FirstName = updateDto.FirstName,
-            LastName = updateDto.LastName ?? "",
-            Bio = updateDto.Bio ?? "",
-        };
+
+        user.FirstName = updateDto.FirstName;
+        user.LastName = updateDto.LastName ?? "";
+        user.Bio = updateDto.Bio ?? "";
+
         if (updateDto.ProfileImage is not null && updateDto.ProfileImage?.Length > 0)
         {
             try
@@ -85,11 +84,24 @@ public class UserService : IUserService
             {
                 throw new InvalidOperationException($"Error while uploading the image to cloudinary on updating user summary.Error:{ex.Message}");
             }
-        } else if (updateDto.ProfileImage is null && updateDto.DeleteImage)
+        }
+        else if (updateDto.ProfileImage is null && updateDto.DeleteImage)
         {
             user.ProfileImage = null;
         }
-        await _userRepository.UpdateUserSummaryAsync(user,  summary);
-        return summary;
+        // save changes
+        await _userRepository.SaveAsync();
+        return new UserSummaryDto
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Bio = user.Bio,
+            ProfileImage = user.ProfileImage ?? "",
+        };
+    }
+
+    public async Task<IEnumerable<int>> GetLatestUserIdsAsync(int amount)
+    {
+        return await _userRepository.GetLatestUserIdsAsync(amount);
     }
 }

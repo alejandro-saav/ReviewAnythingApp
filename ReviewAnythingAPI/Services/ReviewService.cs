@@ -166,137 +166,137 @@ public class ReviewService : IReviewService
     public async Task<ReviewSummaryDto> UpdateReviewAsync(ReviewUpdateRequestDto reviewUpdateRequestDto,
         int userId, int reviewId)
     {
-            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-            // using transaction to ensure data consistency
-            try
+        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+        // using transaction to ensure data consistency
+        try
+        {
+            // review exists
+            var reviewExists = await _reviewRepository.GetByIdAsync(reviewId);
+            if (reviewExists is null)
             {
-                // review exists
-                var reviewExists = await _reviewRepository.GetByIdAsync(reviewId);
-                if (reviewExists is null)
+                throw new EntityNotFoundException($"Review with ID {reviewId} not found");
+            }
+
+            // Does review match the userId
+            if (userId != reviewExists.UserId)
+            {
+                throw new UnauthorizedAccessException(
+                    $"Review with ID {reviewId} does not belong to user");
+            }
+
+
+            // Process tags
+            if (reviewUpdateRequestDto.Tags.Count > 0)
+            {
+                reviewUpdateRequestDto.Tags = reviewUpdateRequestDto.Tags.Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            }
+
+            // Update review
+            reviewExists.Title = reviewUpdateRequestDto.Title;
+            reviewExists.Content = reviewUpdateRequestDto.Content;
+            reviewExists.LastEditDate = DateTime.UtcNow;
+            reviewExists.Rating = reviewUpdateRequestDto.Rating;
+
+            // Process tags and create review-tag associations in batch
+            var reviewTagsToAdd = new List<ReviewTag>();
+            foreach (var tag in reviewUpdateRequestDto.Tags)
+            {
+                var existingTag = await _tagRepository.GetTagByNameAsync(tag);
+                int tagId;
+                if (existingTag is null)
                 {
-                    throw new EntityNotFoundException($"Review with ID {reviewId} not found");
+                    var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
+                    tagId = newTag.TagId;
+                }
+                else
+                {
+                    tagId = existingTag.TagId;
                 }
 
-                // Does review match the userId
-                if (userId != reviewExists.UserId)
+                // Add to batch collection
+                reviewTagsToAdd.Add(new ReviewTag
                 {
-                    throw new UnauthorizedAccessException(
-                        $"Review with ID {reviewId} does not belong to user");
-                }
-                
-
-                // Process tags
-                if (reviewUpdateRequestDto.Tags.Count > 0)
-                {
-                    reviewUpdateRequestDto.Tags = reviewUpdateRequestDto.Tags.Select(t => t.Trim()).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-                }
-
-                // Update review
-                reviewExists.Title = reviewUpdateRequestDto.Title;
-                reviewExists.Content = reviewUpdateRequestDto.Content;
-                reviewExists.LastEditDate = DateTime.UtcNow;
-                reviewExists.Rating = reviewUpdateRequestDto.Rating;
-                
-                // Process tags and create review-tag associations in batch
-                var reviewTagsToAdd = new List<ReviewTag>();
-                foreach (var tag in reviewUpdateRequestDto.Tags)
-                {
-                    var existingTag = await _tagRepository.GetTagByNameAsync(tag);
-                    int tagId;
-                    if (existingTag is null)
-                    {
-                        var newTag = await _tagRepository.AddAsync(new Tag { TagName = tag });
-                        tagId = newTag.TagId;
-                    }
-                    else
-                    {
-                        tagId = existingTag.TagId;
-                    }
-
-                    // Add to batch collection
-                    reviewTagsToAdd.Add(new ReviewTag
-                    {
-                        TagId = tagId,
-                        ReviewId = reviewExists.ReviewId,
-                    });
-                }
-            
-                // Remove all tags
-                await _reviewTagRepository.DeleteAllTagsByReviewIdAsync(reviewExists.ReviewId);
-                // Insert all tags in ReviewTags
-                await _reviewTagRepository.AddRangeAsync(reviewTagsToAdd);
-
-                // Save changes
-                await _dbContext.SaveChangesAsync();
-                
-                // Commit transaction
-                await transaction.CommitAsync();
-                
-                return new ReviewSummaryDto
-                {
+                    TagId = tagId,
                     ReviewId = reviewExists.ReviewId,
-                    Title = reviewExists.Title,
-                    Content = reviewExists.Content,
-                    CreationDate = reviewExists.CreationDate,
-                    LastEditDate = reviewExists.LastEditDate,
-                    Rating = reviewExists.Rating,
-                    ItemId = reviewExists.ItemId,
-                    Tags = reviewUpdateRequestDto.Tags,
-                };
+                });
             }
-            catch (Exception ex)
+
+            // Remove all tags
+            await _reviewTagRepository.DeleteAllTagsByReviewIdAsync(reviewExists.ReviewId);
+            // Insert all tags in ReviewTags
+            await _reviewTagRepository.AddRangeAsync(reviewTagsToAdd);
+
+            // Save changes
+            await _dbContext.SaveChangesAsync();
+
+            // Commit transaction
+            await transaction.CommitAsync();
+
+            return new ReviewSummaryDto
             {
-                await transaction.RollbackAsync();
-                throw new TransactionFailedException($"Review update transaction failed {ex.Message}");
-            }
+                ReviewId = reviewExists.ReviewId,
+                Title = reviewExists.Title,
+                Content = reviewExists.Content,
+                CreationDate = reviewExists.CreationDate,
+                LastEditDate = reviewExists.LastEditDate,
+                Rating = reviewExists.Rating,
+                ItemId = reviewExists.ItemId,
+                Tags = reviewUpdateRequestDto.Tags,
+            };
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new TransactionFailedException($"Review update transaction failed {ex.Message}");
+        }
     }
-    
+
     public async Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByUserIdAsync(int userId)
     {
-               var reviewDtos = await _dbContext.Reviews.Where(r => r.UserId == userId)
-                   .Select(r => new ReviewDetailDto
+        var reviewDtos = await _dbContext.Reviews.Where(r => r.UserId == userId)
+            .Select(r => new ReviewDetailDto
+            {
+                ReviewId = r.ReviewId,
+                Title = r.Title,
+                Content = r.Content,
+                CreationDate = r.CreationDate,
+                LastEditDate = r.LastEditDate,
+                Rating = r.Rating,
+                ItemId = r.ItemId,
+                User = new UserSummaryDto
                 {
-                    ReviewId = r.ReviewId,
-                    Title = r.Title,
-                    Content = r.Content,
-                    CreationDate = r.CreationDate,
-                    LastEditDate = r.LastEditDate,
-                    Rating = r.Rating,
-                    ItemId = r.ItemId,
-                    User = new UserSummaryDto
-                    {
-                        UserId = r.UserId ?? 0,
-                    },
-                    Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
-                    DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
-                    UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
-                    TotalVotes = r.ReviewVotes.Count(),
-                }).ToListAsync();
-            return reviewDtos;
+                    UserId = r.UserId ?? 0,
+                },
+                Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
+                DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
+                UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
+                TotalVotes = r.ReviewVotes.Count(),
+            }).ToListAsync();
+        return reviewDtos;
     }
 
     public async Task<IEnumerable<ReviewDetailDto>> GetAllReviewsByItemIdAsync(int itemId)
     {
-            var reviewDtos = await _dbContext.Reviews.Where(r => r.ItemId == itemId)
-                .Select(r => new ReviewDetailDto
+        var reviewDtos = await _dbContext.Reviews.Where(r => r.ItemId == itemId)
+            .Select(r => new ReviewDetailDto
+            {
+                ReviewId = r.ReviewId,
+                Title = r.Title,
+                Content = r.Content,
+                CreationDate = r.CreationDate,
+                LastEditDate = r.LastEditDate,
+                Rating = r.Rating,
+                ItemId = r.ItemId,
+                User = new UserSummaryDto
                 {
-                    ReviewId = r.ReviewId,
-                    Title = r.Title,
-                    Content = r.Content,
-                    CreationDate = r.CreationDate,
-                    LastEditDate = r.LastEditDate,
-                    Rating = r.Rating,
-                    ItemId = r.ItemId,
-                    User = new UserSummaryDto
-                    {
-                        UserId = r.UserId ?? 0,
-                    },
-                    Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
-                    DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
-                    UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
-                    TotalVotes = r.ReviewVotes.Count(),
-                }).ToListAsync();
-            return reviewDtos;
+                    UserId = r.UserId ?? 0,
+                },
+                Tags = r.ReviewTags.Select(rt => rt.Tag!.TagName).ToList(),
+                DownVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == -1),
+                UpVoteCount = r.ReviewVotes.Count(rv => rv.VoteType == 1),
+                TotalVotes = r.ReviewVotes.Count(),
+            }).ToListAsync();
+        return reviewDtos;
     }
 
     public async Task<bool> DeleteReviewAsync(int reviewId, int userId)
@@ -315,6 +315,12 @@ public class ReviewService : IReviewService
         var review = await _reviewRepository.GetReviewDetailByIdAsync(reviewId);
         if (review is null) throw new EntityNotFoundException("Review for the given id not found");
         return review;
+    }
+
+    public async Task<IEnumerable<int>> GetLatestReviewsIdsAsync(int amount)
+    {
+        var reviews = await _dbContext.Reviews.AsNoTracking().OrderByDescending(r => r.LastEditDate).Take(amount).Select(r => r.ReviewId).ToListAsync();
+        return reviews;
     }
 
     public async Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId)
@@ -336,7 +342,8 @@ public class ReviewService : IReviewService
             };
             await _reviewVoteRepository.AddAsync(newReviewVote);
             response.ActionType = ActionType.Created;
-        } else if (existingVote.VoteType == reviewVoteRequestDto.VoteType)
+        }
+        else if (existingVote.VoteType == reviewVoteRequestDto.VoteType)
         {
             _reviewVoteRepository.DeleteAsyncByEntity(existingVote);
             response.ActionType = ActionType.Deleted;
@@ -388,11 +395,11 @@ public class ReviewService : IReviewService
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null) throw new EntityNotFoundException("User not found");
-        var  userReviews = await _reviewRepository.GetLikesReviewsAsync(userId, pageSize, queryParamsDto);
+        var userReviews = await _reviewRepository.GetLikesReviewsAsync(userId, pageSize, queryParamsDto);
         return userReviews;
     }
 
-    public async Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto,  int pageSize)
+    public async Task<IEnumerable<LikesReviewsDto>> GetExplorePageReviewsAsync(ExploreQueryParamsDto queryParamsDto, int pageSize)
     {
         var reviews = await _reviewRepository.GetExplorePageReviewsAsync(queryParamsDto, pageSize);
         return reviews;

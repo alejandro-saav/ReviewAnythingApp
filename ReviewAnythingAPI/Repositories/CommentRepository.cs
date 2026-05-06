@@ -79,7 +79,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
 
     public async Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId)
     {
-        var comments = await _context.Comments.AsNoTracking().Where(c => c.UserId == userId).Select(c => new MyCommentsPageDto
+        var comments = await _context.Comments.AsNoTracking().Where(c => c.UserId == userId).Include(c => c.Review).Select(c => new MyCommentsPageDto
         {
             CommentId = c.CommentId,
             Content = c.Content,
@@ -87,7 +87,7 @@ public class CommentRepository : Repository<Comment>, ICommentRepository
             ReviewId = c.ReviewId,
             Likes = _context.CommentVotes.AsNoTracking().Where(cv => cv.CommentId == c.CommentId && cv.VoteType == 1).Count(),
             ReviewTitle = c.Review != null ? c.Review.Title : "",
-            UserName = c.User != null ? c.User.UserName : "",
+            UserName = c.Review!.Creator != null ? c.Review.Creator.UserName : "",
             ProfileImage = c.User != null ? c.User.ProfileImage : "",
         }).ToListAsync();
         return comments;

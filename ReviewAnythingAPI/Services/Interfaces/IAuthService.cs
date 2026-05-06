@@ -7,7 +7,7 @@ namespace ReviewAnythingAPI.Services.Interfaces;
 public interface IAuthService
 {
     Task<SuccessAuthResponseDto> RegisterUserAsync(UserRegistrationRequestDto userRegistrationDto);
-    
+
     Task<SuccessAuthResponseDto> LoginUserAsync(UserLoginRequestDto userLoginDto);
 
     Task<string> GenerateJwtToken(ApplicationUser user);
@@ -15,4 +15,5 @@ public interface IAuthService
     Task<SuccessAuthResponseDto> ConfirmEmailAsync(string userId, string token);
     Task<SuccessAuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto forgotPasswordRequestDto);
     Task<SuccessAuthResponseDto> ResetPasswordAsync(string userId, string token, ResetPasswordRequestDto resetPasswordRequestDto);
+    Task<bool> DeleteAccountAsync(string userId);
 }

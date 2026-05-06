@@ -106,4 +106,11 @@ public class UserController : ControllerBase
 
         return Ok(success);
     }
+
+    [HttpGet("latest")]
+    public async Task<IActionResult> GetLatestUserIdsAsync([FromQuery] int amount)
+    {
+        var userIds = await _userService.GetLatestUserIdsAsync(amount);
+        return Ok(userIds);
+    }
 }
