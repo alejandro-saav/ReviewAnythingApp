@@ -1,0 +1,15 @@
+.reviewsGrid {
+    width: 80vw;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 330px));
+    gap: 10px;
+    padding: 1rem;
+    padding-top: 0;
+
+}
+
+@media (max-width: 768px) {
+    .reviewsGrid {
+        width: 100%;
+    }
+}

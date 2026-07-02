@@ -9,124 +9,125 @@
 <PageTitle>Liked Reviews</PageTitle>
 
 <div class="likereviews-container">
-<div class="likereviews-wrapper">
-    <div class="header">
-        <h1>♥ Liked Reviews</h1>
-        <p>Reviews you've liked from the community</p>
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number">@_likesReviews.Count()</div>
-                <div class="stat-label">Reviews Liked</div>
+    <div class="likereviews-wrapper">
+        <div class="header">
+            <h1>♥ Liked Reviews</h1>
+            <p>Reviews you've liked from the community</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">@_likesReviews.Count()</div>
+                    <div class="stat-label">Reviews Liked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">@_likesReviews.Select(r => r.User?.UserName).Distinct().Count()</div>
+                    <div class="stat-label">Different Authors</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">@(_likesReviews.Any() ? _likesReviews.Average(r =>
+                                                                                                r.Rating).ToString("0.0") : 0)</div>
+                        <div class="stat-label">Avg Rating</div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">@_likesReviews.Select(r => r.User?.UserName).Distinct().Count()</div>
-                <div class="stat-label">Different Authors</div>
-            </div>
-            <div class="stat-item">
-                <div
-                    class="stat-number">@(_likesReviews.Any() ? _likesReviews.Average(r => r.Rating).ToString("0.0") : 0)</div>
-                <div class="stat-label">Avg Rating</div>
-            </div>
-        </div>
-    </div>
             <div class="content-container">
-    <div class="filters-section">
-        <input type="text" class="search-bar" placeholder="Search reviews, titles..."
-               id="searchInput" @oninput="HandleSearchInput" value="@QueryParams.Search">
+                <div class="filters-section">
+                    <input type="text" class="search-bar" placeholder="Search reviews, titles..." id="searchInput"
+                           @oninput="HandleSearchInput" value="@QueryParams.Search">
 
-        <div class="filters-grid">
-            <div class="filter-group">
-                <h3>Categories</h3>
-                <div class="category-filters">
-                    <div class="category-chip @(string.IsNullOrEmpty(QueryParams.Category) ? "active" : "")"
-                         @onclick="() => HandleCategoryChange(string.Empty)" data-category="all">All
-                    </div>
-                    @foreach (var category in categories)
-                    {
-                        <div class="category-chip @(QueryParams.Category == category.CategoryName ? "active" : "")"
-                             data-category="books"
-                             @onclick="() => HandleCategoryChange(category.CategoryName)">@category.CategoryName</div>
-                    }
-                </div>
-            </div>
-            <div class="filter-group">
-                <h3>Rating</h3>
-                <div class="rating-filter">
-                    <div class="rating-option @(QueryParams.Rating is null ? "active" : "")" data-rating="all"
-                         @onclick="() => HandleRatingFilter(null)">
-                        <span class="all-ratings">All Ratings</span>
-                    </div>
-                    @for (int i = 5; i >= 1; i--)
-                    {
-                        var rating = i;
-                        <div class="rating-option @(QueryParams.Rating == i ? "active" : "")" data-rating="@i"
-                             @onclick="() => HandleRatingFilter(rating)">
-                            @for (int j = 1; j <= 5; j++)
-                            {
-                                <span class="star @(i >= j ? "" : "empty")">★</span>
-                            }
-                            <span>@i Stars</span>
+                        <div class="filters-grid">
+                            <div class="filter-group">
+                                <h3>Categories</h3>
+                                <div class="category-filters">
+                                    <div class="category-chip @(string.IsNullOrEmpty(QueryParams.Category) ? "active" : "")"
+                                         @onclick="() => HandleCategoryChange(string.Empty)" data-category="all">All
+                                    </div>
+                                    @foreach (var category in categories)
+                                    {
+                                        <div class="category-chip @(QueryParams.Category == category.CategoryName ? "active" : "")"
+                                             data-category="books" @onclick="() => HandleCategoryChange(category.CategoryName)">
+                                            @category.CategoryName</div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="filter-group">
+                                    <h3>Rating</h3>
+                                    <div class="rating-filter">
+                                        <div class="rating-option @(QueryParams.Rating is null ? "active" : "")" data-rating="all"
+                                             @onclick="() => HandleRatingFilter(null)">
+                                            <span class="all-ratings">All Ratings</span>
+                                        </div>
+                                        @for (int i = 5; i >= 1; i--)
+                                        {
+                                            var rating = i;
+                                            <div class="rating-option @(QueryParams.Rating == i ? "active" : "")" data-rating="@i"
+                                                 @onclick="() => HandleRatingFilter(rating)">
+                                                @for (int j = 1; j <= 5; j++)
+                                                {
+                                                    <span class="star @(i >= j ? "" : "empty")">★</span>
+                                                }
+                                                <span>@i Stars</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="filter-group">
+                                    <h3>Sort By</h3>
+                                    <select class="sort-dropdown" id="sortSelect" @onchange="HandleSortChange">
+                                        <option value="" disabled selected>-- Order by --</option>
+                                        @foreach (var option in SortOptions.All)
+                                        {
+                                            <option value="@option">@option</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="filter-group">
+                                    <h3>Tags</h3>
+                                    <input type="text" class="tag-input" placeholder="Add tag..." id="tagInput" @bind="NewTag"
+                                           @bind:event="oninput" @onkeydown="HandleTagFilter">
+                                        @if (!string.IsNullOrEmpty(ErrorTagMessage))
+                                        {
+                                            <span class="error-message">@ErrorTagMessage</span>
+                                        }
+                                        <div class="filter-tags" id="filterTags">
+                                            @foreach (var tag in QueryParams.Tags)
+                                            {
+                                                <div class="tag-container">@tag
+                                                    <button class="remove-tag-btn" type="button" @onclick="() => RemoveTag(tag)">x</button>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="reviews-grid">
+                                <!-- Sample liked reviews -->
+                                @if (IsLoading)
+                                {
+                                    for (int i = 1; i <= 9; i++)
+                                    {
+                                        <LoadingCard />
+                                    }
+                                }
+                                else
+                                {
+                                    @foreach (var review in _likesReviews)
+                                    {
+                                        <ReviewCard review="review" />
+                                    }
+                                }
+                            </div>
                         </div>
-                    }
-                </div>
-            </div>
-
-            <div class="filter-group">
-                <h3>Sort By</h3>
-                <select class="sort-dropdown" id="sortSelect" @onchange="HandleSortChange">
-                    <option value="" disabled selected>-- Order by --</option>
-                    @foreach (var option in SortOptions.All)
-                    {
-                        <option value="@option">@option</option>
-                    }
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <h3>Tags</h3>
-                <input type="text" class="tag-input" placeholder="Add tag..." id="tagInput" @bind="NewTag"
-                       @bind:event="oninput" @onkeydown="HandleTagFilter">
-                @if (!string.IsNullOrEmpty(ErrorTagMessage))
-                {
-                    <span class="error-message">@ErrorTagMessage</span>
-                }
-                <div class="filter-tags" id="filterTags">
-                    @foreach (var tag in QueryParams.Tags)
-                    {
-                        <div class="tag-container">@tag
-                            <button class="remove-tag-btn" type="button" @onclick="() => RemoveTag(tag)">x</button>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="reviews-grid">
-        <!-- Sample liked reviews -->
-        @if (IsLoading) {
-            for (int i = 1; i <= 9; i++)
-            {
-                <LoadingCard />
-            }
-        }
-        else
-        {
-            @foreach (var review in _likesReviews)
-            {
-                <ReviewCard review="review"/>
-            }
-        }
-    </div>
-            </div>
     
-    <div class="pagination">
-        <button class="page-btn" @onclick="() => NavigatePage(QueryParams.Page - 1)">← Previous</button>
-        @foreach (var pageNumber in PaginationHelper.GetPaginationRange(QueryParams.Page, (TotalReviews / 9) + 1))
-        {
-            <button class="page-btn @(pageNumber == QueryParams.Page ? "active" : "")"
-                    @onclick="() => NavigatePage(pageNumber)">@pageNumber</button>
-        }
-        <a class="page-btn" @onclick="() => NavigatePage(QueryParams.Page +1)">Next →</a>
-    </div>
-</div>
-</div>
+                        <div class="pagination">
+                            <button class="page-btn" @onclick="() => NavigatePage(QueryParams.Page - 1)">← Previous</button>
+                            @foreach (var pageNumber in PaginationHelper.GetPaginationRange(QueryParams.Page, (TotalReviews / 9) + 1))
+                            {
+                                <button class="page-btn @(pageNumber == QueryParams.Page ? "active" : "")"
+                                        @onclick="() => NavigatePage(pageNumber)">@pageNumber</button>
+                            }
+                            <a class="page-btn" @onclick="() => NavigatePage(QueryParams.Page +1)">Next →</a>
+                        </div>
+                    </div>
+                </div>

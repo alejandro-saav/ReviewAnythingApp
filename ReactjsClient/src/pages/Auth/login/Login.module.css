@@ -1,0 +1,240 @@
+.loginContainer {
+    min-height: 100dvh;
+    /*background: linear-gradient(135deg, #f8d7da 0%, #f5c2c7 50%, #f1aeb5 100%);*/
+    /*background-color: var(--background-container);*/
+    background-color: var(--background-containerv2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* width: 100vw; */
+    /* overflow: hidden; */
+}
+
+.loginWrapper {
+    display: flex;
+    gap: 40px;
+    max-width: 350px;
+    width: 100%;
+    /*background-color: var(--secondary);*/
+}
+
+.loginPanel {
+    /*background: rgba(255, 255, 255, 0.1);*/
+    /*background: linear-gradient(71deg, #080509, #1a171c, #080509);*/
+    /*background: linear-gradient(71deg, #2a2630, #3b3742, #2a2630);*/
+    backdrop-filter: blur(10px);
+    background: rgba(50, 50, 50, 0.95);
+    box-shadow: var(--lighter-shadow);
+    /*border: 5px solid var(--palette-pink);*/
+    border: var(--input-border);
+    /*border-radius: 25px;*/
+    border-radius: 10px;
+    padding: 25px 25px;
+    flex: 1;
+    min-width: 300px;
+}
+
+.panelTitle {
+    font-size: 2.5em;
+    font-weight: 700;
+    /*color: #6a1b9a;*/
+    color: var(--title-color);
+    text-align: center;
+    margin-bottom: 10px;
+    margin-top: 0;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formInput {
+    width: 100%;
+    padding: 6px 10px;
+    /*border: 3px solid var(--primary-dark);*/
+    /*border: 3px solid #FE5D26;*/
+    border: none;
+    border-bottom: var(--input-border-wider);
+    /*border-radius: 12px;*/
+    border-radius: 5px;
+    /*background: var(--primary-light);*/
+    background: var(--input-background-color);
+    font-size: 16px;
+    color: #000;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.formInput:focus {
+    outline: none;
+    /*border-color: #00759c;*/
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    box-shadow: var(--light-shadow);
+}
+
+.formOptions {
+    display: flex;
+    justify-content: space-between;
+    /*align-items: center;*/
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.checkboxContainer {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    /*color: #333;*/
+    color: #eee;
+    gap: 5px;
+}
+
+/*.checkboxContainer input[type="checkbox"] {*/
+/*    margin-right: 8px;*/
+/*    width: 18px;*/
+/*    height: 18px;*/
+/*    accent-color: #4caf50;*/
+/*}*/
+
+.forgotLink {
+    /*color: #6a1b9a;*/
+    /*color: blue;*/
+    color: #4a90e2;
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.forgotLink:hover {
+    text-decoration: underline;
+}
+
+.btnPrimary {
+    width: 100%;
+    padding: 5px;
+    /*background: linear-gradient(45deg, #26c6da, #00acc1);*/
+    background-color: var(--background-wrapper);
+    border: none;
+    /*border-radius: 25px;*/
+    border-radius: 5px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    /* margin-bottom: 10px; */
+    transition: all 0.2s ease-in-out;
+}
+
+.btnPrimary:hover {
+    transform: translateY(-1px);
+    /*box-shadow: 0 5px 15px rgba(38, 198, 218, 0.4);*/
+    box-shadow: var(--lighter-shadow);
+}
+
+.btnPrimary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.divider {
+    text-align: center;
+    margin: 10px 0;
+    /*color: #333333;*/
+    color: #eee;
+    opacity: 1.5;
+    font-weight: 500;
+    position: relative;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    /*background: #333333;*/
+    background: #eee;
+}
+
+.divider::before {
+    left: 0;
+}
+
+.divider::after {
+    right: 0;
+}
+
+.profileUpload span {
+    color: #6a1b9a;
+    font-weight: 500;
+}
+
+.needAccount {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*color: #000;*/
+    color: #eee;
+}
+
+.needAccount a {
+    /*color: blue;*/
+    color: #4a90e2;
+    transition: color ease-in-out 0.3s;
+}
+
+.needAccount a:hover {
+    text-decoration: underline;
+    /*color: var(--primary-color);*/
+    /*color: darkblue;*/
+}
+
+.spinnerContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    display: block;
+}
+
+
+/* Hide validation messages when valid */
+.valid .validationError {
+    display: none;
+}
+
+.validationError {
+    color: #f44336;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+    padding-left: 20px;
+}
+
+.errorMessage {
+    /* background: rgba(244, 67, 54, 0.1); */
+    border-bottom: 1px solid #f44336;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    color: #d32f2f;
+    font-size: 14px;
+    text-align: center;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

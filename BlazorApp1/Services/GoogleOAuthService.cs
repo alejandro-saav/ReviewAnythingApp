@@ -30,16 +30,16 @@ public class GoogleOAuthService
         };
 
         var content = new FormUrlEncodedContent(tokenRequest);
-        
+
         var response = await _httpClient.PostAsync("https://oauth2.googleapis.com/token", content);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
             throw new Exception($"Token exchange failed: {responseContent}");
 
-        return JsonSerializer.Deserialize<TokenResponse>(responseContent, new JsonSerializerOptions 
-        { 
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower 
+        return JsonSerializer.Deserialize<TokenResponse>(responseContent, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
         }) ?? throw new InvalidOperationException("Failed to deserialize token response.");
     }
 }

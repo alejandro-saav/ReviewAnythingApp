@@ -1,0 +1,235 @@
+.filtersSection {
+    /*background: white;*/
+    background: #333;
+    /*border: var(--input-border);*/
+    /*box-shadow: 0 0 10px 1px #FE5D26;*/
+    border-radius: 5px;
+    padding: 20px;
+    padding-bottom: 0;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    width: 22rem;
+}
+
+.searchBar {
+    width: 100%;
+    padding: 6px 10px;
+    border: none;
+    border-bottom: 2px solid var(--primary);
+    border-radius: 5px;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    transition: border-color 0.3s ease;
+    background: var(--input-background-color);
+}
+
+.searchBar:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.filtersGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-bottom: 10px;
+}
+
+.filterGroup h3 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    /*color: var(--dark);*/
+    color: #eee;
+    font-weight: 600;
+}
+
+.categoryFilters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.categoryChip {
+    background: var(--light);
+    color: var(--dark);
+    /*color: #eee;*/
+    border: 2px solid transparent;
+    padding: 2px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.categoryChip:hover {
+    background: var(--accent);
+    transform: translateY(-2px);
+}
+
+.categoryChip.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    text-shadow: 1px 1px 1px black;
+}
+
+.ratingFilter {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    /*gap: 15px;*/
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.ratingOption {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 2px 10px;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.ratingOption:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.ratingOption.active {
+    background: var(--primary);
+    /*color: var(--dark);*/
+    color: white;
+    text-shadow: 1px 1px 1px black;
+}
+
+.ratingStars {
+    color: var(--secondary);
+    font-size: 1.1rem;
+}
+
+.starFather {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+}
+
+.starContainer:hover {
+    cursor: pointer;
+}
+
+.star {
+    color: var(--primary);
+    font-size: 1.5rem;
+}
+
+.star.empty {
+    color: #ddd;
+}
+
+.star:hover {
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.sortDropdown {
+    padding: 6px 10px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    background: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.sortDropdown:focus {
+    outline: none;
+}
+
+.filterTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.tagInput {
+    padding: 4px 10px;
+    border: 1px solid var(--accent);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    width: 150px;
+}
+
+.tagInput:active,
+.tagInput:focus {
+    outline: 1px solid var(--primary);
+}
+
+.tagChip {
+    background: var(--accent);
+    color: var(--dark);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tagChip .remove {
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.tag {
+    display: flex;
+    gap: 5px;
+    background-color: #111;
+    box-shadow: 1px 1px 1px #111;
+    border-radius: 4px;
+    color: #fff;
+    letter-spacing: 2px;
+    font-size: .9rem;
+    border: 1px solid var(--input-border);
+}
+
+.spTag {
+    padding: 4px 8px;
+    padding-right: 0;
+}
+
+.removeTagBtn {
+    margin-left: 4px;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    width: 18px;
+    color: #e54a1f;
+    font-size: 1.2rem;
+    padding-right: 8px;
+}
+
+.removeTagBtn:hover {
+    color: #df3000;
+}
+
+.errorMessage {
+    color: #ff3b45;
+    display: block;
+    font-size: .9rem;
+    margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    .filtersSection {
+        max-width: 20rem;
+        display: none;
+    }
+}

@@ -1,0 +1,110 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+.profileHeader {
+    width: 100%;
+    display: flex;
+    gap: 30px;
+    margin-bottom: 10px;
+    padding: 5px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Profile Image */
+.skeletonProfileImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid #444;
+    flex-shrink: 0;
+}
+
+/* Name */
+.skeletonName {
+    width: 300px;
+    height: 32px;
+    margin-bottom: 10px;
+}
+
+/* Username */
+.skeletonUsername {
+    width: 150px;
+    height: 20px;
+    margin-bottom: 15px;
+}
+
+/* Member Date */
+.skeletonMemberDate {
+    width: 200px;
+    height: 14px;
+    margin-bottom: 15px;
+}
+
+/* Bio */
+.skeletonBio {
+    width: 250px;
+    height: 16px;
+    margin-bottom: 25px;
+}
+
+/* Stats Numbers */
+.skeletonStatNumber {
+    width: 30px;
+    height: 28px;
+    margin-bottom: 5px;
+}
+
+/* Stats Labels */
+.skeletonStatLabel {
+    width: 70px;
+    height: 14px;
+}
+
+/* Follow Button */
+.skeletonFollowBtn {
+    width: 90px;
+    height: 38px;
+    border-radius: 20px;
+}
+
+/* Section Headers */
+.skeletonSectionHeader {
+    width: 140px;
+    height: 24px;
+}
+
+@media (max-width: 768px) {
+    .skeletonProfileImage {
+        margin: 0 auto 20px;
+    }
+
+    .skeletonName,
+    .skeletonUsername,
+    .skeletonMemberDate,
+    .skeletonBio {
+        margin-left: auto;
+        margin-right: auto;
+    }
+}

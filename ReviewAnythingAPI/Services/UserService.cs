@@ -82,7 +82,7 @@ public class UserService : IUserService
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Error while uploading the image to cloudinary on updating user summary.Error:{ex.Message}");
+                throw new Exception($"Error while uploading the image to cloudinary on updating user summary.Error:{ex.Message}");
             }
         }
         else if (updateDto.ProfileImage is null && updateDto.DeleteImage)

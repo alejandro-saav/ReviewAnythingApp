@@ -229,7 +229,8 @@ public class UserService : IUserService
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/health", HttpCompletionOption.ResponseHeadersRead);
+            using var request = new HttpRequestMessage(HttpMethod.Head, "api/health");
+            var response = await _httpClient.SendAsync(request);
             if (response.IsSuccessStatusCode) return true;
             return false;
         } catch (Exception)

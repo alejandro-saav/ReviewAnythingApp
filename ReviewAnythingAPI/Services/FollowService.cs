@@ -57,7 +57,7 @@ public class FollowService : IFollowService
         var entity = await _followRepository.GetEntityByIdAsync(userId, targetUserId);
         if (entity == null)
         {
-            throw new EntityNotFoundException("User not found");
+            throw new EntityNotFoundException("User is not following the given user.");
         }
 
         _followRepository.DeleteAsyncByEntity(entity);
