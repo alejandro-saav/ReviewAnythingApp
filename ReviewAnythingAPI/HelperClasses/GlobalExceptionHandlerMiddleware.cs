@@ -4,6 +4,9 @@ using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using ReviewAnythingAPI.Context;
 using ReviewAnythingAPI.HelperClasses.CustomExceptions;
+using Sentry;
+using System.Security.Claims;
+using ReviewAnythingAPI.DTOs.AuthDTOs;
 
 namespace ReviewAnythingAPI.HelperClasses;
 
@@ -34,14 +37,24 @@ public class GlobalExceptionHandlerMiddleware
         {
             try
             {
+                SentrySdk.ConfigureScope(scope =>
+                {
+                    scope.User = new SentryUser
+                    {
+                        Id = context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? correlationId
+                    };
+                });
+
                 var stopwatch = Stopwatch.StartNew();
 
                 _logger.LogInformation("➡️ Request started: {Method} {Path}", context.Request.Method, context.Request.Path);
+
                 await _next(context);
 
                 stopwatch.Stop();
 
                 _logger.LogInformation("⬅️ Request completed: {Method} {Path} - {StatusCode} in {ElapsedMs}ms", context.Request.Method, context.Request.Path, context.Response.StatusCode, stopwatch.ElapsedMilliseconds);
+
             }
             catch (Exception ex)
             {
@@ -87,10 +100,10 @@ public class GlobalExceptionHandlerMiddleware
                 break;
         }
 
-        var response = new
+        var response = new GenericResponseDto
         {
-            error = message,
-            statusCode = (int)statusCode
+            Message = message,
+            Success = false
         };
 
         context.Response.ContentType = "application/json";

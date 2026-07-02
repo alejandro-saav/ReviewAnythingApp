@@ -1,0 +1,169 @@
+.confirmationContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*background: linear-gradient(135deg, #fcf6bd 0%, #d0f4de 50%, #a9def9 100%);*/
+    /*background-color: var(--background-container);*/
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.confirmationCard {
+    /*background: white;*/
+    background-color: var(--background-containerv2);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 4px var(--primary);
+    max-width: 500px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+}
+
+.iconContainer {
+    margin-bottom: 10px;
+}
+
+.successIcon {
+    display: inline-flex;
+    padding: 5px;
+    /*background: linear-gradient(135deg, #d0f4de, #a9def9);*/
+    background-color: var(--title-color);
+    border-radius: 50%;
+    color: white;
+    margin: 0 auto;
+}
+
+.errorIcon {
+    display: inline-flex;
+    padding: 10px;
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background-color: var(--title-color);
+    border-radius: 50%;
+    color: white;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.title.success {
+    color: #333;
+    /*background: linear-gradient(135deg, #d0f4de, #a9def9);*/
+    background: var(--title-color);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.title.error {
+    color: #333;
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background: var(--title-color);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.message {
+    font-size: 1rem;
+    color: #eee;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.infoBox {
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 10px;
+    border: 2px solid;
+}
+
+.successBox {
+    /*background: #d0f4de;*/
+    background: var(--background-container);
+    border-color: var(--title-color);
+}
+
+.errorBox {
+    background: var(--background-container);
+    border-color: var(--title-color);
+}
+
+.infoText {
+    color: #333;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btnPrimary {
+    /*background: linear-gradient(135deg, #d0f4de, #a9def9);*/
+    background-color: var(--title-color);
+    color: white;
+}
+
+.btnPrimary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--light-shadow);
+    /*box-shadow: 0 8px 20px rgba(169, 222, 249, 0.4);*/
+}
+
+.btnTertiary {
+    background: transparent;
+    color: #eee;
+    border: var(--input-border);
+    /*border: 2px solid #ccc;*/
+}
+
+.btnTertiary:hover {
+    /*background: #f5f5f5;*/
+    transform: translateY(-1px);
+    box-shadow: var(--light-shadow);
+    /*box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);*/
+}
+
+@media (max-width: 600px) {
+    .confirmationCard {
+        padding: 30px 20px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .message {
+        font-size: 1.1rem;
+    }
+
+    .actionButtons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

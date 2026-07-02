@@ -1,0 +1,40 @@
+.voteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    width: 3rem;
+    height: 2rem;
+    background: #111;
+    border: none;
+    border-bottom: 3px solid #b3d1a3;
+    box-shadow: 1px 1px 10px #111;
+    padding: .3rem 1.4rem;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #eee;
+    border-radius: 5px;
+}
+
+.voteBtn span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.voteBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.voteBtn.active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    color: var(--primary);
+    border-color: var(--primary);
+}

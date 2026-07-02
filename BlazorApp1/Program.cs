@@ -83,7 +83,7 @@ app.UseMiddleware<CaptureClientInfoMiddleware>();
 app.UseForwardedHeaders();
 
 // app.MapFallbackToPage("/NotFound");
-app.UseStatusCodePagesWithReExecute("/NotFoundPage", "?statusCode={0}"); 
+app.UseStatusCodePagesWithReExecute("/NotFoundPage", "?statusCode={0}");
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

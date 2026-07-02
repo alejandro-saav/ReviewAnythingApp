@@ -1,0 +1,250 @@
+.editProfileContainer {
+    width: 100vw;
+    background-color: var(--background-containerv2);
+    height: 100%;
+    padding: 20px;
+}
+
+.editProfileWrapper {
+    max-width: 400px;
+    margin: 0 auto;
+    background: var(--card-dark);
+    border-radius: 4px;
+    padding: 10px;
+    border: 1px solid var(--border-dark);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    color: var(--primary);
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: var(--text-muted);
+    color: #eee;
+    font-size: 1rem;
+}
+
+.profileImageSection {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.imagePreview {
+    position: relative;
+}
+
+.removeBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.removeBtn:hover {
+    background: rgba(244, 67, 54, 1);
+    color: black;
+}
+
+.uploadContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.svgContainer {
+    position: relative;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.svgContainer:hover {
+    background-color: #4a4a4a;
+}
+
+.plusSign {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    stroke: #ddd;
+    color: #ddd;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+    font-weight: bolder;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.profileImage {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary);
+    margin-bottom: 20px;
+}
+
+.previewImg {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.chooseNewImg {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
+
+.formGroup {
+    margin-bottom: 30px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+.formInput {
+    width: 100%;
+    padding: 8px 20px;
+    border: 2px solid var(--border-dark);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    transition: border-color 0.3s ease;
+}
+
+.formInput:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.formInput::placeholder {
+    color: var(--text-muted);
+}
+
+.formInput.textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 8px 32px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btnPrimary {
+    background: var(--primary);
+    color: white;
+}
+
+.btnPrimary:disabled,
+.btnPrimary:disabled:hover {
+    cursor: not-allowed;
+    opacity: .5;
+    background: var(--primary);
+}
+
+.btnPrimary:hover {
+    background: #e54d1f;
+    /* transform: translateY(-2px); */
+}
+
+
+.btnSecondary {
+    background: transparent;
+    color: var(--text-light);
+    border: 2px solid var(--border-dark);
+}
+
+.btnSecondary:hover {
+    border-color: var(--text-light);
+    transform: translateY(-2px);
+}
+
+.fileUploadGroup {
+    margin-bottom: 20px;
+}
+
+.fileUploadInput {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed var(--border-dark);
+    border-radius: 8px;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.fileUploadInput:hover {
+    border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .actionButtons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

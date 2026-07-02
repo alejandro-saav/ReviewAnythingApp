@@ -1,0 +1,256 @@
+.reviewCard {
+    display: block;
+    background: rgba(34, 34, 34, 0.95);
+    border-radius: 5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    padding-right: 1rem;
+    overflow-wrap: break-word;
+    /*margin-bottom: 20px;*/
+}
+
+.reviewAuthor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 5px;
+    padding: 10px;
+    padding-bottom: 0;
+    border-radius: 16px;
+}
+
+.profileImg {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 0 2px #007bff;
+    transition: all 0.3s ease-in-out;
+}
+
+.authorInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-weight: 600;
+    color: #007bff;
+    font-size: 1rem;
+}
+
+.authorBadge {
+    font-size: 0.8rem;
+    color: #007bff;
+    font-weight: 500;
+}
+
+.helperContainer {
+    padding: 12px;
+    padding-bottom: 0;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.reviewTitle {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+.reviewCategory {
+    background: #28a745;
+    color: #343a40;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.reviewRating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.star {
+    color: #007bff;
+    font-size: 1.2rem;
+}
+
+.ratingText {
+    font-size: 0.9rem;
+    color: #eee;
+    opacity: 0.7;
+}
+
+.reviewContent {
+    color: #eee;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+
+.reviewTags {
+    display: flex;
+    gap: 6px;
+    padding-bottom: 15px;
+    justify-content: space-between;
+    overflow-wrap: break-word;
+}
+
+.tagsContainer {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+    gap: 0.5rem;
+}
+
+.reviewTag {
+    background: #f8f9fa;
+    color: #343a40;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.reviewActions {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 15px;
+}
+
+.actionBtn {
+    background: none;
+    border: none;
+    color: #eee;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Skeleton styles */
+.skeleton {
+    background: linear-gradient(90deg, #444 25%, #555 50%, #444 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    border-radius: 4px;
+}
+
+.skeletonCircle {
+    background: linear-gradient(90deg, #444 25%, #555 50%, #444 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    border-radius: 50%;
+}
+
+.skeletonProfile {
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 0 0 2px #555;
+}
+
+.skeletonUsername {
+    height: 16px;
+    width: 120px;
+    margin-bottom: 4px;
+}
+
+.skeletonBadge {
+    height: 13px;
+    width: 90px;
+}
+
+.skeletonTitle {
+    height: 22px;
+    width: 250px;
+    margin-bottom: 5px;
+}
+
+.skeletonCategory {
+    height: 24px;
+    width: 80px;
+    border-radius: 12px;
+}
+
+.skeletonStar {
+    width: 20px;
+    height: 20px;
+    border-radius: 2px;
+}
+
+.skeletonRatingText {
+    height: 14px;
+    width: 80px;
+}
+
+.skeletonContentLine {
+    height: 19px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+}
+
+.skeletonContentLine:nth-child(1) {
+    width: 100%;
+}
+
+.skeletonContentLine:nth-child(2) {
+    width: 85%;
+}
+
+.skeletonContentLine:nth-child(3) {
+    width: 60%;
+}
+
+.skeletonTag {
+    height: 22px;
+    width: 60px;
+    border-radius: 10px;
+    margin-right: 8px;
+}
+
+.skeletonTag:nth-child(2) {
+    width: 45px;
+}
+
+.skeletonTag:nth-child(3) {
+    width: 70px;
+}
+
+.skeletonAction {
+    height: 16px;
+    width: 40px;
+}
+
+@keyframes skeletonLoading {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+h2 {
+    color: #eee;
+    margin-bottom: 30px;
+    text-align: center;
+}

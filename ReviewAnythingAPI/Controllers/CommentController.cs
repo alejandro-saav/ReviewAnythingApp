@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ReviewAnythingAPI.DTOs.AuthDTOs;
 using ReviewAnythingAPI.DTOs.CommentDTOs;
 using ReviewAnythingAPI.DTOs.ReviewDTOs;
 using ReviewAnythingAPI.Enums;
@@ -9,7 +11,9 @@ using ReviewAnythingAPI.Services.Interfaces;
 namespace ReviewAnythingAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Produces("application/json")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class CommentController : ControllerBase
 {
     private readonly ICommentService _commentService;
@@ -22,7 +26,18 @@ public class CommentController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Retrieves all comments by the user unique identifier.
+    /// </summary>
+    /// <param name="userId">The user unique identifier (int)</param>
+    /// <returns>A list of comments with details including: CommentId, Content, ReviewId, LastEditDate, UserInformation and number of likes</returns>
+    /// <response code="200">Returns a list of comments or an empty array if no comments found for the given userId.</response>
+    /// <response code="400">Invalid userId.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [HttpGet("user/{userId}")]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllCommentsByUser([FromRoute] int userId)
     {
         var comments = await _commentService.GetAllCommentsByUserAsync(userId);
@@ -32,7 +47,18 @@ public class CommentController : ControllerBase
         return Ok(comments);
     }
 
+    /// <summary>
+    /// Retrieves all comments from a review unique identifier.
+    /// </summary>
+    /// <param name="reviewId">The review unique identifier (int)</param>
+    /// <returns>A list of comments with details including: CommentId, Content, ReviewId, LastEditDate, UserInformation and number of likes.</returns>
+    /// <response code="200">Returns a list of comments or an empty array if no comments found for the given reviewId.</response>
+    /// <response code="400">Invalid reviewId.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [HttpGet("reviews/{reviewId}")]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllCommentsByReview([FromRoute] int reviewId)
     {
         var comments = await _commentService.GetAllCommentsByReviewAsync(reviewId);
@@ -42,8 +68,21 @@ public class CommentController : ControllerBase
         return Ok(comments);
     }
 
+    /// <summary>
+    /// Creates a new comment resource.
+    /// </summary>
+    /// <remarks>This endpoint is restricted to authenticated users only.</remarks>
+    /// <returns>The newly created comment and its details including: CommentId, Content, ReviewId, LastEditDate, UserInformation and number of Likes.</returns>
+    /// <response code="201">Comment successfully created, returns the newly created comment.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="404">Review not found for the given reviewId.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [Authorize]
     [HttpPost]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateCommentAsync([FromBody] CommentCreateRequestDto comment)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -58,7 +97,18 @@ public class CommentController : ControllerBase
         return CreatedAtAction(nameof(GetCommentById), new { commentId = createdComment.CommentId }, createdComment);
     }
 
+    /// <summary>
+    /// Retrieves the details of a comment by its unique identifier.
+    /// </summary>
+    /// <param name="commentId">The unique identifier of a comment (int).</param>
+    /// <returns>A comment with details including: CommentId, Content, ReviewId, LastEditDate, UserInformation and number of likes</returns>
+    /// <response code="200">Comment found, returns the comment details.</response>
+    /// <response code="404">A comment was not found for the given comment id.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [HttpGet("{commentId}")]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetCommentById([FromRoute] int commentId)
     {
         var comment = await _commentService.GetCommentByIdAsync(commentId);
@@ -68,8 +118,25 @@ public class CommentController : ControllerBase
         return Ok(comment);
     }
 
+    /// <summary>
+    /// Update a comment resource by its unique identifier.
+    /// </summary>
+    /// <remarks>The endpoint is restricted to authenticated users only.</remarks>
+    /// <param name="commentId">The unique identifier of a comment (int).</param>
+    /// <param name="comment">A comment details including: Content and ReviewId.</param>
+    /// <returns>A comment with details including: CommentId, Content, ReviewId, LastEditDate, UserInformation and number of likes</returns>
+    /// <response code="200">Comment successfully updated, returns the comment details.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="403">User is not allowed to perform the operation.</response>
+    /// <response code="404">A comment was not found for the given comment id.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [Authorize]
     [HttpPut("{commentId}")]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateCommentAsync([FromBody] CommentCreateRequestDto comment,
         [FromRoute] int commentId)
     {
@@ -86,8 +153,25 @@ public class CommentController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Deletes a comment resource by its unique identifier.
+    /// </summary>
+    /// <remarks>The endpoint is restricted to authenticated users only.</remarks>
+    /// <param name="commentId">The unique identifier of a comment (int).</param>
+    /// <response code="204">Comment successfully deleted.</response>
+    /// <response code="400">Invalid comment id.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="403">User is not allowed to perform the operation.</response>
+    /// <response code="404">A comment was not found for the given comment id.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [Authorize]
     [HttpDelete("{commentId}")]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DeleteCommentByIdAsync([FromRoute] int commentId)
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -99,8 +183,26 @@ public class CommentController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Add if not exists, update if exists and is different or delete if it is the same comment vote.
+    /// </summary>
+    /// <remarks>The endpoint is restricted to authenticated users only.</remarks>
+    /// <response code="200">Comment vote successfully updated.</response>
+    /// <response code="201">Comment vote successfully created.</response>
+    /// <response code="204">Comment vote successfully deleted.</response>
+    /// <response code="400">Missing parameter fields or invalid vote type. Vote type allow values 1 or -1.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="404">A comment was not found for the given comment id.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [Authorize]
     [HttpPost("comment-votes")]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(IEnumerable<CommentResponseDto>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> PostCommentVotes([FromBody] CommentVoteRequestDto vote)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -116,6 +218,14 @@ public class CommentController : ControllerBase
         };
     }
 
+    /// <summary>
+    /// Retrieves all comments by the user unique identifier with more details about.
+    /// </summary>
+    /// <remarks>The endpoint is restricted to authenticated users only.</remarks>
+    /// <returns>A list of comments with extra details including: CommentId, Content, ReviewId, LastEditDate, Likes, ReviewTitle, UserName and user profile image.</returns>
+    /// <response code="200">Returns a list of comments or an empty array if no comments found for the authenticated user.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="500">Internal server error. Please try again.</response>
     [Authorize]
     [HttpGet("mycomments-page")]
     public async Task<IActionResult> GetMyCommentsPage()

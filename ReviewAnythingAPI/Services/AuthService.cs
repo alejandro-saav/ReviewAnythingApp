@@ -75,7 +75,7 @@ public class AuthService : IAuthService
 
             if (!result.Succeeded)
             {
-                throw new ArgumentException($"User registration failed: {result.Errors.First().Description}");
+                throw new Exception($"User registration failed: {result.Errors.First().Description}");
             }
             // Cloudinary upload image
             if (userRegistrationDto.ProfileImage != null || userRegistrationDto.ProfileImage?.Length > 0)
@@ -133,7 +133,7 @@ public class AuthService : IAuthService
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Unable to confirm your email: {user.Email}");
+            throw new Exception($"Unable to confirm your email: {user.Email}");
         }
 
         var newJwtToken = await GenerateJwtToken(user);
@@ -182,7 +182,7 @@ public class AuthService : IAuthService
         if (!passwordValid)
         {
             await _userManager.AccessFailedAsync(user);
-            throw new InvalidOperationException("Invalid email or password.");
+            throw new ArgumentException("Invalid email or password.");
         }
         // if login success reset access failed count
         await _userManager.ResetAccessFailedCountAsync(user);
@@ -286,7 +286,7 @@ public class AuthService : IAuthService
         }
         catch (InvalidJwtException ex)
         {
-            throw new InvalidOperationException($"Invalid google token. Error: {ex.Message}");
+            throw new Exception($"Invalid google token. Error: {ex.Message}");
         }
 
         // Token is valid, extract user information
@@ -298,7 +298,7 @@ public class AuthService : IAuthService
         var emailVerified = payload.EmailVerified;
         if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(googleUserId))
         {
-            throw new InvalidOperationException($"Required information not found in the token.");
+            throw new Exception($"Required information not found in the token.");
         }
 
         // Use ASP.NET Core Identity's external login mechanism
@@ -454,7 +454,7 @@ public class AuthService : IAuthService
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
         {
-            throw new EntityNotFoundException($"User not found for the given userId: {userId}");
+            throw new InvalidOperationException($"User not found for the given userId: {userId}");
         }
 
         var userDeletionSuccess = await _userManager.DeleteAsync(user);

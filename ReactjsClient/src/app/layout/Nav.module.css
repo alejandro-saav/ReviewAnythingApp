@@ -1,0 +1,175 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: rgba(34, 34, 34, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.navContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.hamburgerIcon {
+    display: none;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    text-decoration: none;
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.navLinks {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    gap: 30px;
+}
+
+
+.navLinks li a {
+    color: var(--light);
+    text-decoration: none;
+    /* transition: color 0.2s ease-in-out; */
+    font-weight: 500;
+}
+
+.navLinks li a:hover,
+.navLinks li a.active {
+    color: var(--secondary);
+}
+
+.profile {
+    position: relative;
+}
+
+.svgContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.profileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 3px #FFF;
+}
+
+.modalOverlay {
+    position: fixed;
+    /* Fixes it to the viewport */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent black backdrop */
+    z-index: 999;
+    /* Ensure it's behind the modal but above other content */
+}
+
+.navModal {
+    position: absolute;
+    background: var(--dark);
+    color: #f2f2f2;
+    padding: 0.5rem 0.2rem;
+    border-radius: 5px;
+    width: 10rem;
+    z-index: 1000;
+}
+
+.navModalList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.navModalList li {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+    padding: 1px 12px;
+    border-radius: 5px;
+    color: var(--light);
+}
+
+.navModalList li:hover {
+    background-color: #656c7633;
+    color: var(--secondary)
+}
+
+.navModalList li svg {
+    margin-right: 4px;
+}
+
+@media(max-width: 760px) {
+    .navContainer {
+        position: relative;
+    }
+
+    .navModal {
+        position: relative;
+        background: none;
+        z-index: 0;
+    }
+
+    .modalOverlay {
+        width: 0;
+        height: 0;
+    }
+
+    .navModalList li {
+        justify-content: center;
+        padding: 0;
+    }
+
+    .profile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navLinks {
+        width: 0;
+        height: 100vh;
+        overflow: hidden;
+        position: absolute;
+        flex-direction: column;
+        right: -10px;
+        top: 45px;
+        background-color: var(--background-containerv2);
+        transition: width 0.3s ease;
+    }
+
+    .hamburgerIcon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .navLinks.open {
+        width: auto;
+        height: 100vh;
+        padding: 1rem;
+        z-index: 100;
+    }
+}

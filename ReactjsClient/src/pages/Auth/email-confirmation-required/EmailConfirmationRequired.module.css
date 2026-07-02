@@ -1,0 +1,135 @@
+.confirmationContainer {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*background: linear-gradient(135deg, #fcf6bd 0%, #d0f4de 50%, #a9def9 100%);*/
+    /*background: var(--background-container);*/
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.confirmationCard {
+    /*background: white;*/
+    background: var(--background-containerv2);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 20px 40px;
+    text-align: center;
+    /*box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);*/
+    max-width: 500px;
+    width: 100%;
+    border: var(--wrapper-border);
+}
+
+.iconContainer {
+    margin-bottom: 30px;
+}
+
+.emailIcon {
+    display: inline-flex;
+    padding: 10px;
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background: var(--background-wrapper);
+    border-radius: 50%;
+    color: #eee;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 20px;
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    /*background: var(--background-container);*/
+}
+
+.message {
+    font-size: 1rem;
+    color: #eee;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.infoBox {
+    background: var(--background-container);
+    border: 2px solid var(--title-color);
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.infoText {
+    color: #333;
+    font-weight: 600;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.btnPrimary {
+    /*background: linear-gradient(135deg, #ff99c8, #e4c1f9);*/
+    background: var(--background-wrapper);
+    color: white;
+}
+
+.btnPrimary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--light-shadow);
+    /*box-shadow: 0 8px 20px rgba(255, 153, 200, 0.4);*/
+}
+
+.btnSecondary {
+    /*background: var(--background-container);*/
+    color: #eee;
+    border: 2px solid var(--title-color);
+}
+
+.btnSecondary:hover {
+    /*background: #a9def9;*/
+    transform: translateY(-1px);
+    box-shadow: var(--light-shadow);
+    /*box-shadow: 0 8px 20px rgba(169, 222, 249, 0.4);*/
+}
+
+@media (max-width: 600px) {
+    .confirmationCard {
+        padding: 30px 20px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .message {
+        font-size: 1.1rem;
+    }
+
+    .actionButtons {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+}

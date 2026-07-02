@@ -1,10 +1,13 @@
 using System.Data;
+using System.Reflection;
 using System.Text;
+using Asp.Versioning;
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using Npgsql;
 using Resend;
 using ReviewAnythingAPI.Context;
@@ -18,16 +21,103 @@ using ReviewAnythingAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Enable Sentry Services
+builder.WebHost.UseSentry();
+
 // CORS Services
+var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("GenericPolicy", policy =>
     {
-        policy.WithOrigins("https://reviewanything.site")
+        policy.WithOrigins(origins ?? ["https://reviewanything.site"])
         .WithMethods("GET", "POST", "PUT", "DELETE", "HEAD", "PATCH")
         .WithHeaders("Content-Type", "Authorization", "X-Client-Type")
         .AllowCredentials();
     });
+});
+
+// API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new QueryStringApiVersionReader("api-version")
+    );
+}).AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+// Adding swagger configuration
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "ReviewAnythin API",
+        Version = "v1",
+        Description = """
+        A RESTful API for the ReviewAnything platform, enabling full CRUD operations 
+        for reviews, comments, votes, and user management.
+        
+        ## Features
+        - **Reviews** – Create, read, update, and delete reviews for any subject
+        - **Comments** – Threaded comments on reviews with full CRUD support
+        - **Votes** – Upvote/downvote system for both reviews and comments
+        - **Users** – User profile management and account operations
+        
+        ## Authentication
+        This API uses **JWT Bearer authentication**. To access protected endpoints:
+        1. Obtain a token via the `/auth/login` endpoint
+        2. Click the **Authorize** button above and enter: `Bearer <your_token>`
+        3. All subsequent requests will include your credentials automatically
+        """,
+        Contact = new OpenApiContact
+        {
+            Name = "Oscar Castro",
+            Email = "oacastro999@gmail.com",
+            Url = new Uri("https://oscarcastro.site")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT License",
+            Url = new Uri("https://opensource.org/licenses/MIT")
+        },
+        TermsOfService = new Uri("https://reviewanything.site/terms-of-service"),
+    });
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and then your token"
+    });
+
+    options.AddServer(new OpenApiServer
+    {
+        Url = "https://api.reviewanything.site",
+        Description = "Production"
+    });
+
+    options.AddServer(new OpenApiServer
+    {
+        Url = "http://localhost:5026",
+        Description = "Local Development"
+    });
+
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
 });
 
 // Configure Cloudinary settings
@@ -169,7 +259,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     // SEED 50 USERS;
 
@@ -195,15 +285,20 @@ if (!app.Environment.IsDevelopment())
     // var categoryIds = await db.Categories.Select(c => c.CategoryId).ToListAsync();
     //
     // await seeder.SeedReviewsAsync(reviewJson, userIds, categoryIds, 1000);
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ReviewAnything API v1");
+        options.RoutePrefix = string.Empty;
+    });
 }
 
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("GenericPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.MapControllers();
 

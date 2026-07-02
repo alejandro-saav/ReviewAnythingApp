@@ -129,7 +129,7 @@ public class CommentService : ICommentService
         var comment = await _commentRepository.GetByIdAsync(commentId);
         if (comment is null)
         {
-            throw new KeyNotFoundException($"comment not found for the given commentId {commentId}");
+            throw new EntityNotFoundException($"comment not found for the given commentId {commentId}");
         }
         ;
 
@@ -144,6 +144,11 @@ public class CommentService : ICommentService
 
     public async Task<CommentVoteResponseDto> CommentVoteAsync(CommentVoteRequestDto commentVoteRequestDto, int userId)
     {
+        var comment = await _commentRepository.GetByIdAsync(commentVoteRequestDto.CommentId);
+        if (comment is null)
+        {
+            throw new EntityNotFoundException("Comment does not exists.");
+        }
         var existingCommentVote = await _commentVoteRepository.GetByUserAndCommentIdAsync(userId, commentVoteRequestDto.CommentId);
         var response = new CommentVoteResponseDto
         {
@@ -180,8 +185,6 @@ public class CommentService : ICommentService
 
     public async Task<IEnumerable<MyCommentsPageDto>> GetAllCommentsPageAsync(int userId)
     {
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user is null) throw new EntityNotFoundException("User not found");
         var comments = await _commentRepository.GetAllCommentsPageAsync(userId);
         return comments;
     }

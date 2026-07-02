@@ -11,6 +11,9 @@ COPY . .
 WORKDIR "/src/ReviewAnythingAPI"
 RUN dotnet build "./ReviewAnythingAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+FROM build AS develop
+WORKDIR "/src/ReviewAnythingAPI"
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./ReviewAnythingAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false

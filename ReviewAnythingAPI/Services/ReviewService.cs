@@ -325,6 +325,8 @@ public class ReviewService : IReviewService
 
     public async Task<ReviewVoteResponseDto> ReviewVoteAsync(ReviewVoteRequestDto reviewVoteRequestDto, int userId)
     {
+        var review = await _reviewRepository.GetByIdAsync(reviewVoteRequestDto.ReviewId);
+        if (review is null) throw new EntityNotFoundException("Review not found for the given review id.");
         var existingVote = await _reviewVoteRepository.GetByUserAndReviewIdAsync(userId, reviewVoteRequestDto.ReviewId);
         var response = new ReviewVoteResponseDto
         {
@@ -386,7 +388,6 @@ public class ReviewService : IReviewService
     public async Task<IEnumerable<LikesReviewsDto>> GetMyReviewsAsync(int userId, int pageSize, ExploreQueryParamsDto queryParamsDto)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user is null) throw new EntityNotFoundException("User not found");
         var userReviews = await _reviewRepository.GetMyReviewsAsync(userId, pageSize, queryParamsDto);
         return userReviews;
     }

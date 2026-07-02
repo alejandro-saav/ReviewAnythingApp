@@ -1,0 +1,209 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    padding-top: 10px;
+}
+
+.titleHeader {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
+    color: var(--primary);
+}
+
+.profileHeader {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+    background-color: rgba(0, 0, 0, 0.075);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.profileImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    flex-shrink: 0;
+}
+
+.profileInfo {
+    flex: 1;
+}
+
+.profileName {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.username {
+    font-size: 22px;
+    color: var(--secondary);
+    margin-bottom: 15px;
+}
+
+.joinDate {
+    font-size: 14px;
+    color: #eee;
+    margin-bottom: 20px;
+}
+
+.bio {
+    font-size: 16px;
+    color: #eee;
+    line-height: 1.5;
+    margin-bottom: 25px;
+}
+
+.stats {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.statItem {
+    text-align: center;
+}
+
+.statNumber {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary);
+    display: block;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #eee;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.socialSections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 10px;
+}
+
+.socialSection h3 {
+    font-size: 18px;
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.header {
+    color: var(--primary);
+}
+
+.followersSection {
+    background-color: rgba(0, 0, 0, 0.075);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.followingSection {
+    background-color: rgba(0, 0, 0, 0.075);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.followersGrid,
+.followingGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.followerItem,
+.followingItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease;
+}
+
+.profilePhoto {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.followerAvatar,
+.followingAvatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    margin-bottom: 5px;
+}
+
+.followerName,
+.followingName {
+    font-size: 11px;
+    text-align: center;
+    color: #eee;
+    max-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .profileHeader {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .socialSections {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .stats {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .followersGrid,
+    .followingGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:hover {
+    background: #e54a1f;
+    transform: translateY(-1px);
+}
