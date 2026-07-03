@@ -10,7 +10,7 @@ namespace ReviewAnythingAPI.Controllers;
 
 [ApiController]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[Controller]")]
+[Route("api/[Controller]")]
 public class LogController : ControllerBase
 {
     private readonly ILogger<LogController> _logger;
