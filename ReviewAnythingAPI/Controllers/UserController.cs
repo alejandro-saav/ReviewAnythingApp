@@ -13,7 +13,7 @@ namespace ReviewAnythingAPI.Controllers;
 [ApiController]
 [Produces("application/json")]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[Controller]")]
+[Route("api/[Controller]")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;

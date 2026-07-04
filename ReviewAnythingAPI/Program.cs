@@ -44,13 +44,12 @@ builder.Services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.ReportApiVersions = true;
     options.ApiVersionReader = ApiVersionReader.Combine(
-        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-Api-Version"),
         new QueryStringApiVersionReader("api-version")
     );
 }).AddApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV";
-    options.SubstituteApiVersionInUrl = true;
 });
 
 // Adding swagger configuration
@@ -285,13 +284,13 @@ if (app.Environment.IsDevelopment())
     // var categoryIds = await db.Categories.Select(c => c.CategoryId).ToListAsync();
     //
     // await seeder.SeedReviewsAsync(reviewJson, userIds, categoryIds, 1000);
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ReviewAnything API v1");
-        options.RoutePrefix = string.Empty;
-    });
 }
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "ReviewAnything API v1");
+    options.RoutePrefix = string.Empty;
+});
 
 
 // app.UseHttpsRedirection();

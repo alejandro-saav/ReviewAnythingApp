@@ -13,7 +13,7 @@ namespace ReviewAnythingAPI.Controllers;
 [ApiController]
 [Produces("application/json")]
 [ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route("api/[controller]")]
 public class CommentController : ControllerBase
 {
     private readonly ICommentService _commentService;
