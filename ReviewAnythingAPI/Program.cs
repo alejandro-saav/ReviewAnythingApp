@@ -21,9 +21,6 @@ using ReviewAnythingAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enable Sentry Services
-builder.WebHost.UseSentry();
-
 // CORS Services
 var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 builder.Services.AddCors(options =>
@@ -243,6 +240,8 @@ builder.Services.AddAuthentication(options =>
 if (!builder.Environment.IsDevelopment())
 {
     builder.WebHost.UseUrls("http://*:80");
+    // Enable Sentry Services
+    builder.WebHost.UseSentry();
 }
 
 // builder.WebHost.ConfigureKestrel(options =>

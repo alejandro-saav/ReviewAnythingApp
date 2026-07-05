@@ -45,7 +45,7 @@ public class LogController : ControllerBase
 
         _logger.LogInformation("New visit log has been inserted. Log ID: {LogId}, at: {Time}", response.Id, DateTime.UtcNow.AddHours(-5));
 
-        return CreatedAtAction(nameof(GetLogByIdAsync), new { logId = response.Id }, response);
+        return CreatedAtAction(nameof(GetLogById), new { logId = response.Id }, response);
     }
 
 
@@ -61,7 +61,7 @@ public class LogController : ControllerBase
     [ProducesResponseType(typeof(RequestLog), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RequestLog), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(RequestLog), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetLogByIdAsync([FromRoute] int logId)
+    public async Task<IActionResult> GetLogById([FromRoute] int logId)
     {
         var response = await _logService.GetVisitLogByIdAsync(logId);
 
