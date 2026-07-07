@@ -10,12 +10,6 @@ namespace ReviewAnythingAPI.Controllers;
 [Route("api/[Controller]")]
 public class HealthController : ControllerBase
 {
-    [HttpGet("visit")]
-    public IActionResult TrackVisit()
-    {
-        return Ok();
-    }
-
     [HttpHead]
     public IActionResult WakeUp()
     {

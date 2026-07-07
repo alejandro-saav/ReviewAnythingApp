@@ -54,7 +54,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "ReviewAnythin API",
+        Title = "ReviewAnything API",
         Version = "v1",
         Description = """
         A RESTful API for the ReviewAnything platform, enabling full CRUD operations 
@@ -287,6 +287,10 @@ if (app.Environment.IsDevelopment())
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
+    options.HeadContent = $@"
+        <link rel='icon' type='image/png' href='data:image/png;base64,{SwaggerIconString.Str}' />
+    ";
+    options.DocumentTitle = "ReviewAnything API";
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "ReviewAnything API v1");
     options.RoutePrefix = string.Empty;
 });
