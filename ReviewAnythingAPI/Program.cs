@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(origins ?? ["https://reviewanything.site"])
         .WithMethods("GET", "POST", "PUT", "DELETE", "HEAD", "PATCH")
-        .WithHeaders("Content-Type", "Authorization", "X-Client-Type")
+        .WithHeaders("Content-Type", "Authorization", "X-Client-Type", "sentry-trace", "baggage")
         .AllowCredentials();
     });
 });
