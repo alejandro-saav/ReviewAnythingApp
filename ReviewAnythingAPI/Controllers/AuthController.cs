@@ -144,7 +144,7 @@ public class AuthController : ControllerBase
     /// <response code="500">Internal server error. Please try again.</response>
     [HttpGet("confirm-email")]
     [ProducesResponseType(typeof(SuccessAuthResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(SuccessAuthResponseDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
@@ -232,13 +232,13 @@ public class AuthController : ControllerBase
     /// Deletes the user account.
     /// </summary>
     /// <returns>A success boolean.</returns>
-    /// <response code="200">Account deletion successful. returns a success response.</response>
+    /// <response code="204">Account deletion successful. returns an empty response.</response>
     /// <response code="403">Unauthorized to perform the delete operation.</response>
     /// <response code="409">User does not exist.</response>
     /// <response code="500">Internal server error. Please try again.</response>
     [Authorize]
     [HttpDelete("delete-account")]
-    [ProducesResponseType(typeof(SuccessAuthResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(GenericResponseDto), StatusCodes.Status500InternalServerError)]

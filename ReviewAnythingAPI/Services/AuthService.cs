@@ -425,7 +425,7 @@ public class AuthService : IAuthService
         }
 
         var result = await _userManager.ResetPasswordAsync(user, token, request.Password);
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
             throw new Exception($"Something went wrong while reseting the user's password. Error: {result.Errors.First().Description}");
         }
